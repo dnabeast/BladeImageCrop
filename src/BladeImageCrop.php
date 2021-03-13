@@ -23,7 +23,6 @@ class BladeImageCrop
 		}
 
 		$this->alterImage($url, $dimensions, $offset);
-
 		$this->dispatchCompression($newImageUrl);
 
 		return '/uploads/'.trim($newImageUrl, '/');
@@ -87,7 +86,7 @@ class BladeImageCrop
 	public function dispatchCompression($newImageUrl)
 	{
 
-		if (config('shortpixel.active')){
+		if (config('bladeimagecrop.short_pixel_active')){
 			dispatch(function() use ( $newImageUrl ){
 				$from = public_path('uploads/'.$newImageUrl);
 				LaravelShortPixel::fromFiles($from, dirname($from));
