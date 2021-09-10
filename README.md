@@ -1,9 +1,5 @@
 # Blade Image Crop
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/dnabeast/bladeimagecrop.svg?style=flat-square)](https://packagist.org/packages/dnabeast/bladeimagecrop)
-[![Build Status](https://img.shields.io/travis/dnabeast/bladeimagecrop/master.svg?style=flat-square)](https://travis-ci.org/dnabeast/bladeimagecrop)
-[![Quality Score](https://img.shields.io/scrutinizer/g/dnabeast/bladeimagecrop.svg?style=flat-square)](https://scrutinizer-ci.com/g/dnabeast/bladeimagecrop)
-[![Total Downloads](https://img.shields.io/packagist/dt/dnabeast/bladeimagecrop.svg?style=flat-square)](https://packagist.org/packages/dnabeast/bladeimagecrop)
 
 ## About Blade Image Crop 2
 
