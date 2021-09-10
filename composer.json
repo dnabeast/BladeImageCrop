@@ -1,55 +1,52 @@
 {
-    "name": "dnabeast/bladeimagecrop",
-    "description": "Creates a blade component that grabs an image and resizes it and crops it to match the blade settings.",
-    "keywords": [
-        "dnabeast",
-        "bladeimagecrop"
-    ],
-    "homepage": "https://github.com/dnabeast/bladeimagecrop",
-    "license": "MIT",
-    "type": "library",
-    "authors": [
-        {
-            "name": "Dan Beeston",
-            "email": "dan@civicnet.com.au",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": "^7.3",
-        "davidcb/laravel-shortpixel": "^0.3.1",
-        "illuminate/support": "^7.0"
-    },
-    "require-dev": {
-        "orchestra/testbench": "^5.0",
-        "phpunit/phpunit": "^9.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "DNABeast\\BladeImageCrop\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "DNABeast\\BladeImageCrop\\Tests\\": "tests"
-        }
-    },
-    "scripts": {
-        "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+	"name": "dnabeast/bladeimagecrop",
+	"description": "Creates a blade component that grabs an image and resizes it and crops it to match the blade settings.",
+	"keywords": [
+		"dnabeast",
+		"bladeimagecrop"
+	],
+	"homepage": "https://github.com/dnabeast/bladeimagecrop",
+	"license": "MIT",
+	"type": "library",
+	"authors": [
+		{
+			"name": "Dan Beeston",
+			"email": "dan@civicnet.com.au",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": "^7.3|^8.0",
+		"shortpixel/shortpixel-php": "^1.7",
+		"illuminate/support": "^6.0|^7.0|^8.0"
+	},
+	"require-dev": {
+		"orchestra/testbench": "^6.0",
+		"phpunit/phpunit": "^9.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"DNABeast\\BladeImageCrop\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"DNABeast\\BladeImageCrop\\Tests\\": "tests"
+		}
+	},
+	"scripts": {
+		"test": "vendor/bin/phpunit",
+		"test-coverage": "vendor/bin/phpunit --coverage-html coverage"
 
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "DNABeast\\BladeImageCrop\\BladeImageCropServiceProvider"
-            ],
-            "aliases": {
-                "BladeImageCrop": "DNABeast\\BladeImageCrop\\BladeImageCropFacade"
-            }
-        }
-    }
+	},
+	"config": {
+		"sort-packages": true
+	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"DNABeast\\BladeImageCrop\\BladeImageCropServiceProvider"
+			]
+		}
+	}
 }

@@ -2,6 +2,9 @@
 
 namespace DNABeast\BladeImageCrop;
 
+use DNABeast\BladeImageCrop\View\Components\Img;
+use DNABeast\BladeImageCrop\View\Components\Pic;
+use DNABeast\BladeImageCrop\View\Components\Sources;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,41 +15,17 @@ class BladeImageCropServiceProvider extends ServiceProvider
 	 */
 	public function boot()
 	{
-		/*
-		 * Optional methods to load your package assets
-		 */
-		// $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'bladeimagecrop');
-		// $this->loadViewsFrom(__DIR__.'/../resources/views', 'bladeimagecrop');
-		// $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-		// $this->loadRoutesFrom(__DIR__.'/routes.php');
+
+		Blade::component('sources', Sources::class);
+		Blade::component('img', Img::class);
+		Blade::component('pic', Pic::class);
 
 		if ($this->app->runningInConsole()) {
 			$this->publishes([
-				__DIR__.'/../config/config.php' => config_path('bladeimagecrop.php'),
+				__DIR__.'/../config/bladeimagecrop.php' => config_path('bladeimagecrop.php'),
 			], 'config');
-
-			// Publishing the views.
-			/*$this->publishes([
-				__DIR__.'/../resources/views' => resource_path('views/vendor/bladeimagecrop'),
-			], 'views');*/
-
-			// Publishing assets.
-			/*$this->publishes([
-				__DIR__.'/../resources/assets' => public_path('vendor/bladeimagecrop'),
-			], 'assets');*/
-
-			// Publishing the translation files.
-			/*$this->publishes([
-				__DIR__.'/../resources/lang' => resource_path('lang/vendor/bladeimagecrop'),
-			], 'lang');*/
-
-			// Registering package commands.
-			// $this->commands([]);
 		}
-		Blade::directive('image', function($options){
 
-			return "<?= app('DNABeast\BladeImageCrop\BladeImageCrop')->fire($options); ?>";
-		});
 	}
 
 	/**
@@ -55,11 +34,7 @@ class BladeImageCropServiceProvider extends ServiceProvider
 	public function register()
 	{
 		// Automatically apply the package configuration
-		$this->mergeConfigFrom(__DIR__.'/../config/config.php', 'bladeimagecrop');
+		$this->mergeConfigFrom(__DIR__.'/../config/bladeimagecrop.php', 'bladeimagecrop');
 
-		// Register the main class to use with the facade
-		$this->app->singleton('bladeimagecrop', function () {
-			return new BladeImageCrop;
-		});
 	}
 }

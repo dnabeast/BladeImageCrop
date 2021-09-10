@@ -3,95 +3,102 @@
 namespace DNABeast\BladeImageCrop;
 
 use Davidcb\LaravelShortPixel\Facades\LaravelShortPixel;
-
 use Illuminate\Support\Facades\Storage;
 
 class BladeImageCrop
 {
 
-	public function fire($url, $dimensions, $offset = [50, 50])
+	public function fire($url, $dimensions, $offset = ['x'=>50, 'y'=>50], $format = 'jpg')
 	{
 
-		if (!Storage::disk('uploads')->has($url)){
-			return 'imageNotFound';
+		$url = trim($url, "/");
+
+		if (!Storage::disk( config('bladeimagecrop.disk') )->has($url)){
+			if (!\App::environment(['local'])) {
+				return 'IMAGENOTFOUND';
+			}
+			return 'IMAGENOTFOUND-'.Storage::disk( config('bladeimagecrop.disk') )->path($url);
 		}
 
-		$newImageUrl = $this->updateUrl($url, $dimensions, $offset);
+		$newImageUrl = $this->updateUrl($url, $dimensions, $offset, $format);
 
-		if (Storage::disk('uploads')->has($newImageUrl)){
-			return '/uploads/'.$newImageUrl;
+		if (Storage::disk( config('bladeimagecrop.disk') )->has($newImageUrl)){
+			return $newImageUrl;
 		}
 
-		$this->alterImage($url, $dimensions, $offset);
-		$this->dispatchCompression($newImageUrl);
+		$this->alterImage($url, $dimensions, $offset, $format);
 
-		return '/uploads/'.trim($newImageUrl, '/');
+		return $newImageUrl;
 	}
 
-	public function updateUrl($url, $dimensions, $offset)
+	public function updateUrl($url, $dimensions, $offset, $format)
 	{
+
 		$segments = collect(explode('/',$url));
 		$filename = $segments->pop();
 
-		return $segments->implode('/')
+		$path = '/'.$segments->implode('/')
 		.'/'.str_replace('.', '_', $filename)
 		.'/'.implode('x', $dimensions)
 		.'_'.implode('_', $offset)
-		.'.jpg';
+		.'.'.$format;
+
+		return str_replace("//", "/", $path);
 
 	}
 
-	public function alterImage($url, $dimensions, $offset)
+	public function alterImage($url, $dimensions, $offset, $format)
 	{
 
-		$imageString = Storage::disk('uploads')->get($url);
+		$imageString = Storage::disk( config('bladeimagecrop.disk') )->get($url);
 		$data = getimagesizefromstring($imageString);
+
 
 		$originalWidth = $data[0];
 		$originalHeight = $data[1];
 		$originalRatio = $originalWidth/$originalHeight;
 
-		$newRatio = $dimensions[0]/$dimensions[1];
-		$maxOriginalWidth = (50-abs($offset[0]-50))/100*$originalWidth*2;
-		$maxOriginalHeight = (50-abs($offset[1]-50))/100*$originalHeight*2;
+		$newRatio = $dimensions['width']/$dimensions['height'];
 
-		if ($originalRatio < $newRatio){ // trim top and bottom
+		$maxOriginalWidth  = (50-abs($offset['x']-50))/100*$originalWidth*2;
+		$maxOriginalHeight = (50-abs($offset['y']-50))/100*$originalHeight*2;
+
+
+		// There are two possibilities. When the crop is wide enough to reach the edge it's not tall enough to reach to top/bottom OR vise-verse
+		if ($maxOriginalWidth < $maxOriginalHeight*$newRatio){
 			$newWidth = $maxOriginalWidth;
 			$newHeight = $maxOriginalWidth/$newRatio;
-		} else { // trim left and right
+		} else {
 			$newWidth = $maxOriginalHeight*$newRatio;
 			$newHeight = $maxOriginalHeight;
 		}
 
 
-		$newX = (int) round($originalWidth*($offset[0]/100) - ($newWidth/2));
-		$newY = (int) round($originalHeight*($offset[1]/100) - ($newHeight/2));
+		$newX = (int) round($originalWidth *($offset['x']/100) - ($newWidth/2));
+		$newY = (int) round($originalHeight*($offset['y']/100) - ($newHeight/2));
 
 		$options = ['x' => $newX, 'y' => $newY, 'width' => (int) round($newWidth), 'height' => (int) round($newHeight)];
 
-		$im2 = imagecreatefromstring($imageString);
-		$image = imagecrop($im2, $options);
-		$image_destination = imagecreatetruecolor($dimensions[0], $dimensions[1]);
-		imagecopyresampled($image_destination, $image, 0,0,0,0, $dimensions[0], $dimensions[1], $newWidth, $newHeight);
 
-		ob_start();
-			imageJpeg($image_destination, null, 75);
-			$data = ob_get_contents();
-		ob_end_clean();
+		$originalImage = imagecreatefromstring($imageString);
+		$image = imagecrop($originalImage, $options);
 
-		Storage::disk('uploads')->put($this->updateUrl($url, $dimensions, $offset), $data);
-		imagedestroy($im2);
-	}
+		$image_destination = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
+		imagecopyresampled($image_destination, $image, 0,0,0,0, $dimensions['width'], $dimensions['height'], $newWidth, $newHeight);
 
-	public function dispatchCompression($newImageUrl)
-	{
+		$uri = $this->updateUrl($url, $dimensions, $offset, $format);
 
-		if (config('bladeimagecrop.short_pixel_active')){
-			dispatch(function() use ( $newImageUrl ){
-				$from = public_path('uploads/'.$newImageUrl);
-				LaravelShortPixel::fromFiles($from, dirname($from));
-			});
+		if (config('bladeimagecrop.text_labels')){
+			$text_color = imagecolorallocate($image_destination, 0, 0, 0);
+			imagestring($image_destination, 1, 4, 6, $uri , $text_color);
+			$text_color = imagecolorallocate($image_destination, 255, 255, 255);
+			imagestring($image_destination, 1, 5, 5, $uri, $text_color);
 		}
 
+		(new ImageBuilder)->create($image_destination, $uri, $format);
+
+		imagedestroy($originalImage);
 	}
+
+
 }
