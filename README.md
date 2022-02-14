@@ -104,7 +104,7 @@ In this instance you might want your images to be 300px wide and 180px tall.
 This would trim the top and bottom off the image. (or if the original has a wider aspect ratio, the left and right) This is great for if you have multiple original images with different sizes and shapes but you want your site images to be identical.
 
 #### Creating varying versions for different sizes and shapes
-Instead of having different DPI settings you could specific the sizes (and shapes). The resulting code would no longer use DPI multipliers and would instead set pixel width versions.
+Instead of having different DPI settings you could specify the sizes (and shapes). The resulting code would no longer use DPI multipliers and would instead set pixel width versions.
 ```blade
 <x-img src="/storage/overlyLargeImage.jpg" :properties="[[300, 180], [1024, 300], 2048]" class="" alt="" />
 ```

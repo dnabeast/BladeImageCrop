@@ -52,11 +52,11 @@ class PicTest extends TestCase
 	/** @test */
 	function provide_pic_tag_and_get_html(){
 		$result = $this->blade('<x-pic  src="/img/OverlyLargeImage.png"  width="320" class="m-1" alt="Description of Image"/>');
-		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAL0lEQVQImQXBgQ2AIAADwf8m4v6j4DTOYpBy5zsfI9C9Q/z+RWIS9b4GgIa2ANAedCUNUwoQpH0AAAAASUVORK5CYII=";
+		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMElEQVQImSXBwQ3AIAADscsh1P1HYRtmqQTpo3b2WlGg94q+56AZwyTPnAFAWn7tB2uJDFbK7Ql/AAAAAElFTkSuQmCC";
 
 		$expected = <<<EOT
 		<source type="image/webp" srcset="/img/OverlyLargeImage_png/320x240_50_50.webp 1x,/img/OverlyLargeImage_png/640x480_50_50.webp 2x">
-		<source type="image/jpeg" srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x">	<img  style="background-size: 100% 100%; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAL0lEQVQImQXBgQ2AIAADwf8m4v6j4DTOYpBy5zsfI9C9Q/z+RWIS9b4GgIa2ANAedCUNUwoQpH0AAAAASUVORK5CYII=')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
+		<source type="image/jpeg" srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x">	<img  style="background-size: 100% 100%; background-image: url('data:image/png;base64,{$base64}')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
 		EOT;
 
 		$result->assertSee($expected, false);

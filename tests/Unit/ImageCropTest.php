@@ -45,7 +45,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'imageNotFound',
+			'IMAGENOTFOUND',
 			$newImageUrl
 		);
 
@@ -184,6 +184,25 @@ class ImageCropTest extends TestCase
 		$this->assertEquals(
 			'/cater_jpg/800x600_50_50.jpg',
 			$result
+		);
+	}
+
+	/** @test */
+	function if_file_has_directory_but_is_not_a_file_it_should_return_image_not_found(){
+		Config::set('bladeimagecrop.disk', 'uploads');
+		Config::set('bladeimagecrop.images_from_public_path', true);
+
+		$url = 'uploads/';
+		$dimensions = [400, 300];
+
+		Storage::fake('uploads');
+		Storage::disk('uploads')->put($url.'test.txt', 'test');
+
+		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+
+		$this->assertEquals(
+			'IMAGENOTFOUND',
+			$newImageUrl
 		);
 	}
 

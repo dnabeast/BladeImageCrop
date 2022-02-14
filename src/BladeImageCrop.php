@@ -13,7 +13,7 @@ class BladeImageCrop
 
 		$url = trim($url, "/");
 
-		if (!Storage::disk( config('bladeimagecrop.disk') )->has($url)){
+		if ($this->fileNotFound($url)){
 			if (!\App::environment(['local'])) {
 				return 'IMAGENOTFOUND';
 			}
@@ -29,6 +29,11 @@ class BladeImageCrop
 		$this->alterImage($url, $dimensions, $offset, $format);
 
 		return $newImageUrl;
+	}
+
+	public function fileNotFound($url){
+		return !Storage::disk( config('bladeimagecrop.disk') )->has($url)
+			|| Storage::disk( config('bladeimagecrop.disk') )->getMetadata($url)['type'] != 'file';
 	}
 
 	public function updateUrl($url, $dimensions, $offset, $format)
