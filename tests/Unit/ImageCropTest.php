@@ -188,15 +188,33 @@ class ImageCropTest extends TestCase
 	}
 
 	/** @test */
-	function if_file_has_directory_but_is_not_a_file_it_should_return_image_not_found(){
+	function if_url_has_directory_but_is_not_a_file_it_should_return_image_not_found(){
 		Config::set('bladeimagecrop.disk', 'uploads');
 		Config::set('bladeimagecrop.images_from_public_path', true);
 
 		$url = 'uploads/';
-		$dimensions = [400, 300];
+		$dimensions = ['width'=>400,'height'=>300];
 
 		Storage::fake('uploads');
 		Storage::disk('uploads')->put($url.'test.txt', 'test');
+
+		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+
+		$this->assertEquals(
+			'IMAGENOTFOUND',
+			$newImageUrl
+		);
+	}
+
+	/** @test */
+	function if_file_has_no_extensions_should_return_image_not_found(){
+		$url = 'banners/page/caterjpg';
+		$dimensions = ['width'=>400,'height'=>300];
+		$image = file_get_contents(__DIR__.'/uploads/banners/page/cater.jpg');
+
+		Storage::fake('public');
+		Storage::disk('public')->put($url, $image);
+		Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
 
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 

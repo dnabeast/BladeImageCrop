@@ -33,7 +33,8 @@ class BladeImageCrop
 
 	public function fileNotFound($url){
 		return !Storage::disk( config('bladeimagecrop.disk') )->has($url)
-			|| Storage::disk( config('bladeimagecrop.disk') )->getMetadata($url)['type'] != 'file';
+			|| Storage::disk( config('bladeimagecrop.disk') )->getMetadata($url)['type'] != 'file'
+			|| pathinfo(Storage::disk( config('bladeimagecrop.disk') )->url($url), PATHINFO_EXTENSION) === '';
 	}
 
 	public function updateUrl($url, $dimensions, $offset, $format)
