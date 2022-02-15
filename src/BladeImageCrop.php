@@ -13,7 +13,7 @@ class BladeImageCrop
 
 		$url = trim($url, "/");
 
-		if ($this->fileNotFound($url)){
+		if ($this->fileNotImage($url)){
 			if (!\App::environment(['local'])) {
 				return 'IMAGENOTFOUND';
 			}
@@ -31,7 +31,7 @@ class BladeImageCrop
 		return $newImageUrl;
 	}
 
-	public function fileNotFound($url){
+	public function fileNotImage($url){
 		return !Storage::disk( config('bladeimagecrop.disk') )->has($url)
 			|| Storage::disk( config('bladeimagecrop.disk') )->getMetadata($url)['type'] != 'file'
 			|| pathinfo(Storage::disk( config('bladeimagecrop.disk') )->url($url), PATHINFO_EXTENSION) === '';
