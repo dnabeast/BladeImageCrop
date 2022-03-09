@@ -233,13 +233,13 @@ class ImageCropTest extends TestCase
 		Storage::fake('public');
 		Storage::disk('public')->put($url, $image);
 
-		$this->assertTrue(
+		$this->assertFalse(
 			(new BladeImageCrop)->fileNotImage($url),
 		);
 
 		Storage::disk('public')->put($url, 'abc');
 
-		$this->assertFalse(
+		$this->assertTrue(
 			(new BladeImageCrop)->fileNotImage($url),
 		);
 	}

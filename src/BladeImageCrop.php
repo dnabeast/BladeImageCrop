@@ -34,7 +34,7 @@ class BladeImageCrop
 	public function fileNotImage($url){
 
 		return !Storage::disk( config('bladeimagecrop.disk') )->has($url)
-			|| in_array(
+			|| !in_array(
 				Storage::disk( config('bladeimagecrop.disk') )->mimeType($url),
 				['image/jpeg', 'image/png', 'image/webp']
 			)
