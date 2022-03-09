@@ -22,7 +22,6 @@ class ImageCropTest extends TestCase
 				'jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder',
 				'webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder'
 			]
-
 		]);
 		$path = __DIR__;
 		Config::set('filesystems.disks.public', [
@@ -221,6 +220,27 @@ class ImageCropTest extends TestCase
 		$this->assertEquals(
 			'IMAGENOTFOUND',
 			$newImageUrl
+		);
+	}
+
+	/** @test */
+	function if_file_is_not_an_image_return_false(){
+
+		$url = 'banners/page/cater.jpg';
+
+		$image = file_get_contents(__DIR__.'/uploads/banners/page/cater.jpg');
+
+		Storage::fake('public');
+		Storage::disk('public')->put($url, $image);
+
+		$this->assertTrue(
+			(new BladeImageCrop)->fileNotImage($url),
+		);
+
+		Storage::disk('public')->put($url, 'abc');
+
+		$this->assertFalse(
+			(new BladeImageCrop)->fileNotImage($url),
 		);
 	}
 
