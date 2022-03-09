@@ -52,7 +52,7 @@ class PicTest extends TestCase
 	/** @test */
 	function provide_pic_tag_and_get_html(){
 		$result = $this->blade('<x-pic  src="/img/OverlyLargeImage.png"  width="320" class="m-1" alt="Description of Image"/>');
-		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMElEQVQImSXBwQ3AIAADscsh1P1HYRtmqQTpo3b2WlGg94q+56AZwyTPnAFAWn7tB2uJDFbK7Ql/AAAAAElFTkSuQmCC";
+		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMElEQVQImSXBwQ3AIBAEsZkVIf23Qje0ggKXB7ZzDBKAc4Kub6MmTX37A1DVKCiuH1lyC1aRmduXAAAAAElFTkSuQmCC";
 
 		$expected = <<<EOT
 		<source type="image/webp" srcset="/img/OverlyLargeImage_png/320x240_50_50.webp 1x,/img/OverlyLargeImage_png/640x480_50_50.webp 2x">

@@ -42,7 +42,7 @@ class ImgTest extends TestCase
 			'root' => __DIR__,
 		]);
 
-		$this->base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMElEQVQImSXBwQ3AIAADscsh1P1HYRtmqQTpo3b2WlGg94q+56AZwyTPnAFAWn7tB2uJDFbK7Ql/AAAAAElFTkSuQmCC';
+		$this->base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMElEQVQImSXBwQ3AIBAEsZkVIf23Qje0ggKXB7ZzDBKAc4Kub6MmTX37A1DVKCiuH1lyC1aRmduXAAAAAElFTkSuQmCC";
 
 	}
 
@@ -85,7 +85,7 @@ class ImgTest extends TestCase
 	/** @test */
 	function give_properties_and_see_them_in_the_result(){
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png" :properties="[300, 200, 60]"  width="320" class="m-1" alt="Description of Image"/>');
-		$base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAL0lEQVQImS3GwQnAIBQFsHwpiPvP4jBuUkV4vTSn1JqzCKS9e597IZ7Re4DS/iE+2UgOPJtAnhUAAAAASUVORK5CYII=';
+		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAJElEQVQImWO8tW0bAwT8/8/0/efPX79/Q7gsnOzsDDDAxIAEAJV6Cj4f17vYAAAAAElFTkSuQmCC";
 		$expected = <<<EOT
 		<img srcset="/img/OverlyLargeImage_png/300x200_60_50.jpg 1x,/img/OverlyLargeImage_png/600x400_60_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,{$base64}')" src="/img/OverlyLargeImage_png/300x200_60_50.jpg" width="300" height="200" class="m-1" alt="Description of Image">
 		EOT;
@@ -101,7 +101,7 @@ class ImgTest extends TestCase
 
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320"/>');
 
-		$base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAALElEQVQImWO8vnnz958/mZmYONjZWZiYmLg5ORkYGBgYGJgYkADL/z9/4BwAJGQIabDDTm8AAAAASUVORK5CYII=';
+		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAL0lEQVQImWO8vmXLj58/mRiZODnYWZiZmLg5ORkYGBgYGFj+///PAAMsDH/+wjkAYRkKbqFozcMAAAAASUVORK5CYII=";
 
 
 		$expected = <<<EOT

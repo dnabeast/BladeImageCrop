@@ -36,7 +36,7 @@ class BackgroundTest extends TestCase
 
 	/** @test */
 	function src_of_image_returns_svg_string(){
-		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAP0lEQVQImQE0AMv/ASsuCUorHmhoSfct/gT38//98f3p3PUFDQEDDg0HDAUBA/8A/f0UBAYDEA8aKuj/Egf3GCRIE53LsvHrAAAAAElFTkSuQmCC";
+		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAP0lEQVQImQE0AMv/ASsvCUoqH2lpSPcs/wT38wD98vzo2/UGDQIDDg0HDAUBA/8B/fwUBAYDEA8aKun/Egf4GADOEqIfhaDkAAAAAElFTkSuQmCC";
 
 		$expected = 'style="background-size: 100% 100%; background-image: url(\'data:image/png;base64,'.$base64.'\')"';
 		$src = 'uploads/banners/page/cater.jpg';
