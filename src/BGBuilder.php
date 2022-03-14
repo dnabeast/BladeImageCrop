@@ -33,6 +33,10 @@ class BGBuilder extends BGTypeBuilder
 		} catch (\Exception $e) {
 			return 'MissingBGImage';
 		}
+		if (!$imageString) {
+			return 'MissingBGImage';
+		}
+
 		$newImage = imagecreatetruecolor($newWidth, $newHeight);
 		$image = imagecreatefromstring($imageString);
 		imagecopyresampled( $newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image) );

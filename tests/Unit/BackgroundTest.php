@@ -49,4 +49,19 @@ class BackgroundTest extends TestCase
 		);
 
 	}
+
+	/** @test */
+	function empty_source_returns_image_not_found(){
+		$base64 = "MissingBGImage";
+
+		$expected = 'style="background-size: 100% 100%; background-image: url(\'data:image/png;base64,'.$base64.'\')"';
+		$src = 'uploads/banners/';
+
+		$result = (new Background($src))->render();
+
+		$this->assertEquals(
+			$expected,
+			$result
+		);
+	}
 }
