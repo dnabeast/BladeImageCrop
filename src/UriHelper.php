@@ -25,16 +25,16 @@ class UriHelper
 	}
 
 	public function trim($src){
+
 		if (!config('bladeimagecrop.images_from_public_path')){
 			return trim($src, '/');
 		}
-		$url = Storage::disk(config('bladeimagecrop.disk') )->url('/');
-		$diskDirectory = str_replace(env('APP_URL'), "", $url);
-		$diskDirectory = ltrim($diskDirectory, '/');
 
-		$src = trim($src, '/');
+		$diskUrl = Storage::disk( config('bladeimagecrop.disk') )->url('/');
+		$diskDirectory = trim( str_replace( trim( config('app.env') , '/' ), '', $diskUrl), '/');
 
-		return ltrim($src, $diskDirectory);
+		return trim( preg_replace('/^'.$diskDirectory.'/', '', trim($src, '/')), '/');
 
 	}
+
 }

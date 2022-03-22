@@ -19,6 +19,7 @@ class ImgTest extends TestCase
 		parent::setUp();
 
 		Blade::component('img', Img::class);
+		Config::set('app.env', 'http://test.com');
 
 		Config::set('bladeimagecrop', [
 			'disk' => 'public',
@@ -40,6 +41,8 @@ class ImgTest extends TestCase
 		Config::set('filesystems.disks.public', [
 			'driver' => 'local',
 			'root' => __DIR__,
+			'url' => 'http://test.com/public'
+
 		]);
 
 		$this->base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMElEQVQImSXBwQ3AIBAEsZkVIf23Qje0ggKXB7ZzDBKAc4Kub6MmTX37A1DVKCiuH1lyC1aRmduXAAAAAElFTkSuQmCC";

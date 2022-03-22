@@ -13,6 +13,7 @@ class BladeImageCrop
 
 		$url = trim($url, "/");
 
+
 		if ($this->fileNotImage($url)){
 			if (!\App::environment(['local'])) {
 				return 'IMAGENOTFOUND';

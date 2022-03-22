@@ -13,10 +13,13 @@ class UriHelperTest extends TestCase
 	{
 		parent::setUp();
 		Config::set('bladeimagecrop.disk', 'public');
+		Config::set('app.env', 'http://test.com');
+
 		$path = __DIR__;
 		Config::set('filesystems.disks.public', [
 			'driver' => 'local',
 			'root' => $path,
+			'url' => 'http://test.com/uploads'
 		]);
 		$this->uri = "uploads/temp/image.jpg";
 	}
@@ -55,6 +58,20 @@ class UriHelperTest extends TestCase
 		$expected = __DIR__.'/uploads/temp/image.jpg';
 
 		$result = (new UriHelper)->path($this->uri);
+
+		$this->assertEquals(
+			$expected,
+			$result
+		);
+	}
+
+	/** @test */
+	function trim_storage_folder_from_uri(){
+		Config::set('bladeimagecrop.images_from_public_path', true);
+
+		$expected = 'temp/image.jpg';
+
+		$result = (new UriHelper)->trim('/uploads/temp/image.jpg');
 
 		$this->assertEquals(
 			$expected,
