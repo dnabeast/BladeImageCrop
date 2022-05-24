@@ -3,6 +3,7 @@
 namespace DNABeast\BladeImageCrop;
 
 use Davidcb\LaravelShortPixel\Facades\LaravelShortPixel;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 
 class BladeImageCrop
@@ -33,8 +34,13 @@ class BladeImageCrop
 	}
 
 	public function fileNotImage($url){
+		if (method_exists((new Filesystem), 'fileExists')){
+			$fileExists = Storage::disk( config('bladeimagecrop.disk') )->fileExists($url);
+		} else {
+			$fileExists = Storage::disk( config('bladeimagecrop.disk') )->has($url);
+		}
 
-		return !Storage::disk( config('bladeimagecrop.disk') )->has($url)
+		return !$fileExists
 			|| !in_array(
 				Storage::disk( config('bladeimagecrop.disk') )->mimeType($url),
 				['image/jpeg', 'image/png', 'image/webp']
