@@ -34,10 +34,12 @@ class BladeImageCrop
 	}
 
 	public function fileNotImage($url){
-		if (method_exists((new Filesystem), 'fileExists')){
-			$fileExists = Storage::disk( config('bladeimagecrop.disk') )->fileExists($url);
+		$disk = Storage::disk( config('bladeimagecrop.disk') );
+
+		if (method_exists($disk, 'fileExists')){
+			$fileExists = $disk->fileExists($url);
 		} else {
-			$fileExists = Storage::disk( config('bladeimagecrop.disk') )->has($url);
+			$fileExists = $disk->has($url);
 		}
 
 		return !$fileExists
