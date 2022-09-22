@@ -35,18 +35,25 @@ class BackgroundTest extends TestCase
 	}
 
 	/** @test */
-	function src_of_image_returns_svg_string(){
+	function src_of_image_returns_png_string(){
 		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAP0lEQVQImQE0AMv/ASsvCUoqH2lpSPcs/wT38wD98vzo2/UGDQIDDg0HDAUBA/8B/fwUBAYDEA8aKun/Egf4GADOEqIfhaDkAAAAAElFTkSuQmCC";
 
-		$expected = 'style="background-size: 100% 100%; background-image: url(\'data:image/png;base64,'.$base64.'\')"';
+		$expected = 'style="background-size: 100% 100%; background-image: url(\'data:image/png;base64,';
 		$src = 'uploads/banners/page/cater.jpg';
 
 		$result = (new Background($src))->render();
 
 		$this->assertEquals(
 			$expected,
-			$result
+			substr($result, 0, 80)
 		);
+
+		$this->assertEquals(
+			271,
+			strlen($result)
+		);
+
+
 
 	}
 

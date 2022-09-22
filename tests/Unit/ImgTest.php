@@ -55,11 +55,16 @@ class ImgTest extends TestCase
 
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320"/>');
 
-		$expected = <<<EOT
-		<img srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,{$this->base64}')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" >
+		$expectedBeginning = <<<EOT
+		<img srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
-		$result->assertSee($expected, false);
+		$expectedEnd = <<<EOT
+		')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" >
+		EOT;
+
+		$result->assertSee($expectedBeginning, false);
+		$result->assertSee($expectedEnd, false);
 	}
 
 	/** @test */
@@ -67,33 +72,50 @@ class ImgTest extends TestCase
 
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  :properties="[320]"/>');
 
-		$expected = <<<EOT
-		<img srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,{$this->base64}')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" >
+
+		$expectedBeginning = <<<EOT
+		<img srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
-		$result->assertSee($expected, false);
+		$expectedEnd = <<<EOT
+		')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" >
+		EOT;
+
+		$result->assertSee($expectedBeginning, false);
+		$result->assertSee($expectedEnd, false);
 	}
 
 	/** @test */
 	function give_class_and_alt_tag_and_see_them_in_the_result(){
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320" class="m-1" alt="Description of Image"/>');
 
-		$expected = <<<EOT
-		<img srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,{$this->base64}')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
+		$expectedBeginning = <<<EOT
+		<img srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
-		$result->assertSee($expected, false);
+		$expectedEnd = <<<EOT
+		')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
+		EOT;
+
+		$result->assertSee($expectedBeginning, false);
+		$result->assertSee($expectedEnd, false);
 	}
 
 	/** @test */
 	function give_properties_and_see_them_in_the_result(){
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png" :properties="[300, 200, 60]"  width="320" class="m-1" alt="Description of Image"/>');
 		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAJElEQVQImWO8tW0bAwT8/8/0/efPX79/Q7gsnOzsDDDAxIAEAJV6Cj4f17vYAAAAAElFTkSuQmCC";
-		$expected = <<<EOT
-		<img srcset="/img/OverlyLargeImage_png/300x200_60_50.jpg 1x,/img/OverlyLargeImage_png/600x400_60_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,{$base64}')" src="/img/OverlyLargeImage_png/300x200_60_50.jpg" width="300" height="200" class="m-1" alt="Description of Image">
+
+		$expectedBeginning = <<<EOT
+		<img srcset="/img/OverlyLargeImage_png/300x200_60_50.jpg 1x,/img/OverlyLargeImage_png/600x400_60_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
-		$result->assertSee($expected, false);
+		$expectedEnd = <<<EOT
+		')" src="/img/OverlyLargeImage_png/300x200_60_50.jpg" width="300" height="200" class="m-1" alt="Description of Image">
+		EOT;
+
+		$result->assertSee($expectedBeginning, false);
+		$result->assertSee($expectedEnd, false);
 	}
 
 	/** @test */
