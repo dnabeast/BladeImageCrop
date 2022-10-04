@@ -2,7 +2,6 @@
 
 namespace DNABeast\BladeImageCrop\View\Components;
 
-use DNABeast\BladeImageCrop\UriHelper;
 use Illuminate\View\Component;
 
 
@@ -15,9 +14,7 @@ class Pic extends Component
 
 	public function __construct($src, $width=null, $properties=null)
 	{
-		$this->uri = new UriHelper;
-		$this->uri->trim($src);
-		$this->src = trim($src, "/");
+		$this->src = $src;
 		$this->properties = $properties??$width;
 	}
 

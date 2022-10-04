@@ -4,17 +4,17 @@ namespace DNABeast\BladeImageCrop;
 
 use Davidcb\LaravelShortPixel\Facades\LaravelShortPixel;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Dimensions;
+use Imagick;
 
 class BladeImageCrop
 {
 
 	public function fire($url, $dimensions, $offset = ['x'=>50, 'y'=>50], $format = 'jpg')
 	{
-
-		$url = trim($url, "/");
-
-
 		if ($this->fileNotImage($url)){
 			if (!\App::environment(['local'])) {
 				return 'IMAGENOTFOUND';
@@ -69,9 +69,19 @@ class BladeImageCrop
 	public function alterImage($url, $dimensions, $offset, $format)
 	{
 
-		$imageString = Storage::disk( config('bladeimagecrop.disk') )->get($url);
-		$data = getimagesizefromstring($imageString);
+		$blob = Storage::disk( config('bladeimagecrop.disk') )->get($url);
 
+		$data = getimagesizefromstring($blob);
+
+		$options = $this->options($data, $dimensions, $offset);
+
+		$uri = $this->updateUrl($url, $dimensions, $offset, $format);
+
+		(new ImageBuilder($blob, $format))->resize($options)->save($uri);
+
+	}
+
+	public function options($data, $dimensions, $offset){
 
 		$originalWidth = $data[0];
 		$originalHeight = $data[1];
@@ -82,7 +92,6 @@ class BladeImageCrop
 		$maxOriginalWidth  = (50-abs($offset['x']-50))/100*$originalWidth*2;
 		$maxOriginalHeight = (50-abs($offset['y']-50))/100*$originalHeight*2;
 
-
 		// There are two possibilities. When the crop is wide enough to reach the edge it's not tall enough to reach to top/bottom OR vise-verse
 		if ($maxOriginalWidth < $maxOriginalHeight*$newRatio){
 			$newWidth = $maxOriginalWidth;
@@ -92,31 +101,22 @@ class BladeImageCrop
 			$newHeight = $maxOriginalHeight;
 		}
 
-
 		$newX = (int) round($originalWidth *($offset['x']/100) - ($newWidth/2));
 		$newY = (int) round($originalHeight*($offset['y']/100) - ($newHeight/2));
 
-		$options = ['x' => $newX, 'y' => $newY, 'width' => (int) round($newWidth), 'height' => (int) round($newHeight)];
+		$biggerThanOriginal = $dimensions['width'] > (int) round($newWidth) || $dimensions['height'] > (int) round($newHeight);
 
+		$targetWidth = $biggerThanOriginal?round($newWidth):$dimensions['width'];
+		$targetHeight = $biggerThanOriginal?round($newHeight):$dimensions['height'];
 
-		$originalImage = imagecreatefromstring($imageString);
-		$image = imagecrop($originalImage, $options);
-
-		$image_destination = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
-		imagecopyresampled($image_destination, $image, 0,0,0,0, $dimensions['width'], $dimensions['height'], $newWidth, $newHeight);
-
-		$uri = $this->updateUrl($url, $dimensions, $offset, $format);
-
-		if (config('bladeimagecrop.text_labels')){
-			$text_color = imagecolorallocate($image_destination, 0, 0, 0);
-			imagestring($image_destination, 1, 4, 6, $uri , $text_color);
-			$text_color = imagecolorallocate($image_destination, 255, 255, 255);
-			imagestring($image_destination, 1, 5, 5, $uri, $text_color);
-		}
-
-		(new ImageBuilder)->create($image_destination, $uri, $format);
-
-		imagedestroy($originalImage);
+		return [
+			'x' => $newX,
+			'y' => $newY,
+			'cropWidth' => (int) round($newWidth),
+			'cropHeight' => (int) round($newHeight),
+			'targetWidth' => (int) $targetWidth,
+			'targetHeight' => (int) $targetHeight,
+		];
 	}
 
 

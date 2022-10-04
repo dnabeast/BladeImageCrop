@@ -17,7 +17,7 @@ class ImageBuilderTest extends TestCase
 
 	/** @test */
 	function creates_and_saves_a_jpeg_image(){
-		Config::set('bladeimagecrop.build_classes', ['jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder']);
+		Config::set('bladeimagecrop.build_classes', ['jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder']);
 		Config::set('bladeimagecrop.disk', 'storage');
 		$path = __DIR__;
 		Config::set('filesystems.disks.storage', [
@@ -31,7 +31,12 @@ class ImageBuilderTest extends TestCase
 		$magenta = imagecolorallocate($image, 255, 0, 255);
 		imagefill($image, 10, 10, $magenta);
 
-		(new ImageBuilder)->create($image, $uri, $format);
+		ob_start();
+		imagepng($image);
+		$blob = ob_get_contents(); // read from buffer
+		ob_end_clean(); // delete buffer
+
+		(new ImageBuilder($blob, 'jpg'))->save($uri);
 
 		imagedestroy($image);
 
@@ -46,7 +51,7 @@ class ImageBuilderTest extends TestCase
 
 	/** @test */
 	function creates_and_saves_a_webp_image(){
-		Config::set('bladeimagecrop.build_classes', ['webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder']);
+		Config::set('bladeimagecrop.build_classes', ['webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder']);
 		Config::set('bladeimagecrop.disk', 'storage');
 		$path = __DIR__;
 		Config::set('filesystems.disks.storage', [
@@ -60,7 +65,12 @@ class ImageBuilderTest extends TestCase
 		$magenta = imagecolorallocate($image, 255, 0, 255);
 		imagefill($image, 10, 10, $magenta);
 
-		(new ImageBuilder)->create($image, $uri, $format);
+		ob_start();
+		imagepng($image);
+		$blob = ob_get_contents(); // read from buffer
+		ob_end_clean(); // delete buffer
+
+		(new ImageBuilder($blob, 'webp'))->save($uri);
 
 		imagedestroy($image);
 
@@ -72,6 +82,7 @@ class ImageBuilderTest extends TestCase
 		unlink(Storage::disk( config('bladeimagecrop.disk') )->path($uri));
 
 	}
+
 
 
 }

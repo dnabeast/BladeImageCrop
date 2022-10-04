@@ -3,9 +3,9 @@
 namespace DNABeast\BladeImageCrop\View\Components;
 
 use DNABeast\BladeImageCrop\Background;
+use DNABeast\BladeImageCrop\HoldImage;
 use DNABeast\BladeImageCrop\ImageProps;
 use DNABeast\BladeImageCrop\Source;
-use DNABeast\BladeImageCrop\UriHelper;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Component;
 
@@ -20,8 +20,7 @@ class Img extends Component
 
 	public function __construct($src, $width=null, $properties=null, $sources=null)
 	{
-		$this->uri = new UriHelper;
-		$this->src = $this->uri->trim($src);
+		$this->image = new HoldImage($src);
 		$this->sources = $sources=='false'?false:true;
 		$this->properties = $properties??$width;
 		$this->imageFormats = collect(array_keys(config('bladeimagecrop.build_classes')));
@@ -48,10 +47,10 @@ class Img extends Component
 
 	public function build(){
 
-		$format = (config('bladeimagecrop.build_classes'));
+		$format = config('bladeimagecrop.build_classes');
 
 		$options = [
-			'src' => $this->src,
+			'src' => $this->image->file(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
 			'properties' => $this->calculatedProperties(),
 			'pixelRatios' => isset($this->properties[0][1])?false:true
@@ -86,11 +85,11 @@ class Img extends Component
 
 	public function aspectFromImage(){
 		try {
-			$originalImage = getimagesize( $this->uri->path( $this->src ) );
+			$originalImage = getimagesize( $this->image->path() );
+			return $originalImage[1]/$originalImage[0];
 		} catch (\Exception $e) {
 			return 3/4; // default failed image shape
 		}
-		return round($originalImage[1]/$originalImage[0], 2);
 	}
 
 }

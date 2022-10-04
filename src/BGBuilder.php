@@ -3,8 +3,10 @@
 namespace DNABeast\BladeImageCrop;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
+use Imagick;
 
 
 class BGBuilder extends BGTypeBuilder
@@ -14,7 +16,6 @@ class BGBuilder extends BGTypeBuilder
 	public function __construct($src)
 	{
 		$this->src = $src;
-		$this->uri = new UriHelper;
 	}
 
 	public function make(){
@@ -29,7 +30,7 @@ class BGBuilder extends BGTypeBuilder
 		$newWidth = 4;
 		$newHeight = 4;
 		try {
-			$imageString = $this->uri->file( $this->src );
+			$imageString = Storage::disk( config('bladeimagecrop.disk') )->get( $this->src );
 		} catch (\Exception $e) {
 			return 'MissingBGImage';
 		}

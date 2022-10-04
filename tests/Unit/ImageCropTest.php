@@ -19,8 +19,8 @@ class ImageCropTest extends TestCase
 			'short_pixel_active' => env('BLADE_CROP_SHORTPIXEL', false),
 			'disk' => 'public',
 			'build_classes' => [
-				'jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder',
-				'webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder'
+				'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
+				'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder'
 			]
 		]);
 		$path = __DIR__;
@@ -28,18 +28,19 @@ class ImageCropTest extends TestCase
 			'driver' => 'local',
 			'root' => storage_path('app/public'),
 		]);
+
+		$this->app->bind('path.public', function() {
+			return str_replace("vendor/orchestra/testbench-core/laravel", "tests/Unit/storage", base_path());
+		});
 	}
 
 	/** @test */
-	function if_no_image_found_return_null(){
+	function if_no_image_found_return_imagenotfound(){
 
-		$url = 'banners/page/cater.jpg';
+		$url = 'uploads/banners/page/doesntexist.jpg';
 		$dimensions = [400, 300];
-		$image = file_get_contents(__DIR__.'/uploads/'.$url);
 
-		// $image = Storage::disk('tests')->get('Unit/uploads/'.$url);
-
-		Storage::fake('uploads');
+		Storage::fake('public');
 
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
@@ -54,9 +55,9 @@ class ImageCropTest extends TestCase
 	/** @test */
 	function if_correct_file_exists_return_file_url(){
 
-		$url = 'banners/page/cater.jpg';
+		$url = 'uploads/banners/page/cater.jpg';
 		$dimensions = ['width' => 400, 'height' => 300];
-		$image = file_get_contents(__DIR__.'/uploads/'.$url);
+		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$url);
 
 		Storage::fake('public');
 		Storage::disk('public')->put($url, $image);
@@ -64,12 +65,12 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/banners/page/cater_jpg/400x300_50_50.jpg',
+			'/uploads/banners/page/cater_jpg/400x300_50_50.jpg',
 			$newImageUrl
 		);
 
 		$this->assertTrue(
-			Storage::disk('public')->has('/banners/page/cater_jpg/400x300_50_50.jpg')
+			Storage::disk('public')->has('/uploads/banners/page/cater_jpg/400x300_50_50.jpg')
 		);
 
 	}
@@ -226,7 +227,8 @@ class ImageCropTest extends TestCase
 	/** @test */
 	function if_file_is_not_an_image_return_false(){
 
-		$url = 'banners/page/cater.jpg';
+		$url = 'uploads/banners/page/isImage.jpg';
+		$url2 = 'uploads/banners/page/isText.txt';
 
 		$image = file_get_contents(__DIR__.'/uploads/banners/page/cater.jpg');
 
@@ -237,11 +239,81 @@ class ImageCropTest extends TestCase
 			(new BladeImageCrop)->fileNotImage($url),
 		);
 
-		Storage::disk('public')->put($url, 'abc');
+		Storage::disk('public')->put($url2, 'This is some Text');
 
 		$this->assertTrue(
-			(new BladeImageCrop)->fileNotImage($url),
+			(new BladeImageCrop)->fileNotImage($url2),
 		);
 	}
+
+	/** @test */
+	function get_newly_calculated_size_options_for_the_builder(){
+		$data = [
+			1000,
+			800,
+		];
+
+		$dimensions = [
+			"width" => 400,
+			"height" => 300
+		];
+
+		$offset = [
+			'x' => 50,
+			'y' => 50
+ 		];
+
+		$expected = [
+			'x' => 0,
+			'y' => 25,
+			'cropWidth' => 1000,
+			'cropHeight' => 750,
+			'targetWidth' => 400,
+			'targetHeight' => 300
+		];
+
+
+		$result = (new BladeImageCrop)->options($data, $dimensions, $offset);
+
+		$this->assertEquals(
+			$expected,
+			$result
+		);
+	}
+
+	/** @test */
+	function dont_resize_image_if_target_is_bigger_than_original_image(){
+
+			$data = [
+				500,
+				250,
+			];
+
+			$dimensions = [
+				"width" => 1000,
+				"height" => 400
+			];
+
+			$offset = [
+				'x' => 50,
+				'y' => 50
+	 		];
+
+			$expected = [
+				'x' => 0,
+				'y' => 25,
+				'cropWidth' => 500,
+				'cropHeight' => 200,
+				'targetWidth' => 500,
+				'targetHeight' => 200
+			];
+
+			$result = (new BladeImageCrop)->options($data, $dimensions, $offset);
+
+			$this->assertEquals(
+				$expected,
+				$result
+			);
+		}
 
 }

@@ -54,12 +54,12 @@ class PicTest extends TestCase
 		$result = $this->blade('<x-pic  src="/img/OverlyLargeImage.png"  width="320" class="m-1" alt="Description of Image"/>');
 
 		$expectedBeginning = <<<EOT
-		<source type="image/webp" srcset="/img/OverlyLargeImage_png/320x240_50_50.webp 1x,/img/OverlyLargeImage_png/640x480_50_50.webp 2x">
-		<source type="image/jpeg" srcset="/img/OverlyLargeImage_png/320x240_50_50.jpg 1x,/img/OverlyLargeImage_png/640x480_50_50.jpg 2x">	<img  style="background-size: 100% 100%; background-image: url('data:image/png;base64,
+		<source type="image/webp" srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.webp 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.webp 2x">
+		<source type="image/jpeg" srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x">	<img  style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
 		$expectedEnd = <<<EOT
-		')" src="/img/OverlyLargeImage_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
+		')" src="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
 		EOT;
 
 		$result->assertSee($expectedBeginning, false);

@@ -3,6 +3,7 @@
 namespace DNABeast\BladeImageCrop;
 
 use DNABeast\BladeImageCrop\BladeImageCrop;
+use Str;
 
 class Source
 {
@@ -25,9 +26,11 @@ class Source
 	}
 
 	public function render(){
-		return <<<EOT
-		<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
-		EOT;
+		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
+			return <<<EOT
+			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
+			EOT;
+		}
 
 	}
 

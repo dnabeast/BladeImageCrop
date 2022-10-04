@@ -1,7 +1,7 @@
 # Blade Image Crop
 
 
-## About Blade Image Crop 2
+## About Blade Image Crop 3
 
 Use WebP without the headache. Provide alternate image sizes for your user's preferred display. Reference one image on your server then specify its dimensions in a blade component.
 
@@ -15,7 +15,7 @@ It supports
 - webp with jpeg as a fallback (In a picture tag)
 - Inline backgrounds that display first on slow connections
 - Mobile and desktop versions
-
+- local AND online images
 
 ## Installation
 
@@ -39,21 +39,13 @@ Or make whatever changes you wish to the storage. (more info below)
 
 ## Upgrade Guide
 
-Version 2 is a breaking upgrade.
-
-Where you once wrote
-```html
-<img src="@image('img/image.jpg', [800, 600])" >
-```
-You instead need to replace it with
-```blade
-<x-img src="img/image.jpg" :properties="[800, 600]" />
-```
-The old syntax is no longer supported.
-
-If you set the flag to turn on Short Pixel (I don't think anyone other that I did) this doesn't work anymore. You'll have to change the registered compression option in the config instead.
-
-I would strongly recommend deleting the old config and republishing.
+Because it uses the Laravel Http helper this program no longer supports Laravel 6.
+By default we use Image Magick which comes installed by default on Laravel Forge. There is still the option to switch to GD library by publishing the config file and selecting the GD options.
+The system now grabs the original src from the public directory OR an URL (rather than the weird workaround needed by the FileStorage system )
+The next time you load an image using the blade component it will duplicate your image to a holding directory and remake your resized images. It will only do this once.
+You can safely remove older versions of files.
+If you've turned the images_from_public_path to false then it's not going to work any more and you'll have to update your img src attributes.
+No longer upscales images if the original image is too small. (It allows the browser to do this)
 
 ## Usage
 
@@ -74,12 +66,12 @@ Instead you would put
 The initial image would be resized and saved to a 300px wide version and a 600px wide version (for hi-res displays) in JPG format. The resulting output would be
 ```html
 <img srcset="
-/storage/overlyLargeImage_jpg/300x200_50_50.jpg 1x,
-/storage/overlyLargeImage_jpg/600x400_50_50.jpg 2x"
+/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x200_50_50.jpg 1x,
+/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x400_50_50.jpg 2x"
 style="
 background-size: 100% 100%;
 background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*")"
-src="/storage/overlyLargeImage_jpg/320x240_50_50.jpg"
+src="/storage/blade_image_crop_holding/overlyLargeImage_jpg/320x240_50_50.jpg"
 width="300" height="200" class="" alt="">
 ```
 
@@ -113,11 +105,11 @@ This creates a 300px x 180px version, a 1024px x 300px version and a 2048px x 60
 The resulting code would be
 ```html
 <img srcset="
-	/storage/overlyLargeImage_jpg/300x180_50_50.jpg 300w,
-	/storage/overlyLargeImage_jpg/1024x300_50_50.jpg 1024w,
-	/storage/overlyLargeImage_jpg/2048x600_50_50.jpg 2048w"
+	/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x180_50_50.jpg 300w,
+	/storage/blade_image_crop_holding/overlyLargeImage_jpg/1024x300_50_50.jpg 1024w,
+	/storage/blade_image_crop_holding/overlyLargeImage_jpg/2048x600_50_50.jpg 2048w"
 style="background-size: 100% 100%; background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*")
-	 src="/storage/overlyLargeImage_jpg/300x180_50_50.jpg"
+	 src="/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x180_50_50.jpg"
 	 width="300" height="180" class="" alt="">
 ```
 
@@ -158,13 +150,13 @@ This will result in
 ```html
 <picture>
 	<source type="image/webp" srcset="
-	/storage/overlyLargeImage_jpg/300x100_50_50.webp 1x,
-	/storage/overlyLargeImage_jpg/600x200_50_50.webp 2x">
+	/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.webp 1x,
+	/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x200_50_50.webp 2x">
 	<source type="image/jpeg" srcset="
-	/storage/overlyLargeImage_jpg/300x100_50_50.jpg 1x,
-	/storage/overlyLargeImage_jpg/600x200_50_50.jpg 2x">
+	/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.jpg 1x,
+	/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x200_50_50.jpg 2x">
 	<img  style="background-size: 100% 100%; background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*"')"
-	src="/storage/overlyLargeImage_jpg/300x100_50_50.jpg"
+	src="/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.jpg"
 	width="300" height="100" class="" alt="">
 </picture>
 ```
@@ -183,7 +175,7 @@ Notice the img tag needs the **sources="false"** attribute so that the srcset is
 
 ```blade
 <picture>
-	<x-sources src="/storage/overlyLargeImage_jpg" :properties="[[800, 600], 1024]" sizes="(min-width: 60rem) 80vw, 100vw"/>
+	<x-sources src="/storage/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[[800, 600], 1024]" sizes="(min-width: 60rem) 80vw, 100vw"/>
 	<x-img sources="false" src="/img/OverlyLargeImage.png" :properties="[[800, 600], 1024]"/>
 </picture>
 ```
@@ -205,8 +197,8 @@ This will output
 Or, if you're looking to have a mobile version of your image that is square and a desktop version that is wide. (and also let's pretend the focus of the image in slightly on the left )
 ```blade
 <picture>
-	<x-sources src="/storage/overlyLargeImage_jpg" :properties="[300, 300, 35, 50]" media="(max-width: 450px) and (orientation: portrait)" />
-	<x-sources src="/storage/overlyLargeImage_jpg" :properties="[800, 600]" />
+	<x-sources src="/storage/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[300, 300, 35, 50]" media="(max-width: 450px) and (orientation: portrait)" />
+	<x-sources src="/storage/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[800, 600]" />
 	<x-img sources="false" src="/img/OverlyLargeImage.png" :properties="[800, 600]" alt="" class=""/>
 </picture>
 ```
@@ -218,42 +210,6 @@ This creates an extra set of source files that only activate when the media quer
 ### 'disk' => 'public'
 
 Select the disk you want to use for storage
-
-### 'images_from_public_path' => true,
-
-In a default Laravel installation the public storage is set like so
-```php
-'public' => [
-	'driver' => 'local',
-	'root' => storage_path('app/public'),
-	'url' => env('APP_URL').'/storage',
-	'visibility' => 'public',
-],
-```
-Which means that if your image is stored in the storage directory you would normally write your image tag
-```html
-<img src="/storage/image.jpg" />
-```
-or possibly
-```blade
-<img src="{{ asset('/storage/image.jpg') }}" />
-```
-But when using the components it sees the src as being from the disk directory so you'd instead have to put
-```blade
-<x-img src="/image.jpg" />
-```
-By default the images_from_public_path trims the src so that you can write it like you're writing from the point of view of the a public directory.
-
-If however you changed the filesystem to be the public directory like so
-```php
-'public' => [
-	'driver' => 'local',
-	'root' => public_path(),
-	'url' => env('APP_URL'),
-	'visibility' => 'public',
-],
-```
-You may wish to change this to **false**
 
 ### Default Offsets
 ```php
@@ -277,25 +233,29 @@ The inline backgrounds can be turned off. If you need to add style tags on your 
 If you need to test to make sure the correct image is being displayed turning this to true will write the filename onto the image itself.
 **Beware:** Any files created with this flag on will keep this label once you turn it off again. The images should be deleted so that they can be recreated.
 
+## 	'render_source_tag_if_unavailable' => env('BLADE_CROP_RENDER_SOURCE', false),
+
+When developing if can be useful to see the source tags even when an error has occurred. In production you can turn this off. If you rely on JS to detect image errors turn this off.
+ie.
+```
+<img src="broken_img.jpg" onerror="this.onerror=null; this.src='/svg/backup.svg'"/>
+```
 
 ### Build Classes
-The default build classes can be switched out here. The keys will be the file types that are created. If you want to replace the way the image files are compressed you can build your own. The class accepts a GD resource and needs to save that to your drive.
+The default build classes can be switched out here. The keys will be the file types that are created. If you want to replace the way the image files are compressed you can build your own. The class accepts an image string in the constructor and needs to save that to your drive.
 
 ```php
 'build_classes' => [
-	'webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder',
-	'jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder',
+	'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
+	'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
+	// 'webp' => 'DNABeast\BladeImageCrop\Builder\GD_WebPBuilder',
+	'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
+	// 'jpg' => 'DNABeast\BladeImageCrop\Builder\GD_JPGBuilder',
 	// 'jpg' => 'DNABeast\BladeImageCrop\Builder\ShortPixelJPGBuilder',
 ],
 ```
 
 The order of keys is the order the files will load in your browser. So if you put JPG first it won't even try to load WebP.
-
-If you wanted to add a class that makes AVIP and tries it before WebP and JPG you put
-```php
-'avip' => 'YourApp\AVIPBuilder',
-```
-And you'd put it at the top of the list of build classes.
 
 ### 'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
 The background builder can also be over written. Currently it takes the images and resizes it to 4px x 4px. It then converts that to base64 and return the style tag with the background info. This is cached by Laravel.
@@ -319,7 +279,8 @@ File not found at path: imageNotFound
 ```
 or the image is appearing as an empty 4x3 aspect rectangle.
 
-The original image isn't where you told it. Double check your disk selection in the config, your filesystems setup and the images_from_public_path flag in the config. In your local environment you can check the img's output image path to see the full path that it's looking for the image.
+The original image isn't where you told it. It should be looking in the public path. If you've done something weird to your public path this is a good place to start looking.
+In your local environment you can check the img's output image path to see the full path that it's looking for the image.
 
 ### Testing
 
