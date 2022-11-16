@@ -23,7 +23,7 @@ class IM_AVIFBuilder extends ImageTypeBuilder
 
 	public function resize($options){
 		$this->image->cropImage( $options['cropWidth'], $options['cropHeight'], $options['x'], $options['y'] );
-		$this->image->adaptiveResizeImage( $options['targetWidth'], $options['targetHeight'] );
+		$this->image->resizeImage( $options['targetWidth'], $options['targetHeight'], 12, 1 );
 		return $this;
 	}
 
