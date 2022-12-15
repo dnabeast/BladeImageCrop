@@ -62,7 +62,7 @@ class BladeImageCrop
 		.'_'.implode('_', $offset)
 		.'.'.$format;
 
-		return str_replace("//", "/", $path);
+		return Storage::disk(config('bladeimagecrop.disk'))->url( str_replace("//", "/", $path) );
 
 	}
 
