@@ -49,6 +49,7 @@ class GD_JPGBuilder extends ImageTypeBuilder
 				imagejpeg($this->image, null, 75);
 				$data = ob_get_contents();
 			ob_end_clean();
+
 			return Storage::disk( config('bladeimagecrop.disk') )->put($path, $data);
 		}
 

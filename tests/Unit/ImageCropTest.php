@@ -70,7 +70,7 @@ class ImageCropTest extends TestCase
 		);
 
 		$this->assertTrue(
-			Storage::disk('public')->has('/storage/uploads/banners/page/cater_jpg/400x300_50_50.jpg')
+			Storage::disk('public')->has('/uploads/banners/page/cater_jpg/400x300_50_50.jpg')
 		);
 
 	}
@@ -95,7 +95,7 @@ class ImageCropTest extends TestCase
 		);
 
 		$this->assertTrue(
-			Storage::disk('public')->has('/storage/banners/page/cater_jpg/400x300_50_50.webp')
+			Storage::disk('public')->has('banners/page/cater_jpg/400x300_50_50.webp')
 		);
 
 	}
@@ -157,7 +157,7 @@ class ImageCropTest extends TestCase
 			'/storage/banners/page/grid_png/500x250_50_50.jpg',
 			$newImageUrl
 		);
-		$newImageUrl = str_replace('uploads/', '', $newImageUrl);
+		$newImageUrl = str_replace('storage/', '', $newImageUrl);
 
 		$this->assertTrue(
 			Storage::disk('public')->has($newImageUrl)
@@ -176,13 +176,13 @@ class ImageCropTest extends TestCase
 	function update_url_returns_proper_url(){
 		$result = (new BladeImageCrop)->updateUrl('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'/storage/uploads/cater_jpg/800x600_50_50.jpg',
+			'uploads/cater_jpg/800x600_50_50.jpg',
 			$result
 		);
 
 		$result = (new BladeImageCrop)->updateUrl('cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'/storage/cater_jpg/800x600_50_50.jpg',
+			'cater_jpg/800x600_50_50.jpg',
 			$result
 		);
 	}

@@ -23,14 +23,15 @@ class BladeImageCrop
 		}
 
 		$newImageUrl = $this->updateUrl($url, $dimensions, $offset, $format);
+		$fixedNewImageUrl = parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( $newImageUrl ) )['path'];
 
 		if (Storage::disk( config('bladeimagecrop.disk') )->has($newImageUrl)){
-			return $newImageUrl;
+			return $fixedNewImageUrl;
 		}
 
 		$this->alterImage($url, $dimensions, $offset, $format);
 
-		return $newImageUrl;
+		return $fixedNewImageUrl;
 	}
 
 	public function fileNotImage($url){
@@ -62,7 +63,8 @@ class BladeImageCrop
 		.'_'.implode('_', $offset)
 		.'.'.$format;
 
-		return parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( trim($path, '/') ))['path'];
+		return  trim($path, '/');
+
 	}
 
 	public function alterImage($url, $dimensions, $offset, $format)
