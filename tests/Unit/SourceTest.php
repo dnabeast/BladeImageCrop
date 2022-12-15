@@ -23,8 +23,8 @@ class SourceTest extends TestCase
 			'pixel_device_ratios' => ['1x', '2x'],
 			'text_labels' => env('BLADE_CROP_TEST_LABELS', false),
 			'build_classes' => [
-				'webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder',
-				'jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder',
+				'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
+				'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
 				// 'jpg' => 'DNABeast\BladeImageCrop\Builder\ShortPixelJPGBuilder',
 			]
 		]);

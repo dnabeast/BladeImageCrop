@@ -29,8 +29,8 @@ class SourcesTest extends TestCase
 			'backgrounds' => true,
 			'text_labels' => env('BLADE_CROP_TEST_LABELS', false), // These labels get written to the created images if they're not yet created.
 			'build_classes' => [
-				'webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder',
-				'jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder',
+				'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
+				'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
 				// 'jpg' => 'DNABeast\BladeImageCrop\Builder\ShortPixelJPGBuilder',
 			],
 			'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
@@ -51,8 +51,8 @@ class SourcesTest extends TestCase
 
 
 		$expected = <<<EOT
-		<source media="test" type="image/webp" srcset="/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.webp 1x,/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1600x1200_50_50.webp 2x" sizes="sizeTest">
-		<source media="test" type="image/jpeg" srcset="/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.jpg 1x,/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1600x1200_50_50.jpg 2x" sizes="sizeTest">
+		<source media="test" type="image/webp" srcset="/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.webp 1x,/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1600x1200_50_50.webp 2x" sizes="sizeTest">
+		<source media="test" type="image/jpeg" srcset="/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.jpg 1x,/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1600x1200_50_50.jpg 2x" sizes="sizeTest">
 		EOT;
 
 		$result = $this->blade('<x-sources src="uploads/banners/page/cater.jpg" :properties="[800, 600]" media="test" sizes="sizeTest"/>');
@@ -65,8 +65,8 @@ class SourcesTest extends TestCase
 	function if_blade_command_sources_requested_with_many_properties_return_a_html_string(){
 
 		$expected = <<<EOT
-		<source media="test" type="image/webp" srcset="/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.webp 800w,/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1024x768_50_50.webp 1024w" sizes="sizeTest">
-		<source media="test" type="image/jpeg" srcset="/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.jpg 800w,/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1024x768_50_50.jpg 1024w" sizes="sizeTest">
+		<source media="test" type="image/webp" srcset="/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.webp 800w,/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1024x768_50_50.webp 1024w" sizes="sizeTest">
+		<source media="test" type="image/jpeg" srcset="/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/800x600_50_50.jpg 800w,/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/1024x768_50_50.jpg 1024w" sizes="sizeTest">
 		EOT;
 
 		$result = $this->blade('<x-sources src="uploads/banners/page/cater.jpg" :properties="[[800, 600], 1024]" media="test" sizes="sizeTest"/>');

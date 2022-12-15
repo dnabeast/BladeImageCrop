@@ -62,8 +62,7 @@ class BladeImageCrop
 		.'_'.implode('_', $offset)
 		.'.'.$format;
 
-		return Storage::disk(config('bladeimagecrop.disk'))->url( str_replace("//", "/", $path) );
-
+		return parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( trim($path, '/') ))['path'];
 	}
 
 	public function alterImage($url, $dimensions, $offset, $format)
@@ -82,6 +81,9 @@ class BladeImageCrop
 	}
 
 	public function options($data, $dimensions, $offset){
+
+		$dimensions['width'] = $dimensions['width']??$dimensions[0];
+		$dimensions['height'] = $dimensions['height']??$dimensions[1];
 
 		$originalWidth = $data[0];
 		$originalHeight = $data[1];

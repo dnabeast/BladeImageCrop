@@ -31,9 +31,9 @@ class ImgTest extends TestCase
 			'backgrounds' => true,
 			'text_labels' => env('BLADE_CROP_TEST_LABELS', false),
 			'build_classes' => [
-				'webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder',
-				// 'jpg' => 'DNABeast\BladeImageCrop\Builder\ShortPixelJPGBuilder',
-				'jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder',
+				'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
+				// 'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_ShortPixelJPGBuilder',
+				'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
 			],
 			'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
 
@@ -61,11 +61,11 @@ class ImgTest extends TestCase
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320"/>');
 
 		$expectedBeginning = <<<EOT
-		<img srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
+		<img srcset="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/public/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
 		$expectedEnd = <<<EOT
-		')" src="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
+		')" src="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
 		EOT;
 
 		$result->assertSee($expectedBeginning, false);
@@ -79,11 +79,11 @@ class ImgTest extends TestCase
 
 
 		$expectedBeginning = <<<EOT
-		<img srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
+		<img srcset="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/public/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
 		$expectedEnd = <<<EOT
-		')" src="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
+		')" src="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
 		EOT;
 
 		$result->assertSee($expectedBeginning, false);
@@ -95,11 +95,11 @@ class ImgTest extends TestCase
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320" class="m-1" alt="Description of Image"/>');
 
 		$expectedBeginning = <<<EOT
-		<img srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
+		<img srcset="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/public/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
 		$expectedEnd = <<<EOT
-		')" src="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
+		')" src="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" class="m-1" alt="Description of Image">
 		EOT;
 
 		$result->assertSee($expectedBeginning, false);
@@ -111,11 +111,11 @@ class ImgTest extends TestCase
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png" :properties="[300, 200, 60]"  width="320" class="m-1" alt="Description of Image"/>');
 
 		$expectedBeginning = <<<EOT
-		<img srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/300x200_60_50.jpg 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/600x400_60_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
+		<img srcset="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/300x200_60_50.jpg 1x,/public/blade_image_crop_holding/imgoverlylargeimagepng_png/600x400_60_50.jpg 2x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
 		$expectedEnd = <<<EOT
-		')" src="/blade_image_crop_holding/imgoverlylargeimagepng_png/300x200_60_50.jpg" width="300" height="200" class="m-1" alt="Description of Image">
+		')" src="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/300x200_60_50.jpg" width="300" height="200" class="m-1" alt="Description of Image">
 		EOT;
 
 		$result->assertSee($expectedBeginning, false);
@@ -132,11 +132,11 @@ class ImgTest extends TestCase
 
 
 		$expectedBeginning = <<<EOT
-		<img srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_40_70.jpg 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_40_70.jpg 2x,/blade_image_crop_holding/imgoverlylargeimagepng_png/1280x960_40_70.jpg 4x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
+		<img srcset="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_40_70.jpg 1x,/public/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_40_70.jpg 2x,/public/blade_image_crop_holding/imgoverlylargeimagepng_png/1280x960_40_70.jpg 4x" style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 		EOT;
 
 		$expectedEnd = <<<EOT
-		')" src="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_40_70.jpg" width="320" height="240" >
+		')" src="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_40_70.jpg" width="320" height="240" >
 		EOT;
 
 		$result->assertSee($expectedBeginning, false);
@@ -150,7 +150,7 @@ class ImgTest extends TestCase
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320"/>');
 
 		$expected = <<<EOT
-		<img srcset="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x"  src="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
+		<img srcset="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg 1x,/public/blade_image_crop_holding/imgoverlylargeimagepng_png/640x480_50_50.jpg 2x"  src="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
 		EOT;
 
 		$result->assertSee($expected, false);
@@ -163,7 +163,7 @@ class ImgTest extends TestCase
 		$result = $this->blade('<x-img sources="false" src="/img/OverlyLargeImage.png"  width="320"/>');
 
 		$expected = <<<EOT
-		<img   src="/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
+		<img   src="/public/blade_image_crop_holding/imgoverlylargeimagepng_png/320x240_50_50.jpg" width="320" height="240" >
 		EOT;
 
 		$result->assertSee($expected, false);

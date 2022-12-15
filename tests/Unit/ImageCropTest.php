@@ -65,12 +65,12 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/uploads/banners/page/cater_jpg/400x300_50_50.jpg',
+			'/storage/uploads/banners/page/cater_jpg/400x300_50_50.jpg',
 			$newImageUrl
 		);
 
 		$this->assertTrue(
-			Storage::disk('public')->has('/uploads/banners/page/cater_jpg/400x300_50_50.jpg')
+			Storage::disk('public')->has('/storage/uploads/banners/page/cater_jpg/400x300_50_50.jpg')
 		);
 
 	}
@@ -90,12 +90,12 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions, $offset, 'webp');
 
 		$this->assertEquals(
-			'/banners/page/cater_jpg/400x300_50_50.webp',
+			'/storage/banners/page/cater_jpg/400x300_50_50.webp',
 			$newImageUrl
 		);
 
 		$this->assertTrue(
-			Storage::disk('public')->has('/banners/page/cater_jpg/400x300_50_50.webp')
+			Storage::disk('public')->has('/storage/banners/page/cater_jpg/400x300_50_50.webp')
 		);
 
 	}
@@ -115,7 +115,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/banners/page/cater_jpg/400x300_50_50.jpg',
+			'/storage/banners/page/cater_jpg/400x300_50_50.jpg',
 			$newImageUrl
 		);
 
@@ -135,7 +135,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/banners/page/cater_jpg/400x300_50_50.jpg',
+			'/storage/banners/page/cater_jpg/400x300_50_50.jpg',
 			$newImageUrl
 		);
 
@@ -154,7 +154,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/banners/page/grid_png/500x250_50_50.jpg',
+			'/storage/banners/page/grid_png/500x250_50_50.jpg',
 			$newImageUrl
 		);
 		$newImageUrl = str_replace('uploads/', '', $newImageUrl);
@@ -176,13 +176,13 @@ class ImageCropTest extends TestCase
 	function update_url_returns_proper_url(){
 		$result = (new BladeImageCrop)->updateUrl('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'/uploads/cater_jpg/800x600_50_50.jpg',
+			'/storage/uploads/cater_jpg/800x600_50_50.jpg',
 			$result
 		);
 
 		$result = (new BladeImageCrop)->updateUrl('cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'/cater_jpg/800x600_50_50.jpg',
+			'/storage/cater_jpg/800x600_50_50.jpg',
 			$result
 		);
 	}
