@@ -9,7 +9,7 @@ return [
 	'text_labels' => env('BLADE_CROP_TEST_LABELS', false), // These labels get written to the created images if they're not yet created.
 	'render_source_tag_if_unavailable' => env('BLADE_CROP_RENDER_SOURCE', false),
 	'build_classes' => [
-		'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
+		// 'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
 		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
 		// 'webp' => 'DNABeast\BladeImageCrop\Builder\GD_WebPBuilder',
 		'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',

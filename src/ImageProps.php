@@ -5,6 +5,9 @@ namespace DNABeast\BladeImageCrop;
 
 class ImageProps
 {
+	public $aspect;
+	public $offset_x;
+	public $offset_y;
 
 	public function calc($properties, $aspect = null){
 		$this->aspect = $aspect;
@@ -13,8 +16,8 @@ class ImageProps
 
 		$properties = $this->properWrapping($properties);
 
-		$properties = array_map( function($line) use ($aspect){
-			return $this->calcLine($line, $aspect);
+		$properties = array_map( function($line){
+			return $this->calcLine($line);
 		}, $properties);
 
 		$properties = $this->addPixelRatios($properties);
@@ -41,7 +44,7 @@ class ImageProps
 		return $properties;
 	}
 
-	public function calcLine($line, $aspect){
+	public function calcLine($line){
 		$line[0] = (int) $line[0];
 
 		if (!isset($line[1])){
