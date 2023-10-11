@@ -9,6 +9,13 @@ class Source
 {
 
 	public $options;
+    public $bladeImageCrop;
+    public $src;
+    public $image_format;
+    public $properties;
+    public $media;
+    public $sizes;
+    public $pixelRatios;
 
 	public function __construct($options, BladeImageCrop $bladeImageCrop )
 	{

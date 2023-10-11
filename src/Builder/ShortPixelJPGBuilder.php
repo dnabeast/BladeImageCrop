@@ -10,6 +10,8 @@ class ShortPixelJPGBuilder extends ImageTypeBuilder
 {
 
 	public $imageString;
+    public $image;
+    public $resize;
 
 	public function __construct($imageString)
 	{

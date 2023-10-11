@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 class GD_WebPBuilder extends ImageTypeBuilder
 {
 	public $imageString;
+    public $image;
 
 	public function __construct($imageString)
 	{

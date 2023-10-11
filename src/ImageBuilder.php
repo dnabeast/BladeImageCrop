@@ -7,6 +7,7 @@ class ImageBuilder
 {
 	public $glob;
 	public $format;
+    public $class;
 
 	public function __construct($glob, $format)
 	{

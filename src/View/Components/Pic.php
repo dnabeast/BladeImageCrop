@@ -11,7 +11,6 @@ class Pic extends Component
 	public $width;
 	public $properties;
 
-
 	public function __construct($src, $width=null, $properties=null)
 	{
 		$this->src = $src;

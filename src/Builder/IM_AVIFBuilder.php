@@ -8,6 +8,7 @@ use Imagick;
 class IM_AVIFBuilder extends ImageTypeBuilder
 {
 	public $imageString;
+    public $image;
 
 	public function __construct($imageString)
 	{

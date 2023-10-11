@@ -16,7 +16,8 @@ class Img extends Component
 	public $width;
 	public $properties;
 	public $sources;
-
+    public $image;
+    public $imageFormats;
 
 	public function __construct($src, $width=null, $properties=null, $sources=null)
 	{

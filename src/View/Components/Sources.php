@@ -15,6 +15,8 @@ class Sources extends Component
 	public $media;
 	public $properties;
 	public $sizes;
+    public $image;
+    public $imageFormats;
 
 	public function __construct($src, $properties, $media = null,  $sizes = null)
 	{

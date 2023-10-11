@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 class HoldImage
 {
 	public $src;
+    public $storageDisk;
 
 	public function __construct($src)
 	{
