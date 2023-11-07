@@ -25,7 +25,6 @@ class Sources extends Component
 		$this->properties = $properties;
 		$this->sizes = $sizes;
 		$this->imageFormats = collect(array_keys(config('bladeimagecrop.build_classes')));
-
 	}
 
 	/**

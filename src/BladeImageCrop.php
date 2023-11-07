@@ -3,6 +3,7 @@
 namespace DNABeast\BladeImageCrop;
 
 use Davidcb\LaravelShortPixel\Facades\LaravelShortPixel;
+use DNABeast\BladeImageCrop\Jobs\ProcessImage;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -17,9 +18,9 @@ class BladeImageCrop
 	{
 		if ($this->fileNotImage($url)){
 			if (!\App::environment(['local'])) {
-				return 'IMAGENOTFOUND';
+				return 'IMAGE_NOT_FOUND';
 			}
-			return 'IMAGENOTFOUND-'.Storage::disk( config('bladeimagecrop.disk') )->path($url);
+			return 'IMAGE_NOT_FOUND-'.Storage::disk( config('bladeimagecrop.disk') )->path($url);
 		}
 
 		$newImageUrl = $this->updateUrl($url, $dimensions, $offset, $format);
@@ -29,9 +30,9 @@ class BladeImageCrop
 			return $fixedNewImageUrl;
 		}
 
-		$this->alterImage($url, $dimensions, $offset, $format);
+        $this->alterImage($url, $dimensions, $offset, $format);
 
-		return $fixedNewImageUrl;
+        return parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( $url ) )['path'];
 	}
 
 	public function fileNotImage($url){
@@ -78,7 +79,10 @@ class BladeImageCrop
 
 		$uri = $this->updateUrl($url, $dimensions, $offset, $format);
 
-		(new ImageBuilder($blob, $format))->resize($options)->save($uri);
+        dispatch(
+            new ProcessImage(
+                $url, $format, $options,$uri
+            ));
 
 	}
 

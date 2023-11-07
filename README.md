@@ -16,6 +16,7 @@ It supports
 - Inline backgrounds that display first on slow connections
 - Mobile and desktop versions
 - local AND online images
+- queuing the image processing
 
 ## Installation
 
@@ -78,6 +79,8 @@ width="300" height="200" class="" alt="">
 Note that the different DPI versions are set in the srcset tag. A very low-res png image is created and converted into base64 then placed inline into the style tag. It also works out the height of the resized image. This combination means that the loading image appears onscreen without needing to make a html call and avoids a redraw problem.
 [Why this is important]( https://www.smashingmagazine.com/2020/03/setting-height-width-images-important-again/ )
 
+This image processing is done asynchronously so the first load will show the uncompressed image allowing time for the various versions to be processed without slowing the page load.
+If the original image continues to load on subsequent page loads double check your queue settings. 
 
 #### Resizing and cropping the image
 
@@ -246,7 +249,7 @@ The default build classes can be switched out here. The keys will be the file ty
 
 ```php
 'build_classes' => [
-	'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
+	//'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
 	'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
 	// 'webp' => 'DNABeast\BladeImageCrop\Builder\GD_WebPBuilder',
 	'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
@@ -263,7 +266,7 @@ The background builder can also be over written. Currently it takes the images a
 If you wanted to (for instance) change this to load the same loading image you can write your own builder and swap it in with the config.
 
 ## Troubleshooting
-Are you getting this error?
+**Are you getting this error?**
 ```
 syntax error, unexpected end of file, expecting "elseif" or "else" or "endif"
 ```
@@ -273,7 +276,7 @@ It probably means you haven't closed the blade component tag. Use one of these s
 <x-img></x-img>
 ```
 
-How about this one?
+**How about this one?**
 ```
 File not found at path: imageNotFound
 ```
@@ -281,6 +284,10 @@ or the image is appearing as an empty 4x3 aspect rectangle.
 
 The original image isn't where you told it. It should be looking in the public path. If you've done something weird to your public path this is a good place to start looking.
 In your local environment you can check the img's output image path to see the full path that it's looking for the image.
+
+**Server failures? 500 errors?**
+
+When loading a page of many images or some big images the php service can get overwhelmed. BladeImageCrop does the image processing asynchronously so perhaps try setting up your queue drivers.
 
 ### Testing
 

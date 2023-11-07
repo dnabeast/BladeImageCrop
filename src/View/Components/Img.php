@@ -36,12 +36,11 @@ class Img extends Component
 	{
 
 		return function (array $data){
-
+            $build = $this->build();
 			return <<<EOT
-			<img {$this->build()['sources']} {$this->build()['background']} src="{$this->build()['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
+			<img {$build['sources']} {$build['background']} src="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
 			EOT;
 		};
-
 
 	}
 
@@ -49,7 +48,6 @@ class Img extends Component
 	public function build(){
 
 		$format = config('bladeimagecrop.build_classes');
-
 		$options = [
 			'src' => $this->image->file(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
@@ -57,13 +55,15 @@ class Img extends Component
 			'pixelRatios' => isset($this->properties[0][1])?false:true
 		];
 
-		$defaultImageSrc = explode(" ", Source::make($options)->srcsetLines())[0];
+        $lines = Source::make($options)->srcsetLines();
+
+		$defaultImageSrc = explode(" ", $lines)[0];
 
 		if (config('bladeimagecrop.backgrounds')){
 			$backgroundString = (new Background($defaultImageSrc))->render();
 		}
 
-		$sourcesString = $this->sources?'srcset="'.Source::make($options)->srcsetLines().'"':'';
+		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
 
 		return [
 			'sources' => $sourcesString,

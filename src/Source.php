@@ -72,7 +72,6 @@ class Source
 			->map(function($properties, $key) use ($pixelRatios){
 				$measurement = $this->pixelRatios?$pixelRatios[$key]:$properties['dimensions']['width'].'w';
 				$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
-
 				return $newImageUri.' '.$measurement;
 			})
 			->implode(",");

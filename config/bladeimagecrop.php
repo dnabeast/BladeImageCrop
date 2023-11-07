@@ -13,7 +13,7 @@ return [
 		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
 		// 'webp' => 'DNABeast\BladeImageCrop\Builder\GD_WebPBuilder',
 		'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
-		// 'jpg' => 'DNABeast\BladeImageCrop\Builder\GD_JPGBuilder',
+//		 'jpg' => 'DNABeast\BladeImageCrop\Builder\GD_JPGBuilder',
 		// 'jpg' => 'DNABeast\BladeImageCrop\Builder\ShortPixelJPGBuilder',
 	],
 	'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'

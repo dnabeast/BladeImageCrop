@@ -3,6 +3,7 @@
 namespace DNABeast\BladeImageCrop\Tests\Unit;
 
 use DNABeast\BladeImageCrop\BladeImageCrop;
+use DNABeast\BladeImageCrop\ImageBuilder;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
@@ -45,7 +46,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'IMAGENOTFOUND',
+			'IMAGE_NOT_FOUND',
 			$newImageUrl
 		);
 
@@ -153,6 +154,10 @@ class ImageCropTest extends TestCase
 
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
+        dd('Replace ->fire with the ImageBuilder inside it');
+        $blob = Storage::disk( config('bladeimagecrop.disk') )->get($url);
+        (new ImageBuilder($blob, $this->format))->resize($this->options)->save($this->uri);
+
 		$this->assertEquals(
 			'/storage/banners/page/grid_png/500x250_50_50.jpg',
 			$newImageUrl
@@ -201,7 +206,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'IMAGENOTFOUND',
+			'IMAGE_NOT_FOUND',
 			$newImageUrl
 		);
 	}
@@ -219,7 +224,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'IMAGENOTFOUND',
+			'IMAGE_NOT_FOUND',
 			$newImageUrl
 		);
 	}
