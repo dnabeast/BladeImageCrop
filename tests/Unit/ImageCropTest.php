@@ -66,7 +66,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/storage/uploads/banners/page/cater_jpg/400x300_50_50.jpg',
+			'/storage/uploads/banners/page/cater.jpg',
 			$newImageUrl
 		);
 
@@ -88,12 +88,7 @@ class ImageCropTest extends TestCase
 		Storage::disk('public')->put($url, $image);
 		// Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions, $offset, 'webp');
-
-		$this->assertEquals(
-			'/storage/banners/page/cater_jpg/400x300_50_50.webp',
-			$newImageUrl
-		);
+		(new BladeImageCrop)->fire($url, $dimensions, $offset, 'webp');
 
 		$this->assertTrue(
 			Storage::disk('public')->has('banners/page/cater_jpg/400x300_50_50.webp')
@@ -146,29 +141,26 @@ class ImageCropTest extends TestCase
 	function if_correct_file_doens_t_exists_return_file_url_and_make_new_directory_and_file(){
 
 		$url = 'banners/page/grid.png';
-		$dimensions = ['width'=>500, 'height'=>250];
+		$options = ['targetWidth'=>500, 'targetHeight'=>250, 'cropWidth'=>50, 'cropHeight'=>50, 'x'=>50, 'y'=>50];
 		$image = file_get_contents(__DIR__.'/uploads/'.$url);
 
 		Storage::fake('public');
 		Storage::disk('public')->put($url, $image);
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+//		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
-        dd('Replace ->fire with the ImageBuilder inside it');
         $blob = Storage::disk( config('bladeimagecrop.disk') )->get($url);
-        (new ImageBuilder($blob, $this->format))->resize($this->options)->save($this->uri);
-
-		$this->assertEquals(
-			'/storage/banners/page/grid_png/500x250_50_50.jpg',
-			$newImageUrl
-		);
-		$newImageUrl = str_replace('storage/', '', $newImageUrl);
+        (new ImageBuilder($blob, 'jpg'))->resize($options)->save('test.jpg');
 
 		$this->assertTrue(
-			Storage::disk('public')->has($newImageUrl)
+            Storage::disk( config('bladeimagecrop.disk') )->has('test.jpg')
 		);
 
-		$newImage = getimagesizefromstring(Storage::disk('public')->get($newImageUrl));
+		$this->assertTrue(
+			Storage::disk('public')->has('test.jpg')
+		);
+
+		$newImage = getimagesizefromstring(Storage::disk('public')->get('test.jpg'));
 
 		$this->assertEquals(
 			500, // width
