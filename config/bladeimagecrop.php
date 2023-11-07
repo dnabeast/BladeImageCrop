@@ -7,6 +7,7 @@ return [
 	'pixel_device_ratios' => ['1x', '2x'], // add multipliers here for ultra high def screens
 	'backgrounds' => true,
 	'text_labels' => env('BLADE_CROP_TEST_LABELS', false), // These labels get written to the created images if they're not yet created.
+    'compress_held_image' => env('BLADE_CROP_COMPRESS_HELD_IMAGE', true), // converts lossless photos to slightly compressed images to save space
 	'render_source_tag_if_unavailable' => env('BLADE_CROP_RENDER_SOURCE', false),
 	'build_classes' => [
 		// 'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',

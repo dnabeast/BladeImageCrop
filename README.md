@@ -236,6 +236,10 @@ The inline backgrounds can be turned off. If you need to add style tags on your 
 If you need to test to make sure the correct image is being displayed turning this to true will write the filename onto the image itself.
 **Beware:** Any files created with this flag on will keep this label once you turn it off again. The images should be deleted so that they can be recreated.
 
+### 'compress_held_image' => env('BLADE_CROP_COMPRESS_HELD_IMAGE', true)
+
+The package creates and stores a Held Image that it uses for reference. If the original image vanishes for some reason there is always a source of truth. If this image is not compressed at all we can ensure that it's at least stored as slightly lossy else your storage fills up with lossless images.
+
 ## 	'render_source_tag_if_unavailable' => env('BLADE_CROP_RENDER_SOURCE', false),
 
 When developing if can be useful to see the source tags even when an error has occurred. In production you can turn this off. If you rely on JS to detect image errors turn this off.
