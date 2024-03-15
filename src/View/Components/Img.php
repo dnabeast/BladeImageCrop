@@ -60,7 +60,8 @@ class Img extends Component
 		$defaultImageSrc = explode(" ", $lines)[0];
 
 		if (config('bladeimagecrop.backgrounds')){
-			$backgroundString = (new Background($defaultImageSrc))->render();
+            $backgroundLocation = 'blade_image_crop_holding/'.str($defaultImageSrc)->after('blade_image_crop_holding');
+            $backgroundString = (new Background($backgroundLocation))->render();
 		}
 
 		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';

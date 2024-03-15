@@ -6,6 +6,7 @@ use DNABeast\BladeImageCrop\View\Components\Img;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithViews;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Orchestra\Testbench\TestCase;
 
 
@@ -155,6 +156,7 @@ class ImgTest extends TestCase
 
 		$result->assertSee($expected, false);
 	}
+
 
 	/** @test */
 	function turn_sources_off_and_dont_see_srcset_at_all(){
