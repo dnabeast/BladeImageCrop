@@ -112,27 +112,27 @@ class HoldImageTest extends TestCase
 		);
 	}
 
-    // if the config option to compress the hold image is set the held image should be smaller than the original image
-    /** @test  */
-    function if_the_config_option_to_compress_the_hold_image_is_set_the_held_image_should_be_smaller_than_the_original_image(){
-        Config::set(['bladeimagecrop.compress_held_image' => true]);
+	// if the config option to compress the hold image is set the held image should be smaller than the original image
+	/** @test  */
+	function if_the_config_option_to_compress_the_hold_image_is_set_the_held_image_should_be_smaller_than_the_original_image(){
+		Config::set(['bladeimagecrop.compress_held_image' => true]);
 
-        $file = 'uploads/banners/page/shea.jpg';
-        $image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$file);
+		$file = 'uploads/banners/page/shea.jpg';
+		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$file);
 
-        Storage::fake('public');
-        Storage::disk('public')->put($file, $image);
+		Storage::fake('public');
+		Storage::disk('public')->put($file, $image);
 
-        $originalSize = Storage::disk('public')->fileSize($file);
+		$originalSize = Storage::disk('public')->fileSize($file);
 
-        $holdImage = (new HoldImage($file))->file();
+		$holdImage = (new HoldImage($file))->file();
 
-        $heldSize = Storage::disk('public')->fileSize($holdImage);
+		$heldSize = Storage::disk('public')->fileSize($holdImage);
 
-        $this->assertLessThan(
-            $originalSize,
-            $heldSize
-        );
+		$this->assertLessThan(
+			$originalSize,
+			$heldSize
+		);
 
-    }
+	}
 }
