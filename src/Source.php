@@ -127,6 +127,7 @@ class Source
 			[ 'mime'=>'image/gif',		'extensions'=> ['gif'] ],
 			[ 'mime'=>'image/jpeg',		'extensions'=> ['jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp'] ],
 			[ 'mime'=>'image/png',		'extensions'=> ['png'] ],
+			[ 'mime'=>'image/jxl',		'extensions'=> ['jxl'] ],
 			[ 'mime'=>'image/svg+xml',	'extensions'=>  ['svg'] ],
 			[ 'mime'=>'image/webp',		'extensions'=> ['webp'] ]
 		];
