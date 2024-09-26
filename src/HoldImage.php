@@ -38,7 +38,7 @@ class HoldImage
 			}
 
 			if ( config('bladeimagecrop.compress_held_image')??false ) {
-				$glob = imagecreatefromstring($file);
+				$glob = @imagecreatefromstring($file);
 				ob_start();
 				if ($extension == 'jpg' || $extension == 'jpeg') {
 					imagejpeg($glob, null, 95);
