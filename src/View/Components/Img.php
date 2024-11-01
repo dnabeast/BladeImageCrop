@@ -7,6 +7,7 @@ use DNABeast\BladeImageCrop\HoldImage;
 use DNABeast\BladeImageCrop\ImageProps;
 use DNABeast\BladeImageCrop\Source;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\Component;
 
 
@@ -34,6 +35,10 @@ class Img extends Component
 	 */
 	public function render()
 	{
+		if (!config('bladeimagecrop.enabled', true)){
+			return '<img src="'.$this->image->file().'" />';
+		}
+
 
 		return function (array $data){
             $build = $this->build();
@@ -47,7 +52,6 @@ class Img extends Component
 
 	public function build(){
 
-		$format = config('bladeimagecrop.build_classes');
 		$options = [
 			'src' => $this->image->file(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
@@ -60,7 +64,7 @@ class Img extends Component
 		$defaultImageSrc = explode(" ", $lines)[0];
 
 		if (config('bladeimagecrop.backgrounds')){
-            $backgroundLocation = 'blade_image_crop_holding/'.str($defaultImageSrc)->after('blade_image_crop_holding');
+            $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
             $backgroundString = (new Background($backgroundLocation))->render();
 		}
 

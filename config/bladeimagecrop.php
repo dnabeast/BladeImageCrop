@@ -1,6 +1,7 @@
 <?php
 
 return [
+	'enabled' => env('BLADE_CROP_ENABLED', true),
 	'disk' => 'public',
 	'offset_x' => 50, // percentage
 	'offset_y' => 50,

@@ -270,6 +270,16 @@ The background builder can also be over written. Currently it takes the images a
 If you wanted to (for instance) change this to load the same loading image you can write your own builder and swap it in with the config.
 
 ## Troubleshooting
+**Is the site crashing and you're freaking out?**
+Sometimes a weird file get through. I've tried my best to get rid of potential crashes but I can never underestimate the ingenuity of fools. If you need to turn off the process there is a config option.
+```
+'enabled' => env('BLADE_CROP_ENABLED', false),
+```
+or set it in your .env
+```
+BLADE_CROP_ENABLED=false
+```
+
 **Are you getting this error?**
 ```
 syntax error, unexpected end of file, expecting "elseif" or "else" or "endif"

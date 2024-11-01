@@ -23,6 +23,7 @@ class HoldImage
 	}
 
 	public function file(){
+
 		$extension = strtolower($this->src->explode('.')->last());
 		$formattedFileName = $this->src->slug.'.'.$extension;
 		// if file exists then return it

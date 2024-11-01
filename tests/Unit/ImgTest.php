@@ -171,4 +171,5 @@ class ImgTest extends TestCase
 		$result->assertSee($expected, false);
 	}
 
+
 }
