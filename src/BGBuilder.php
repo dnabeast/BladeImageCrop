@@ -38,18 +38,22 @@ class BGBuilder extends BGTypeBuilder
 			return 'MissingBGImage';
 		}
 
-		$newImage = imagecreatetruecolor($newWidth, $newHeight);
-		$image = imagecreatefromstring($imageString);
-		imagecopyresampled( $newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image) );
+		try {
+			$newImage = imagecreatetruecolor($newWidth, $newHeight);
+			$image = imagecreatefromstring($imageString);
+			imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image));
 
-		ob_start();
-		imagepng($newImage);
-		$data =  ob_get_clean();
+			ob_start();
+			imagepng($newImage);
+			$data = ob_get_clean();
 
-		imagedestroy($image);
-		imagedestroy($newImage);
+			imagedestroy($image);
+			imagedestroy($newImage);
 
-		return base64_encode($data);
+			return base64_encode($data);
+		} catch (\Exception $e) {
+			return 'MissingBGImage';
+		}
 
 
 	}
