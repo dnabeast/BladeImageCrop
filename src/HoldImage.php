@@ -40,29 +40,29 @@ class HoldImage
 
 			if ( config('bladeimagecrop.compress_held_image')??false ) {
 				$glob = @imagecreatefromstring($file);
-				ob_start();
-				if ($extension == 'jpg' || $extension == 'jpeg') {
-					imagejpeg($glob, null, 95);
+				if ((bool) $glob) {
+					ob_start();
+					if ($extension == 'jpg' || $extension == 'jpeg') {
+						imagejpeg($glob, null, 95);
+					}
+					if ($extension == 'png') {
+						imagepng($glob);
+					}
+					if ($extension == 'webp') {
+						imagewebp($glob, null, 95);
+					}
+					$newFile = ob_get_contents();
+					if ($newFile && strlen($newFile) < strlen($file)) {
+						$file = $newFile;
+					}
+					ob_end_clean();
 				}
-				if($extension == 'png') {
-					imagepng($glob);
-				}
-				if($extension == 'webp') {
-					imagewebp($glob, null, 95);
-				}
-				$newFile = ob_get_contents();
-				if($newFile && strlen($newFile) < strlen($file)){
-					$file = $newFile;
-				}
-				ob_end_clean();
 			}
+			$this->storageDisk->put('blade_image_crop_holding/'.$formattedFileName, $file);
 		} catch (\Exception $e) {
 			return 'FILE NOT FOUND';
 		}
 
-
-
-		$this->storageDisk->put('blade_image_crop_holding/'.$formattedFileName, $file);
 
 		return 'blade_image_crop_holding/'.$formattedFileName;
 	}
