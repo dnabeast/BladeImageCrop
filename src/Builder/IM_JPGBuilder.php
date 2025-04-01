@@ -19,6 +19,7 @@ class IM_JPGBuilder extends ImageTypeBuilder
 		public function makeImage(){
 			$image = (new Imagick);
 			$image->readImageBlob($this->imageString);
+			$image->autoOrient();
 			return $image;
 		}
 
