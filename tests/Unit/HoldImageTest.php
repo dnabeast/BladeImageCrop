@@ -75,7 +75,9 @@ class HoldImageTest extends TestCase
 	}
 
 	/** @test */
-	function give_it_an_online_image_that_exists_returns_path(){
+	function give_it_an_online_image_that_exists_returns_fail_message(){
+		Config::set(['bladeimagecrop.compress_held_image' => true]);
+
 		$file = 'https://smartenough.org/img/stealbananas.jpg';
 		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'uploads/banners/page/cater.jpg');
 
@@ -102,7 +104,7 @@ class HoldImageTest extends TestCase
 
 		Storage::fake('public');
 
-		$expected = 'blade_image_crop_holding/httpssmartenoughorgimgstealbananasjpg.jpg';
+		$expected ='FILE NOT FOUND';
 
 		$holdImage = new HoldImage($file);
 

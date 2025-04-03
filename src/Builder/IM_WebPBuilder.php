@@ -19,11 +19,11 @@ class IM_WebPBuilder extends ImageTypeBuilder
 	public function makeImage(){
 		$image = (new Imagick);
 		$image->readImageBlob($this->imageString);
-		$image->autoOrient();
 		return $image;
 	}
 
 	public function resize($options){
+		$this->image->autoOrient();
 		$this->image->cropImage( $options['cropWidth'], $options['cropHeight'], $options['x'], $options['y'] );
 		$this->image->resizeImage( $options['targetWidth'], $options['targetHeight'], 7, 1 );
 		return $this;
