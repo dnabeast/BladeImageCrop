@@ -303,6 +303,10 @@ In your local environment you can check the img's output image path to see the f
 
 When loading a page of many images or some big images the php service can get overwhelmed. BladeImageCrop does the image processing asynchronously so perhaps try setting up your queue drivers.
 
+**Images are showing sideways or upside down**
+
+Some images taken on devices that register orientation (smart phones etc) will show the image upright and then display in the browser at the incorrect angle. This is slowly getting fixed by browsers but until then the solution exists only when you're using Image Magick. If Image Magick in installed on your server they will auto align but with only GD there is no current fix for ths issue. You will need to resave this image using your photo processing software of choice.
+
 ### Testing
 
 ``` bash
