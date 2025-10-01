@@ -4,6 +4,7 @@ namespace DNABeast\BladeImageCrop;
 
 use Davidcb\LaravelShortPixel\Facades\LaravelShortPixel;
 use DNABeast\BladeImageCrop\Jobs\ProcessImage;
+use Exception;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -73,7 +74,11 @@ class BladeImageCrop
 
 		$blob = Storage::disk( config('bladeimagecrop.disk') )->get($url);
 
-		$data = getimagesizefromstring($blob);
+		try{
+			$data = getimagesizefromstring($blob);
+		} catch (Exception $e){
+			return;
+		}
 
 		$options = $this->options($data, $dimensions, $offset);
 
