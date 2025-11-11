@@ -45,12 +45,19 @@ class BladeImageCrop
 			$fileExists = $disk->has($url);
 		}
 
-		return !$fileExists
-			|| !in_array(
-				Storage::disk( config('bladeimagecrop.disk') )->mimeType($url),
-				['image/jpeg', 'image/png', 'image/webp']
-			)
-			|| pathinfo(Storage::disk( config('bladeimagecrop.disk') )->url($url), PATHINFO_EXTENSION) === '';
+		if (!$fileExists){
+			return true;
+		}
+
+		if ( pathinfo(Storage::disk( config('bladeimagecrop.disk') )->url($url), PATHINFO_EXTENSION) === '' ){
+			return true;
+		};
+
+		if(@is_array(getimagesize($disk->path($url)))){
+			return false;
+		}
+
+		return true;
 	}
 
 	public function updateUrl($url, $dimensions, $offset, $format)
