@@ -24,9 +24,6 @@ class Pic extends Component
 	 */
 	public function render()
 	{
-		if (!config('bladeimagecrop.enabled', true)){
-			return '<img src="'.$this->src.'" />';
-		}
 
 		return function (array $data){
 			$attributes = $data['attributes']->toHtml();

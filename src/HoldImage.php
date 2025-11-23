@@ -72,7 +72,7 @@ class HoldImage
 		$image->autoOrient();
 		$image->setImageCompressionQuality(85);
 		$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $image->getImageBlob());
-		$image->destroy();
+		$image->clear();
 	}
 
 	/**

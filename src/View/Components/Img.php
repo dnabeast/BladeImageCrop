@@ -22,6 +22,7 @@ class Img extends Component
 
 	public function __construct($src, $width=null, $properties=null, $sources=null)
 	{
+		$this->src = $src;
 		$this->image = new HoldImage($src);
 		$this->sources = $sources=='false'?false:true;
 		$this->properties = $properties??$width;
@@ -36,9 +37,9 @@ class Img extends Component
 	public function render()
 	{
 		if (!config('bladeimagecrop.enabled', true)){
-			return '<img src="'.$this->image->file().'" />';
+			$propertyArray = is_array($this->properties)?['width'=>$this->properties[0].'px', 'height'=>$this->properties[1].'px']:['width' => $this->properties.'px', 'height'=>"auto"];
+			return '<img style="object-fit:cover" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
 		}
-
 
 		return function (array $data){
             $build = $this->build();

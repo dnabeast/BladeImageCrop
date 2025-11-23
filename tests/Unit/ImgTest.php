@@ -171,5 +171,18 @@ class ImgTest extends TestCase
 		$result->assertSee($expected, false);
 	}
 
+	/** @test */
+	function set_bic_to_not_enabled_and_return_with_width_and_height(){
+		Config::set('bladeimagecrop.enabled', false);
+
+		$result = $this->blade('<x-img src="/img/OverlyLargeImage.png"  width="320"/>');
+
+		$expected = <<<EOT
+		<img style="object-fit:cover" src="/img/OverlyLargeImage.png" width="320px" height="auto">
+		EOT;
+
+		$result->assertSee($expected, false);
+	}
+
 
 }
