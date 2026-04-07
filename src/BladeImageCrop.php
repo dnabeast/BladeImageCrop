@@ -17,6 +17,7 @@ class BladeImageCrop
 
 	public function fire($url, $dimensions, $offset = ['x'=>50, 'y'=>50], $format = 'jpg')
 	{
+
 		if ($this->fileNotImage($url)){
 			if (!\App::environment(['local'])) {
 				return 'IMAGE_NOT_FOUND';
@@ -25,7 +26,17 @@ class BladeImageCrop
 		}
 
 		$newImageUrl = $this->updateUrl($url, $dimensions, $offset, $format);
+
 		$fixedNewImageUrl = parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( $newImageUrl ) )['path'];
+
+		$oldUblockUnfriendlyUrl = str($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function(array $matches){
+			return $matches[1];
+		})->value();
+
+
+		if (Storage::disk( config('bladeimagecrop.disk') )->has($oldUblockUnfriendlyUrl)){
+			Storage::disk( config('bladeimagecrop.disk') )->move($oldUblockUnfriendlyUrl, $newImageUrl);
+		}
 
 		if (Storage::disk( config('bladeimagecrop.disk') )->has($newImageUrl)){
 			return $fixedNewImageUrl;
@@ -68,7 +79,7 @@ class BladeImageCrop
 
 		$path = '/'.$segments->implode('/')
 		.'/'.str_replace('.', '_', $filename)
-		.'/'.implode('x', $dimensions)
+		.'/bic_'.implode('x', $dimensions)
 		.'_'.implode('_', $offset)
 		.'.'.$format;
 

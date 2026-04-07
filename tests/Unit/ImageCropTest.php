@@ -71,7 +71,7 @@ class ImageCropTest extends TestCase
 		);
 
 		$this->assertTrue(
-			Storage::disk('public')->has('/uploads/banners/page/cater_jpg/400x300_50_50.jpg')
+			Storage::disk('public')->has('/uploads/banners/page/cater_jpg/bic_400x300_50_50.jpg')
 		);
 
 	}
@@ -91,7 +91,7 @@ class ImageCropTest extends TestCase
 		(new BladeImageCrop)->fire($url, $dimensions, $offset, 'webp');
 
 		$this->assertTrue(
-			Storage::disk('public')->has('banners/page/cater_jpg/400x300_50_50.webp')
+			Storage::disk('public')->has('banners/page/cater_jpg/bic_400x300_50_50.webp')
 		);
 
 	}
@@ -111,9 +111,12 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/storage/banners/page/cater_jpg/400x300_50_50.jpg',
+			'/storage/banners/page/cater_jpg/bic_400x300_50_50.jpg',
 			$newImageUrl
 		);
+//		$this->assertTrue(
+//		Storage::disk('uploads')->has('banners/page/cater_jpg/bic_400x300_50_50.jpg', $image)
+//		);
 
 	}
 
@@ -131,7 +134,7 @@ class ImageCropTest extends TestCase
 		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'/storage/banners/page/cater_jpg/400x300_50_50.jpg',
+			'/storage/banners/page/cater_jpg/bic_400x300_50_50.jpg',
 			$newImageUrl
 		);
 
@@ -173,13 +176,13 @@ class ImageCropTest extends TestCase
 	function update_url_returns_proper_url(){
 		$result = (new BladeImageCrop)->updateUrl('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'uploads/cater_jpg/800x600_50_50.jpg',
+			'uploads/cater_jpg/bic_800x600_50_50.jpg',
 			$result
 		);
 
 		$result = (new BladeImageCrop)->updateUrl('cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'cater_jpg/800x600_50_50.jpg',
+			'cater_jpg/bic_800x600_50_50.jpg',
 			$result
 		);
 	}
