@@ -178,7 +178,7 @@ class ImgTest extends TestCase
 		$result = $this->blade('<x-img src="/img/OverlyLargeImage.png"  width="320"/>');
 
 		$expected = <<<EOT
-		<img style="object-fit:cover" src="/img/OverlyLargeImage.png" width="320px" height="auto">
+		<img style="object-fit:cover; width: 320px; height: auto;" src="/img/OverlyLargeImage.png" width="320px" height="auto">
 		EOT;
 
 		$result->assertSee($expected, false);
