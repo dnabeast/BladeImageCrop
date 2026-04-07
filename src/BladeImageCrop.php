@@ -29,9 +29,9 @@ class BladeImageCrop
 
 		$fixedNewImageUrl = parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( $newImageUrl ) )['path'];
 
-		$oldUblockUnfriendlyUrl = str($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function(array $matches){
+		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function(array $matches){
 			return $matches[1];
-		})->value();
+		});
 
 
 		if (Storage::disk( config('bladeimagecrop.disk') )->has($oldUblockUnfriendlyUrl)){
