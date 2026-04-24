@@ -63,6 +63,7 @@ class HoldImage
 	public function holdFileWithImageMagick(string $formattedFileName): void
 	{
 		if ($this->src->startsWith('http')) {
+			if (@get_headers($this->src)[0] == "HTTP/1.1 404 Not Found"){ throw new \Exception('FILE NOT FOUND'); }
 			$image = new Imagick();
 			$image->readImageBlob(file_get_contents($this->src));
 		} else {
