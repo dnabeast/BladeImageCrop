@@ -38,8 +38,8 @@ class HoldImage
 		}
 
 		$formattedFileName = $workingSrc . '.' . $extension;
-		// if file exists then return it
 
+		// if file exists then return it
 		if ($this->storageDisk->exists('blade_image_crop_holding/' . $formattedFileName)) {
 			return 'blade_image_crop_holding/' . $formattedFileName;
 		}

@@ -214,6 +214,15 @@ This creates an extra set of source files that only activate when the media quer
 
 Select the disk you want to use for storage
 
+### 'remove_domain'
+
+If you need your images to have the site url attached but don't want this included in the name of your held files set this to true.
+
+Files will save to 
+```/bladeimagecrop/imgfilenamepng.jpg```
+instead of 
+```/bladeimagecrop/httpsitecomimgfilenamepng.jpg```
+
 ### Default Offsets
 ```php
 'offset_x' => 50, // percentage
