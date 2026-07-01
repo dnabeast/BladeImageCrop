@@ -30,7 +30,14 @@ class HoldImage
 	{
 
 		$extension = strtolower($this->src->explode('.')->last());
-		$formattedFileName = $this->src->slug . '.' . $extension;
+
+		if (config('bladeimagecrop.remove_domain')){
+			$workingSrc = $this->src->replace(url('/').'/', "")->slug();
+		} else {
+			$workingSrc = $this->src->slug();
+		}
+
+		$formattedFileName = $workingSrc . '.' . $extension;
 		// if file exists then return it
 
 		if ($this->storageDisk->exists('blade_image_crop_holding/' . $formattedFileName)) {
@@ -63,9 +70,11 @@ class HoldImage
 	public function holdFileWithImageMagick(string $formattedFileName): void
 	{
 		if ($this->src->startsWith('http')) {
-			if (@get_headers($this->src)[0] == "HTTP/1.1 404 Not Found"){ throw new \Exception('FILE NOT FOUND'); }
+			$response = Http::get($this->src);
+
+			if ($response->status() == 404){ throw new \Exception('FILE NOT FOUND'); }
 			$image = new Imagick();
-			$image->readImageBlob(file_get_contents($this->src));
+			$image->readImageBlob($response->body());
 		} else {
 			$image = new Imagick(public_path($this->src));
 		}

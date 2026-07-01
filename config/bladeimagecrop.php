@@ -2,6 +2,7 @@
 
 return [
 	'enabled' => env('BLADE_CROP_ENABLED', true),
+	'remove_domain' => env('BLADE_REMOVE_DOMAIN', false),
 	'disk' => 'public',
 	'offset_x' => 50, // percentage
 	'offset_y' => 50,

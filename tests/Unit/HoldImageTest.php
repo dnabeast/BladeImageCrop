@@ -75,7 +75,7 @@ class HoldImageTest extends TestCase
 	}
 
 	/** @test */
-	function give_it_an_online_image_that_exists_returns_fail_message(){
+	function give_it_an_online_image_that_exists_returns_success(){
 		Config::set(['bladeimagecrop.compress_held_image' => true]);
 
 		$file = 'https://smartenough.org/img/stealbananas.jpg';
@@ -86,6 +86,29 @@ class HoldImageTest extends TestCase
 		Storage::fake('public');
 
 		$expected = 'blade_image_crop_holding/httpssmartenoughorgimgstealbananasjpg.jpg';
+
+		$holdImage = new HoldImage($file);
+
+		$this->assertEquals(
+			$expected,
+			$holdImage->file()
+		);
+	}
+
+
+	/** @test */
+	function give_it_an_online_image_but_turn_off_domain_returns_truncated_filename(){
+		Config::set(['bladeimagecrop.compress_held_image' => true]);
+		Config::set(['bladeimagecrop.remove_domain' => true]);
+
+		$file = 'http://localhost/img/stealbananas.jpg';
+		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'uploads/banners/page/cater.jpg');
+
+		Http::fake([$file => Http::response($image, 200) ]);
+
+		Storage::fake('public');
+
+		$expected = 'blade_image_crop_holding/imgstealbananasjpg.jpg';
 
 		$holdImage = new HoldImage($file);
 
