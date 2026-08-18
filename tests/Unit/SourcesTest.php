@@ -46,8 +46,7 @@ class SourcesTest extends TestCase
 		});
 	}
 
-	/** @test */
-	function if_blade_command_sources_requested_return_a_html_string(){
+	function test_if_blade_command_sources_requested_return_a_html_string(){
 
 
 		$expected = <<<EOT
@@ -61,8 +60,7 @@ class SourcesTest extends TestCase
 
 	}
 
-	/** @test */
-	function if_blade_command_sources_requested_with_many_properties_return_a_html_string(){
+	function test_if_blade_command_sources_requested_with_many_properties_return_a_html_string(){
 
 		$expected = <<<EOT
 		<source media="test" type="image/webp" srcset="/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/bic_800x600_50_50.webp 800w,/storage/blade_image_crop_holding/uploadsbannerspagecaterjpg_jpg/bic_1024x768_50_50.webp 1024w" sizes="sizeTest">
@@ -77,8 +75,7 @@ class SourcesTest extends TestCase
 
 	// assert contains only instances of
 
-	/** @test */
-	function if_properties_is_not_dynamic_throw_exception(){
+	function test_if_properties_is_not_dynamic_throw_exception(){
 
 		$this->expectException(\Exception::class);
 		$this->expectExceptionMessage('Properties must use : as a prefix.');

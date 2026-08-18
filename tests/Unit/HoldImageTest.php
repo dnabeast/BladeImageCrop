@@ -38,8 +38,7 @@ class HoldImageTest extends TestCase
 		});
 	}
 
-	/** @test */
-	function give_it_a_local_image_that_exists_returns_path(){
+	function test_give_it_a_local_image_that_exists_returns_path(){
 
 		$file = 'uploads/banners/page/cater.jpg';
 		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$file);
@@ -58,8 +57,7 @@ class HoldImageTest extends TestCase
 
 	}
 
-	/** @test */
-	function give_it_a_local_image_that_doesn_t_exists_returns_fail_message(){
+	function test_give_it_a_local_image_that_doesn_t_exists_returns_fail_message(){
 		$file = 'uploads/banners/page/doesntexist.jpg';
 
 		Storage::fake('public');
@@ -74,8 +72,7 @@ class HoldImageTest extends TestCase
 		);
 	}
 
-	/** @test */
-	function give_it_an_online_image_that_exists_returns_success(){
+	function test_give_it_an_online_image_that_exists_returns_success(){
 		Config::set(['bladeimagecrop.compress_held_image' => true]);
 
 		$file = 'https://smartenough.org/img/stealbananas.jpg';
@@ -96,8 +93,7 @@ class HoldImageTest extends TestCase
 	}
 
 
-	/** @test */
-	function give_it_an_online_image_but_turn_off_domain_returns_truncated_filename(){
+	function test_give_it_an_online_image_but_turn_off_domain_returns_truncated_filename(){
 		Config::set(['bladeimagecrop.compress_held_image' => true]);
 		Config::set(['bladeimagecrop.remove_domain' => true]);
 
@@ -118,8 +114,7 @@ class HoldImageTest extends TestCase
 		);
 	}
 
-	/** @test */
-	function give_it_an_online_image_that_doesn_t_exists_returns_fail_message(){
+	function test_give_it_an_online_image_that_doesn_t_exists_returns_fail_message(){
 		$file = 'https://smartenough.org/img/stealbananas.jpg';
 		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'uploads/banners/page/cater.jpg');
 

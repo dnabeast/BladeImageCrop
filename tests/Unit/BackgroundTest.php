@@ -34,8 +34,7 @@ class BackgroundTest extends TestCase
 		]);
 	}
 
-	/** @test */
-	function src_of_image_returns_png_string(){
+	function test_src_of_image_returns_png_string(){
 		$base64 = "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAP0lEQVQImQE0AMv/ASsvCUoqH2lpSPcs/wT38wD98vzo2/UGDQIDDg0HDAUBA/8B/fwUBAYDEA8aKun/Egf4GADOEqIfhaDkAAAAAElFTkSuQmCC";
 
 		$expected = 'style="background-size: 100% 100%; background-image: url(\'data:image/png;base64,';
@@ -57,8 +56,7 @@ class BackgroundTest extends TestCase
 
 	}
 
-	/** @test */
-	function empty_source_returns_image_not_found(){
+	function test_empty_source_returns_image_not_found(){
 		$base64 = "MissingBGImage";
 
 		$expected = 'style="background-size: 100% 100%; background-image: url(\'data:image/png;base64,'.$base64.'\')"';

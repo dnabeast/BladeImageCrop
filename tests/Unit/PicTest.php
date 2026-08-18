@@ -49,8 +49,7 @@ class PicTest extends TestCase
 
 	}
 
-	/** @test */
-	function provide_pic_tag_and_get_html(){
+	function test_provide_pic_tag_and_get_html(){
 		$result = $this->blade('<x-pic  src="/img/OverlyLargeImage.png"  width="320" class="m-1" alt="Description of Image"/>');
 
 		$expectedBeginning = <<<EOT

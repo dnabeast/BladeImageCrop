@@ -15,8 +15,7 @@ class ImageBuilderTest extends TestCase
 		parent::setUp();
 	}
 
-	/** @test */
-	function creates_and_saves_a_jpeg_image(){
+	function test_creates_and_saves_a_jpeg_image(){
 		Config::set('bladeimagecrop.build_classes', ['jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder']);
 		Config::set('bladeimagecrop.disk', 'storage');
 		$path = __DIR__;
@@ -49,8 +48,7 @@ class ImageBuilderTest extends TestCase
 
 	}
 
-	/** @test */
-	function creates_and_saves_a_webp_image(){
+	function test_creates_and_saves_a_webp_image(){
 		Config::set('bladeimagecrop.build_classes', ['webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder']);
 		Config::set('bladeimagecrop.disk', 'storage');
 		$path = __DIR__;

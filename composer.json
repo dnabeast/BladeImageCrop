@@ -16,14 +16,14 @@
 		}
 	],
 	"require": {
-		"php": "^7.3|^8.0",
-		"guzzlehttp/guzzle": "^6.0|^7.0",
+		"php": "^8.3",
+		"guzzlehttp/guzzle": "^7.0",
 		"shortpixel/shortpixel-php": "^1.7",
-		"illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0"
+		"illuminate/support": "^12.40|^13.0"
 	},
 	"require-dev": {
-		"orchestra/testbench": "^7.0",
-		"phpunit/phpunit": "^9.0"
+		"orchestra/testbench": "^10.8|^11.0",
+		"pestphp/pest": "^4.1.5"
 	},
 	"autoload": {
 		"psr-4": {
@@ -41,7 +41,10 @@
 
 	},
 	"config": {
-		"sort-packages": true
+		"sort-packages": true,
+		"allow-plugins": {
+			"pestphp/pest-plugin": true
+		}
 	},
 	"extra": {
 		"laravel": {

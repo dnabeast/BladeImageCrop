@@ -52,7 +52,9 @@ class HoldImage
 					$this->holdFileWithGDLibrary($extension, $formattedFileName);
 				}
 			} else {
-				$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, File::get(public_path($this->src)));
+				$file = Storage::disk('public')->get($this->src);
+				if (!$file) { return 'FILE NOT FOUND';}
+				$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $file);
 				return 'blade_image_crop_holding/' . $formattedFileName;
 			}
 		} catch (\Exception $e) {

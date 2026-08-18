@@ -35,8 +35,7 @@ class ImageCropTest extends TestCase
 		});
 	}
 
-	/** @test */
-	function if_no_image_found_return_imagenotfound(){
+	function test_if_no_image_found_return_imagenotfound(){
 
 		$url = 'uploads/banners/page/doesntexist.jpg';
 		$dimensions = [400, 300];
@@ -53,8 +52,7 @@ class ImageCropTest extends TestCase
 	}
 
 
-	/** @test */
-	function if_correct_file_exists_return_file_url(){
+	function test_if_correct_file_exists_return_file_url(){
 
 		$url = 'uploads/banners/page/cater.jpg';
 		$dimensions = ['width' => 400, 'height' => 300];
@@ -76,8 +74,7 @@ class ImageCropTest extends TestCase
 
 	}
 
-	/** @test */
-	function if_correct_file_exists_with_webp_format_return_file_url(){
+	function test_if_correct_file_exists_with_webp_format_return_file_url(){
 
 		$url = 'banners/page/cater.jpg';
 		$dimensions = ['width' => 400, 'height' => 300];
@@ -96,8 +93,7 @@ class ImageCropTest extends TestCase
 
 	}
 
-	/** @test */
-	function if_correct_file_exists_on_correct_disk_return_file_url(){
+	function test_if_correct_file_exists_on_correct_disk_return_file_url(){
 		Config::set('bladeimagecrop.disk', 'uploads');
 
 		$url = 'banners/page/cater.jpg';
@@ -120,8 +116,7 @@ class ImageCropTest extends TestCase
 
 	}
 
-	/** @test */
-	function if_correct_file_in_correct_directory_exists_return_file_url(){
+	function test_if_correct_file_in_correct_directory_exists_return_file_url(){
 
 		$url = 'banners/page/cater.jpg';
 		$dimensions = [400, 300];
@@ -140,8 +135,7 @@ class ImageCropTest extends TestCase
 
 	}
 
-	/** @test */
-	function if_correct_file_doens_t_exists_return_file_url_and_make_new_directory_and_file(){
+	function test_if_correct_file_doens_t_exists_return_file_url_and_make_new_directory_and_file(){
 
 		$url = 'banners/page/grid.png';
 		$options = ['targetWidth'=>500, 'targetHeight'=>250, 'cropWidth'=>50, 'cropHeight'=>50, 'x'=>50, 'y'=>50];
@@ -172,8 +166,7 @@ class ImageCropTest extends TestCase
 
 	}
 
-	/** @test */
-	function update_url_returns_proper_url(){
+	function test_update_url_returns_proper_url(){
 		$result = (new BladeImageCrop)->updateUrl('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
 			'uploads/cater_jpg/bic_800x600_50_50.jpg',
@@ -187,8 +180,7 @@ class ImageCropTest extends TestCase
 		);
 	}
 
-	/** @test */
-	function if_url_has_directory_but_is_not_a_file_it_should_return_image_not_found(){
+	function test_if_url_has_directory_but_is_not_a_file_it_should_return_image_not_found(){
 		Config::set('bladeimagecrop.disk', 'uploads');
 		Config::set('bladeimagecrop.images_from_public_path', true);
 
@@ -206,8 +198,7 @@ class ImageCropTest extends TestCase
 		);
 	}
 
-	/** @test */
-	function if_file_has_no_extensions_should_return_image_not_found(){
+	function test_if_file_has_no_extensions_should_return_image_not_found(){
 		$url = 'banners/page/caterjpg';
 		$dimensions = ['width'=>400,'height'=>300];
 		$image = file_get_contents(__DIR__.'/uploads/banners/page/cater.jpg');
@@ -224,8 +215,7 @@ class ImageCropTest extends TestCase
 		);
 	}
 
-	/** @test */
-	function if_file_is_not_an_image_return_false(){
+	function test_if_file_is_not_an_image_return_false(){
 
 		$url = 'uploads/banners/page/isImage.jpg';
 		$url2 = 'uploads/banners/page/isText.txt';
@@ -246,8 +236,7 @@ class ImageCropTest extends TestCase
 		);
 	}
 
-	/** @test */
-	function get_newly_calculated_size_options_for_the_builder(){
+	function test_get_newly_calculated_size_options_for_the_builder(){
 		$data = [
 			1000,
 			800,
@@ -281,8 +270,7 @@ class ImageCropTest extends TestCase
 		);
 	}
 
-	/** @test */
-	function dont_resize_image_if_target_is_bigger_than_original_image(){
+	function test_dont_resize_image_if_target_is_bigger_than_original_image(){
 
 			$data = [
 				500,

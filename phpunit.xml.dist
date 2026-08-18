@@ -1,28 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php"
-		 backupGlobals="false"
-		 backupStaticAttributes="false"
-		 colors="true"
-		 verbose="true"
-		 convertErrorsToExceptions="true"
-		 convertNoticesToExceptions="true"
-		 convertWarningsToExceptions="true"
-		 processIsolation="false"
-		 stopOnFailure="false">
-	<testsuites>
-		<testsuite name="Blade Image Crop Test Suite">
-			<directory>tests</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-		<whitelist>
-			<directory suffix=".php">src/</directory>
-		</whitelist>
-	</filter>
-	<logging>
-		<log type="tap" target="build/report.tap"/>
-		<log type="junit" target="build/report.junit.xml"/>
-		<log type="coverage-text" target="build/coverage.txt"/>
-		<log type="coverage-clover" target="build/logs/clover.xml"/>
-	</logging>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         testdox="true"
+>
+  <testsuites>
+    <testsuite name="Blade Image Crop Test Suite">
+      <directory>tests/Unit</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="DB_CONNECTION" value="testing" force="true"/>
+    <env name="DB_DATABASE" value=":memory:" force="true"/>
+    <env name="APP_ENV" value="testing" force="true"/>
+  </php>
 </phpunit>

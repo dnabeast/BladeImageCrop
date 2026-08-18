@@ -56,8 +56,7 @@ class ImgTest extends TestCase
 	}
 
 
-	/** @test */
-	function give_x_img_component_and_return_filled_img_tag(){
+	function test_give_x_img_component_and_return_filled_img_tag(){
 
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320"/>');
 
@@ -73,8 +72,7 @@ class ImgTest extends TestCase
 		$result->assertSee($expectedEnd, false);
 	}
 
-	/** @test */
-	function give_x_img_component_with_1_prop_and_return_filled_img_tag(){
+	function test_give_x_img_component_with_1_prop_and_return_filled_img_tag(){
 
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  :properties="[320]"/>');
 
@@ -91,8 +89,7 @@ class ImgTest extends TestCase
 		$result->assertSee($expectedEnd, false);
 	}
 
-	/** @test */
-	function give_class_and_alt_tag_and_see_them_in_the_result(){
+	function test_give_class_and_alt_tag_and_see_them_in_the_result(){
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320" class="m-1" alt="Description of Image"/>');
 
 		$expectedBeginning = <<<EOT
@@ -107,8 +104,7 @@ class ImgTest extends TestCase
 		$result->assertSee($expectedEnd, false);
 	}
 
-	/** @test */
-	function give_properties_and_see_them_in_the_result(){
+	function test_give_properties_and_see_them_in_the_result(){
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png" :properties="[300, 200, 60]"  width="320" class="m-1" alt="Description of Image"/>');
 
 		$expectedBeginning = <<<EOT
@@ -123,8 +119,7 @@ class ImgTest extends TestCase
 		$result->assertSee($expectedEnd, false);
 	}
 
-	/** @test */
-	function set_changed_default_and_see_them_in_the_result(){
+	function test_set_changed_default_and_see_them_in_the_result(){
 		Config::set('bladeimagecrop.offset_x', 40);
 		Config::set('bladeimagecrop.offset_y', 70);
 		Config::set('bladeimagecrop.pixel_device_ratios', ['1x', '2x', '4x']);
@@ -144,8 +139,7 @@ class ImgTest extends TestCase
 		$result->assertSee($expectedEnd, false);
 	}
 
-	/** @test */
-	function set_no_background_and_see_it_removed_from_the_result(){
+	function test_set_no_background_and_see_it_removed_from_the_result(){
 		Config::set('bladeimagecrop.backgrounds', false);
 
 		$result = $this->blade('<x-img  src="/img/OverlyLargeImage.png"  width="320"/>');
@@ -158,8 +152,7 @@ class ImgTest extends TestCase
 	}
 
 
-	/** @test */
-	function turn_sources_off_and_dont_see_srcset_at_all(){
+	function test_turn_sources_off_and_dont_see_srcset_at_all(){
 		Config::set('bladeimagecrop.backgrounds', false);
 
 		$result = $this->blade('<x-img sources="false" src="/img/OverlyLargeImage.png"  width="320"/>');
@@ -171,8 +164,7 @@ class ImgTest extends TestCase
 		$result->assertSee($expected, false);
 	}
 
-	/** @test */
-	function set_bic_to_not_enabled_and_return_with_width_and_height(){
+	function test_set_bic_to_not_enabled_and_return_with_width_and_height(){
 		Config::set('bladeimagecrop.enabled', false);
 
 		$result = $this->blade('<x-img src="/img/OverlyLargeImage.png"  width="320"/>');

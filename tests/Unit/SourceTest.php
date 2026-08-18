@@ -35,8 +35,7 @@ class SourceTest extends TestCase
 		]);
 	}
 
-	/** @test */
-	function return_source_object_with_all_options(){
+	function test_return_source_object_with_all_options(){
 
 		$response = '/image_jpg/800x600_50_50.jpg';
 
@@ -63,8 +62,7 @@ class SourceTest extends TestCase
 	}
 
 
-	/** @test */
-	function calculate_the_uris_from_the_srcset_lines(){
+	function test_calculate_the_uris_from_the_srcset_lines(){
 
 		$response = '/image_jpg/800x600_50_50.jpg';
 
@@ -90,8 +88,7 @@ class SourceTest extends TestCase
 
 	}
 
-	/** @test */
-	function calculate_the_uris_pixel_ratio_from_the_srcset_lines(){
+	function test_calculate_the_uris_pixel_ratio_from_the_srcset_lines(){
 
 		$response = '/image_jpg/800x600_50_50.jpg';
 
