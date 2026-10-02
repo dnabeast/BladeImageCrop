@@ -15,16 +15,6 @@ class GD_WebPBuilder extends ImageTypeBuilder
 		$this->image = $this->makeImage();
 	}
 
-
-	// if (config('bladeimagecrop.text_labels')){
-	// 	$text_color = imagecolorallocate($image_destination, 0, 0, 0);
-	// 	imagestring($image_destination, 1, 4, 6, $uri , $text_color);
-	// 	$text_color = imagecolorallocate($image_destination, 255, 255, 255);
-	// 	imagestring($image_destination, 1, 5, 5, $uri, $text_color);
-	// }
-
-
-
 	public function makeImage(){
 		return imagecreatefromstring($this->imageString);
 	}

@@ -25,14 +25,12 @@ class HoldImage
 		return $this->storageDisk->path($this->file());
 	}
 
-
 	public function file()
 	{
-
 		$extension = strtolower($this->src->explode('.')->last());
 
 		if (config('bladeimagecrop.remove_domain')){
-			$workingSrc = $this->src->replace(url('/').'/', "")->slug();
+			$workingSrc = $this->src->replaceMatches("/^https?:\/\/.*?\//", "")->slug();
 		} else {
 			$workingSrc = $this->src->slug();
 		}
@@ -52,8 +50,9 @@ class HoldImage
 					$this->holdFileWithGDLibrary($extension, $formattedFileName);
 				}
 			} else {
-				$file = Storage::disk('public')->get($this->src);
-				if (!$file) { return 'FILE NOT FOUND';}
+				$file = Http::get($this->src);
+
+				if ($file->status() != 200) { return 'FILE NOT FOUND';}
 				$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $file);
 				return 'blade_image_crop_holding/' . $formattedFileName;
 			}
@@ -71,15 +70,15 @@ class HoldImage
 	 */
 	public function holdFileWithImageMagick(string $formattedFileName): void
 	{
-		if ($this->src->startsWith('http')) {
+//		if ($this->src->startsWith('http')) {
 			$response = Http::get($this->src);
 
 			if ($response->status() == 404){ throw new \Exception('FILE NOT FOUND'); }
 			$image = new Imagick();
 			$image->readImageBlob($response->body());
-		} else {
-			$image = new Imagick(public_path($this->src));
-		}
+//		} else {
+//			$image = new Imagick(public_path($this->src));
+//		}
 
 		$image->autoOrient();
 		$image->setImageCompressionQuality(85);

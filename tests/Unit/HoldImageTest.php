@@ -43,8 +43,10 @@ class HoldImageTest extends TestCase
 		$file = 'uploads/banners/page/cater.jpg';
 		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$file);
 
-		Storage::fake('public');
-		Storage::disk('public')->put($file, $image);
+//		Storage::fake('public');
+//		Storage::disk('public')->put($file, $image);
+
+		Http::fake([$file => Http::response($image, 200) ]);
 
 		$expected = 'blade_image_crop_holding/uploadsbannerspagecaterjpg.jpg';
 
@@ -116,9 +118,8 @@ class HoldImageTest extends TestCase
 
 	function test_give_it_an_online_image_that_doesn_t_exists_returns_fail_message(){
 		$file = 'https://smartenough.org/img/stealbananas.jpg';
-		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'uploads/banners/page/cater.jpg');
 
-		Http::fake();
+		Http::fake([$file => Http::response(null, 404) ]);
 
 		Storage::fake('public');
 

@@ -37,7 +37,7 @@ class Img extends Component
 	public function render()
 	{
 		if (!config('bladeimagecrop.enabled', true)){
-			$propertyArray = is_array($this->properties)?['width'=>$this->properties[0].'px', 'height'=>$this->properties[1].'px']:['width' => $this->properties.'px', 'height'=>"auto"];
+			$propertyArray = is_array($this->properties)?['width'=>$this->properties[0].'px', 'height'=>isset($this->properties[1])?$this->properties[1].'px':'auto']:['width' => $this->properties.'px', 'height'=>'auto'];
 			return '<img style="object-fit:cover; width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
 		}
 

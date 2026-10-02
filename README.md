@@ -1,7 +1,7 @@
 # Blade Image Crop
 
 
-## About Blade Image Crop 3
+## About Blade Image Crop 4
 
 Use WebP without the headache. Provide alternate image sizes for your user's preferred display. Reference one image on your server then specify its dimensions in a blade component.
 
@@ -17,6 +17,7 @@ It supports
 - Mobile and desktop versions
 - local AND online images
 - queuing the image processing
+- S3 and Laravel Cloud
 
 ## Installation
 
@@ -40,9 +41,8 @@ Or make whatever changes you wish to the storage. (more info below)
 
 ## Upgrade Guide
 
-Because it uses the Laravel Http helper this program no longer supports Laravel 6.
-By default we use Image Magick which comes installed by default on Laravel Forge. There is still the option to switch to GD library by publishing the config file and selecting the GD options.
-The system now grabs the original src from the public directory OR an URL (rather than the weird workaround needed by the FileStorage system )
+By default we use Image Magick which (in most instances) comes installed by default on Laravel Forge and Cloud. There is still the option to switch to GD library by publishing the config file and selecting the GD options.
+The system now grabs the original src from the URL.
 The next time you load an image using the blade component it will duplicate your image to a holding directory and remake your resized images. It will only do this once.
 You can safely remove older versions of files.
 If you've turned the images_from_public_path to false then it's not going to work any more and you'll have to update your img src attributes.
@@ -64,15 +64,17 @@ Instead you would put
 <x-img src="/storage/overlyLargeImage.jpg" width="300" class="" alt="" />
 ```
 
+Note: You can put the full url in the src attribute or just the local path. The output will always be the full url in order to support other disks.
+
 The initial image would be resized and saved to a 300px wide version and a 600px wide version (for hi-res displays) in JPG format. The resulting output would be
 ```html
 <img srcset="
-/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x200_50_50.jpg 1x,
-/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x400_50_50.jpg 2x"
+https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x200_50_50.jpg 1x,
+https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x400_50_50.jpg 2x"
 style="
 background-size: 100% 100%;
-background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*")"
-src="/storage/blade_image_crop_holding/overlyLargeImage_jpg/320x240_50_50.jpg"
+background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*)"
+src="https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/320x200_50_50.jpg"
 width="300" height="200" class="" alt="">
 ```
 
@@ -91,7 +93,7 @@ As before you might have your image like so
 
 In this instance you might want your images to be 300px wide and 180px tall.
 
-(Note the **:** before **properties** to make blade recogise it is an array and not a string)
+(Note the **:** before **properties** to make blade recognise it is an array and not a string)
 ```blade
 <x-img src="/storage/overlyLargeImage.jpg" :properties="[300, 180]" class="" alt="" />
 ```
@@ -108,11 +110,11 @@ This creates a 300px x 180px version, a 1024px x 300px version and a 2048px x 60
 The resulting code would be
 ```html
 <img srcset="
-	/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x180_50_50.jpg 300w,
-	/storage/blade_image_crop_holding/overlyLargeImage_jpg/1024x300_50_50.jpg 1024w,
-	/storage/blade_image_crop_holding/overlyLargeImage_jpg/2048x600_50_50.jpg 2048w"
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x180_50_50.jpg 300w,
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/1024x300_50_50.jpg 1024w,
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/2048x600_50_50.jpg 2048w"
 style="background-size: 100% 100%; background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*")
-	 src="/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x180_50_50.jpg"
+	 src="https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x180_50_50.jpg"
 	 width="300" height="180" class="" alt="">
 ```
 
@@ -124,13 +126,13 @@ style="background-size: 100% 100%; background-image: url('data:image/png;base64,
 If your original image has its point of focus not in the centre of the image (for instance a figure on the left hand side) you can set the crop to offset horizontally.
 
 ```blade
-<x-img src="/storage/overlyLargeImage.jpg" :properties="[300, 200, 75]"/>
+<x-img src="https://yourserver.com/storage/overlyLargeImage.jpg" :properties="[300, 200, 75]"/>
 ```
 
 The above setting would crop to include the point 75% across the original image and 50% down.
 
 ```blade
-<x-img src="/storage/overlyLargeImage.jpg" :properties="[300, 200, 50, 25]"/>
+<x-img src="https://yourserver.com/storage/overlyLargeImage.jpg" :properties="[300, 200, 50, 25]"/>
 ```
 This one would focus on the horizontal centre but 25% down from the top of the image.
 
@@ -145,7 +147,7 @@ You don't have to. The real power of Blade Image Crop is in the pic tag.
 (Note: You must wrap this tag in a picture tag)
 ```blade
 <picture>
-	<x-pic src="/storage/overlyLargeImage.jpg" :properties="[300, 100]"/>
+	<x-pic src="https://yourserver.com/storage/overlyLargeImage.jpg" :properties="[300, 100]"/>
 </picture>
 ```
 
@@ -153,13 +155,13 @@ This will result in
 ```html
 <picture>
 	<source type="image/webp" srcset="
-	/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.webp 1x,
-	/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x200_50_50.webp 2x">
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.webp 1x,
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x200_50_50.webp 2x">
 	<source type="image/jpeg" srcset="
-	/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.jpg 1x,
-	/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x200_50_50.jpg 2x">
-	<img  style="background-size: 100% 100%; background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*"')"
-	src="/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.jpg"
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.jpg 1x,
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/600x200_50_50.jpg 2x">
+	<img  style="background-size: 100% 100%; background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*')"
+	src="https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/300x100_50_50.jpg"
 	width="300" height="100" class="" alt="">
 </picture>
 ```
@@ -178,31 +180,31 @@ Notice the img tag needs the **sources="false"** attribute so that the srcset is
 
 ```blade
 <picture>
-	<x-sources src="/storage/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[[800, 600], 1024]" sizes="(min-width: 60rem) 80vw, 100vw"/>
-	<x-img sources="false" src="/img/OverlyLargeImage.png" :properties="[[800, 600], 1024]"/>
+	<x-sources src="storage/overlyLargeImage.jpg" :properties="[[800, 600], 1024]" sizes="(min-width: 60rem) 80vw, 100vw"/>
+	<x-img sources="false" src="storage/overlyLargeImage.jpg" :properties="[[800, 600], 1024]"/>
 </picture>
 ```
 This will output
 ```html
 <picture>
 	<source type="image/webp" srcset="
-	/cater_jpg/800x600_50_50.webp 800w,
-	/cater_jpg/1024x768_50_50.webp 1024w"
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/800x600_50_50.webp 800w,
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/1024x768_50_50.webp 1024w"
 	sizes="(min-width: 60rem) 80vw, 100vw">
 	<source type="image/jpeg" srcset="
-	/cater_jpg/800x600_50_50.jpg 800w,
-	/cater_jpg/1024x768_50_50.jpg 1024w"
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/800x600_50_50.jpg 800w,
+	https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/1024x768_50_50.jpg 1024w"
 	sizes="(min-width: 60rem) 80vw, 100vw">
-	<img style="background-size: 100% 100%; background-image: url('*very_low_res_base64_encoded_img*')" src="/cater_jpg/800x600_50_50.jpg" width="800" height="600" >
+	<img style="background-size: 100% 100%; background-image: url('*very_low_res_base64_encoded_img*')" src="https://yourserver.com/storage/blade_image_crop_holding/overlyLargeImage_jpg/800x600_50_50.jpg" width="800" height="600" >
 </picture>
 ```
 
 Or, if you're looking to have a mobile version of your image that is square and a desktop version that is wide. (and also let's pretend the focus of the image in slightly on the left )
 ```blade
 <picture>
-	<x-sources src="/storage/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[300, 300, 35, 50]" media="(max-width: 450px) and (orientation: portrait)" />
-	<x-sources src="/storage/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[800, 600]" />
-	<x-img sources="false" src="/img/OverlyLargeImage.png" :properties="[800, 600]" alt="" class=""/>
+	<x-sources src="https://yourserver.com/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[300, 300, 35, 50]" media="(max-width: 450px) and (orientation: portrait)" />
+	<x-sources src="https://yourserver.com/blade_image_crop_holding/overlyLargeImage_jpg" :properties="[800, 600]" />
+	<x-img sources="false" src="/OverlyLargeImage.png" :properties="[800, 600]" alt="" class=""/>
 </picture>
 ```
 This creates an extra set of source files that only activate when the media query matches.
@@ -241,9 +243,7 @@ Or if you don't want any DPI options just set it to ['1x']
 The inline backgrounds can be turned off. If you need to add style tags on your image you may need to turn this off.
 
 ### 'text_labels' => env('BLADE_CROP_TEST_LABELS', false),
-
-If you need to test to make sure the correct image is being displayed turning this to true will write the filename onto the image itself.
-**Beware:** Any files created with this flag on will keep this label once you turn it off again. The images should be deleted so that they can be recreated.
+This wrote text to the images for testing but has since been removed as it was not valuable and took too much support.
 
 ### 'compress_held_image' => env('BLADE_CROP_COMPRESS_HELD_IMAGE', true)
 
@@ -280,7 +280,7 @@ If you wanted to (for instance) change this to load the same loading image you c
 
 ## Troubleshooting
 **Is the site crashing and you're freaking out?**
-Sometimes a weird file get through. I've tried my best to get rid of potential crashes but I can never underestimate the ingenuity of fools. If you need to turn off the process there is a config option.
+Sometimes a weird file gets through. I've tried my best to get rid of potential crashes but I can never underestimate the ingenuity of fools. If you need to turn off the process there is a config option.
 ```
 'enabled' => env('BLADE_CROP_ENABLED', false),
 ```

@@ -2,14 +2,10 @@
 
 namespace DNABeast\BladeImageCrop;
 
-use Davidcb\LaravelShortPixel\Facades\LaravelShortPixel;
 use DNABeast\BladeImageCrop\Jobs\ProcessImage;
 use Exception;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Dimensions;
 use Imagick;
 
 class BladeImageCrop
@@ -39,7 +35,7 @@ class BladeImageCrop
 		}
 
 		if (Storage::disk( config('bladeimagecrop.disk') )->has($newImageUrl)){
-			return $fixedNewImageUrl;
+			return Storage::disk(config('bladeimagecrop.disk') )->url( $newImageUrl );
 		}
 
         $this->alterImage($url, $dimensions, $offset, $format);
@@ -64,7 +60,7 @@ class BladeImageCrop
 			return true;
 		};
 
-		if(@is_array(getimagesize($disk->path($url)))){
+		if(@is_array(getimagesize($disk->image($url)))){
 			return false;
 		}
 
