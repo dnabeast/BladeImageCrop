@@ -58,9 +58,9 @@ class BladeImageCrop
 
 		if ( pathinfo(Storage::disk( config('bladeimagecrop.disk') )->url($url), PATHINFO_EXTENSION) === '' ){
 			return true;
-		};
+		}
 
-		if(@is_array(getimagesize($disk->image($url)))){
+		if(@is_array(getimagesize( Storage::disk( config('bladeimagecrop.disk') )->url($url) ))){
 			return false;
 		}
 
