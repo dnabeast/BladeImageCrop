@@ -4,6 +4,7 @@ namespace DNABeast\BladeImageCrop\Builder;
 
 use Illuminate\Support\Facades\Storage;
 use Imagick;
+use Log;
 
 class IM_WebPBuilder extends ImageTypeBuilder
 {
@@ -17,14 +18,14 @@ class IM_WebPBuilder extends ImageTypeBuilder
 	}
 
 	public function makeImage(){
+		Log::info('Trying to make. '. $this->originPath);;
 		$image = new Imagick($this->originPath);
-		\Log::debug('Trying to make. '. $this->originPath);;
 		return $image;
 	}
 
 	public function resize($options){
 		if ($this->image->getNumberImages() == 0){
-			\Log::debug('Image is somehow missing. '. $this->originPath);;
+			Log::info('Image is somehow missing. '. $this->originPath);;
 			return null;
 		}
 		$this->image->autoOrient();
@@ -35,7 +36,7 @@ class IM_WebPBuilder extends ImageTypeBuilder
 
 	public function save($destinationPath){
 		if ($this->image->getNumberImages() == 0){
-			\Log::debug('Image is somehow missing. '. $this->originPath);;
+			Log::info('Image is somehow missing. '. $this->originPath);;
 			return null;
 		}
 		$this->image->setImageFormat( 'webp');

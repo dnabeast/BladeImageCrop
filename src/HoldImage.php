@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Imagick;
+use Log;
 
 
 class HoldImage
@@ -44,16 +45,19 @@ class HoldImage
 		try {
 			if (config('bladeimagecrop.compress_held_image') == 'true' ?? false) {
 				if (extension_loaded('imagick')) {
+					Log::info('Using Imagick');
 					$this->holdFileWithImageMagick($formattedFileName);
 				} else {
 					try {
+						Log::info('Using GD Library');
 						$this->holdFileWithGDLibrary($extension, $formattedFileName);
 					} catch (\Exception $e) {
-						\Log::error('GD Library failed. Reduce Image size or install Imagick. ' . $formattedFileName);
+						Log::error('GD Library failed. Reduce Image size or install Imagick. ' . $formattedFileName);
 						throw new \Exception('GD Library failed.');
 					}
 				}
 			} else {
+				Log::info('Not compressing held image');
 				$file = Http::withOptions(['stream' => true])->get($this->src);
 
 				if ($file->failed()) {
