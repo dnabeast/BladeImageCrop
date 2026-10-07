@@ -97,10 +97,10 @@ class BladeImageCrop
 
 		$uri = $this->updateUrl($path, $dimensions, $offset, $format);
 
-        dispatch(
+
             new ProcessImage(
                 $heldImagePath, $format, $options,$uri
-            ));
+            );
 
 	}
 
