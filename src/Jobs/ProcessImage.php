@@ -15,7 +15,7 @@ class ProcessImage implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 
-    public $url;
+    public $path;
     public $format;
     public $options;
     public $uri;
@@ -23,8 +23,8 @@ class ProcessImage implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($url, $format,$options,$uri) {
-        $this->url = $url;
+    public function __construct($path, $format,$options,$uri) {
+        $this->path = $path;
         $this->format = $format;
         $this->options = $options;
         $this->uri = $uri;
@@ -35,7 +35,6 @@ class ProcessImage implements ShouldQueue
      */
     public function handle(): void
     {
-        $blob = Storage::disk( config('bladeimagecrop.disk') )->get($this->url);
-        (new ImageBuilder($blob, $this->format))->resize($this->options)->save($this->uri);
+		(new ImageBuilder($this->path, $this->format))->resize($this->options)->save($this->uri);
     }
 }

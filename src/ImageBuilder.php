@@ -5,20 +5,20 @@ namespace DNABeast\BladeImageCrop;
 
 class ImageBuilder
 {
-	public $glob;
+	public $path;
 	public $format;
     public $class;
 
-	public function __construct($glob, $format)
+	public function __construct($path, $format)
 	{
-		$this->glob = $glob;
+		$this->path = $path;
 		$this->format = $format;
 		$this->class = $this->buildClass();
 	}
 
 	public function buildClass(){
 		$class = config('bladeimagecrop.build_classes')[$this->format];
-		return new $class($this->glob);
+		return new $class($this->path);
 	}
 
 	public function resize($options){

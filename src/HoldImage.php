@@ -2,7 +2,6 @@
 
 namespace DNABeast\BladeImageCrop;
 
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -29,7 +28,7 @@ class HoldImage
 	{
 		$extension = strtolower($this->src->explode('.')->last());
 
-		if (config('bladeimagecrop.remove_domain')){
+		if (config('bladeimagecrop.remove_domain')) {
 			$workingSrc = $this->src->replaceMatches("/^https?:\/\/.*?\//", "")->slug();
 		} else {
 			$workingSrc = $this->src->slug();
@@ -43,16 +42,23 @@ class HoldImage
 		}
 
 		try {
-			if (config('bladeimagecrop.compress_held_image') ?? false) {
+			if (config('bladeimagecrop.compress_held_image') == 'true' ?? false) {
 				if (extension_loaded('imagick')) {
 					$this->holdFileWithImageMagick($formattedFileName);
 				} else {
-					$this->holdFileWithGDLibrary($extension, $formattedFileName);
+					try {
+						$this->holdFileWithGDLibrary($extension, $formattedFileName);
+					} catch (\Exception $e) {
+						\Log::error('GD Library failed. Reduce Image size or install Imagick. ' . $formattedFileName);
+						throw new \Exception('GD Library failed.');
+					}
 				}
 			} else {
-				$file = Http::get($this->src);
+				$file = Http::withOptions(['stream' => true])->get($this->src);
 
-				if ($file->status() != 200) { return 'FILE NOT FOUND';}
+				if ($file->failed()) {
+					return 'FILE NOT FOUND';
+				}
 				$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $file);
 				return 'blade_image_crop_holding/' . $formattedFileName;
 			}
@@ -70,20 +76,25 @@ class HoldImage
 	 */
 	public function holdFileWithImageMagick(string $formattedFileName): void
 	{
-//		if ($this->src->startsWith('http')) {
-			$response = Http::get($this->src);
 
-			if ($response->status() == 404){ throw new \Exception('FILE NOT FOUND'); }
-			$image = new Imagick();
-			$image->readImageBlob($response->body());
-//		} else {
-//			$image = new Imagick(public_path($this->src));
-//		}
+		$tempFilePath = tempnam(sys_get_temp_dir(), 'img_');
+		$response = Http::withOptions(['stream' => true])->get($this->src);
+
+		$inputStream = fopen($tempFilePath, 'w+');
+		stream_copy_to_stream($response->toPsrResponse()->getBody()->detach(), $inputStream);
+		fclose($inputStream);
+
+		$image = new Imagick($tempFilePath);
 
 		$image->autoOrient();
-		$image->setImageCompressionQuality(85);
+		$image->setImageCompressionQuality(80);
 		$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $image->getImageBlob());
 		$image->clear();
+
+		if (file_exists($tempFilePath)) {
+			unlink($tempFilePath);
+		}
+
 	}
 
 	/**
@@ -93,32 +104,26 @@ class HoldImage
 	 */
 	public function holdFileWithGDLibrary(string $extension, string $formattedFileName): void
 	{
-		if ($this->src->startsWith('http')) {
-			$file = Http::get($this->src)->body();
-		} else {
-			$file = File::get(public_path($this->src));
-		}
+		$body = Http::withOptions(['stream' => true])->get($this->src)->body();
 
-		$glob = @imagecreatefromstring($file);
+		$image = @imagecreatefromstring($body);
 
-		if ((bool)$glob) {
-			ob_start();
+		if ($image) {
+			$outputStream = fopen('php://temp', 'w+');
+
 			if ($extension == 'jpg' || $extension == 'jpeg') {
-				imagejpeg($glob, null, 95);
+				imagejpeg($image, $outputStream, 95);
+			} elseif ($extension == 'png') {
+				imagepng($image, $outputStream, 9);
+			} elseif ($extension == 'webp') {
+				imagewebp($image, $outputStream, 95);
 			}
-			if ($extension == 'png') {
-				imagepng($glob);
-			}
-			if ($extension == 'webp') {
-				imagewebp($glob, null, 95);
-			}
-			$newFile = ob_get_contents();
-			if ($newFile && strlen($newFile) < strlen($file)) {
-				$file = $newFile;
-			}
-			ob_end_clean();
+			rewind($outputStream);
+			$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, stream_get_contents($outputStream));
+			fclose($outputStream);
+			imagedestroy($image);
+
 		}
-		$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $file);
 	}
 
 }

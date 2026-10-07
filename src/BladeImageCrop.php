@@ -11,24 +11,23 @@ use Imagick;
 class BladeImageCrop
 {
 
-	public function fire($url, $dimensions, $offset = ['x'=>50, 'y'=>50], $format = 'jpg')
+	public function fire($path, $dimensions, $offset = ['x'=>50, 'y'=>50], $format = 'jpg')
 	{
 
-		if ($this->fileNotImage($url)){
+		if ($this->fileNotImage($path)){
 			if (!\App::environment(['local'])) {
 				return 'IMAGE_NOT_FOUND';
 			}
-			return 'IMAGE_NOT_FOUND-'.Storage::disk( config('bladeimagecrop.disk') )->path($url);
+			return 'IMAGE_NOT_FOUND-'.Storage::disk( config('bladeimagecrop.disk') )->path($path);
 		}
 
-		$newImageUrl = $this->updateUrl($url, $dimensions, $offset, $format);
+		$newImageUrl = $this->updateUrl($path, $dimensions, $offset, $format);
 
 		$fixedNewImageUrl = parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( $newImageUrl ) )['path'];
 
 		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function(array $matches){
 			return $matches[1];
 		});
-
 
 		if (Storage::disk( config('bladeimagecrop.disk') )->has($oldUblockUnfriendlyUrl)){
 			Storage::disk( config('bladeimagecrop.disk') )->move($oldUblockUnfriendlyUrl, $newImageUrl);
@@ -38,9 +37,9 @@ class BladeImageCrop
 			return Storage::disk(config('bladeimagecrop.disk') )->url( $newImageUrl );
 		}
 
-        $this->alterImage($url, $dimensions, $offset, $format);
+		$this->alterImage($path, $dimensions, $offset, $format);
 
-        return parse_url( Storage::disk(config('bladeimagecrop.disk') )->url( $url ) )['path'];
+        return Storage::disk(config('bladeimagecrop.disk') )->url( $path );
 	}
 
 	public function fileNotImage($url){
@@ -83,24 +82,24 @@ class BladeImageCrop
 
 	}
 
-	public function alterImage($url, $dimensions, $offset, $format)
+	public function alterImage($path, $dimensions, $offset, $format)
 	{
 
-		$blob = Storage::disk( config('bladeimagecrop.disk') )->get($url);
+		$heldImagePath = Storage::disk( config('bladeimagecrop.disk') )->path($path);
 
 		try{
-			$data = getimagesizefromstring($blob);
+			$data = getimagesize( $heldImagePath );
 		} catch (Exception $e){
 			return;
 		}
 
 		$options = $this->options($data, $dimensions, $offset);
 
-		$uri = $this->updateUrl($url, $dimensions, $offset, $format);
+		$uri = $this->updateUrl($path, $dimensions, $offset, $format);
 
         dispatch(
             new ProcessImage(
-                $url, $format, $options,$uri
+                $heldImagePath, $format, $options,$uri
             ));
 
 	}

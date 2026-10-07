@@ -7,21 +7,20 @@ use Imagick;
 
 class IM_JPGBuilder extends ImageTypeBuilder
 {
-		public $imageString;
+		public $originPath;
         public $image;
 
-		public function __construct($imageString)
+		public function __construct($originPath)
 		{
-			$this->imageString = $imageString;
+			$this->originPath = $originPath;
 			$this->image = $this->makeImage();
 		}
 
-		public function makeImage(){
-			$image = (new Imagick);
-			$image->readImageBlob($this->imageString);
-			$image->autoOrient();
-			return $image;
-		}
+	public function makeImage(){
+		$image = new Imagick($this->originPath);
+		$image->autoOrient();
+		return $image;
+	}
 
 		public function resize($options){
 			$this->image->cropImage( $options['cropWidth'], $options['cropHeight'], $options['x'], $options['y'] );
@@ -29,10 +28,10 @@ class IM_JPGBuilder extends ImageTypeBuilder
 			return $this;
 		}
 
-		public function save($path){
+		public function save($destinationPath){
 			$this->image->setImageFormat( 'jpg');
 			$this->image->setImageCompressionQuality(75);
-			return Storage::disk( config('bladeimagecrop.disk') )->put($path, $this->image);
+			return Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
 		}
 
 	}

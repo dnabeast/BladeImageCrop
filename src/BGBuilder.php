@@ -23,7 +23,7 @@ class BGBuilder extends BGTypeBuilder
 			return $this->resizedImage();
 		});
 
-		return "style=\"background-size: 100% 100%; background-image: url('data:image/png;base64,$base64')\"";
+		return "style=\"object-fit: cover; background-size: 100% 100%; background-image: url('data:image/png;base64,$base64')\"";
 	}
 
 	public function resizedImage(){

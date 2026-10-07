@@ -38,7 +38,6 @@ class Source
 			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
 			EOT;
 		}
-
 	}
 
 	public function mimeResult(){
