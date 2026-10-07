@@ -18,17 +18,26 @@ class IM_WebPBuilder extends ImageTypeBuilder
 
 	public function makeImage(){
 		$image = new Imagick($this->originPath);
-		$image->autoOrient();
+		\Log::debug('Trying to make. '. $this->originPath);;
 		return $image;
 	}
 
 	public function resize($options){
+		if ($this->image->getNumberImages() == 0){
+			\Log::debug('Image is somehow missing. '. $this->originPath);;
+			return null;
+		}
+		$this->image->autoOrient();
 		$this->image->cropImage( $options['cropWidth'], $options['cropHeight'], $options['x'], $options['y'] );
 		$this->image->resizeImage( $options['targetWidth'], $options['targetHeight'], 7, 1 );
 		return $this;
 	}
 
 	public function save($destinationPath){
+		if ($this->image->getNumberImages() == 0){
+			\Log::debug('Image is somehow missing. '. $this->originPath);;
+			return null;
+		}
 		$this->image->setImageFormat( 'webp');
 		$this->image->setImageCompressionQuality( 80 );
 		return Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
