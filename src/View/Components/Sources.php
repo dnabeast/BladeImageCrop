@@ -2,6 +2,7 @@
 
 namespace DNABeast\BladeImageCrop\View\Components;
 
+use Cache;
 use DNABeast\BladeImageCrop\HoldImage;
 use DNABeast\BladeImageCrop\ImageProps;
 use DNABeast\BladeImageCrop\Source;
@@ -67,7 +68,9 @@ class Sources extends Component
 
 	public function aspectFromImage(){
 		try {
-			$originalImage = getimagesize( $this->image->path() );
+			$originalImage = Cache::remember('bic_props_'. $this->image->path(), now()->addMinutes(3), function(){
+				return getimagesize( $this->image->path() );
+			});
 			return $originalImage[1]/$originalImage[0];
 		} catch (\Exception $e) {
 			return 3/4; // default failed image shape

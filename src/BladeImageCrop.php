@@ -4,6 +4,7 @@ namespace DNABeast\BladeImageCrop;
 
 use DNABeast\BladeImageCrop\Jobs\ProcessImage;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Log;
@@ -42,25 +43,27 @@ class BladeImageCrop
 		return Storage::disk(config('bladeimagecrop.disk'))->url($path);
 	}
 
-	public function fileNotImage($url)
+	public function fileNotImage($path)
 	{
 		$disk = Storage::disk(config('bladeimagecrop.disk'));
 
 		if (method_exists($disk, 'fileExists')) {
-			$fileExists = $disk->fileExists($url);
+			$fileExists = $disk->fileExists($path);
 		} else {
-			$fileExists = $disk->has($url);
+			$fileExists = $disk->has($path);
 		}
 
 		if (!$fileExists) {
 			return true;
 		}
 
-		if (pathinfo(Storage::disk(config('bladeimagecrop.disk'))->url($url), PATHINFO_EXTENSION) === '') {
+		if (pathinfo(Storage::disk(config('bladeimagecrop.disk'))->url($path), PATHINFO_EXTENSION) === '') {
 			return true;
 		}
 
-		if (@is_array(getimagesize(Storage::disk(config('bladeimagecrop.disk'))->url($url)))) {
+		if (@is_array(Cache::remember('bic_props_'. Storage::disk(config('bladeimagecrop.disk'))->path($path), now()->addMinutes(3), function() use ($path){
+			return getimagesize(Storage::disk(config('bladeimagecrop.disk'))->path($path));
+		}))) {
 			return false;
 		}
 
@@ -89,7 +92,9 @@ class BladeImageCrop
 		$heldImagePath = Storage::disk(config('bladeimagecrop.disk'))->path($path);
 
 		try {
-			$data = getimagesize($heldImagePath);
+			$data = Cache::remember('bic_props_'. $heldImagePath, now()->addMinutes(3), function() use ($heldImagePath){
+				return getimagesize( $heldImagePath );
+			});
 		} catch (Exception $e) {
 			Log::alert($e->getMessage());
 			return;

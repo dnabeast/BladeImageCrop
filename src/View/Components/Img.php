@@ -6,6 +6,7 @@ use DNABeast\BladeImageCrop\Background;
 use DNABeast\BladeImageCrop\HoldImage;
 use DNABeast\BladeImageCrop\ImageProps;
 use DNABeast\BladeImageCrop\Source;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
@@ -91,8 +92,11 @@ class Img extends Component
 	}
 
 	public function aspectFromImage(){
+		$this->image->path();
 		try {
-			$originalImage = getimagesize( $this->image->path() );
+			$originalImage = Cache::remember('bic_props_'. $this->image->path(), now()->addMinutes(3), function(){
+				return getimagesize( $this->image->path() );
+			});
 			return $originalImage[1]/$originalImage[0];
 		} catch (\Exception $e) {
 			return 3/4; // default failed image shape
