@@ -49,7 +49,7 @@ class BGBuilder extends BGTypeBuilder
 
 			imagedestroy($image);
 			imagedestroy($newImage);
-
+			ob_end_flush();
 			return base64_encode($data);
 		} catch (\Exception $e) {
 			return 'MissingBGImage';
