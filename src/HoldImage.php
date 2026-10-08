@@ -42,18 +42,21 @@ class HoldImage
 			return 'blade_image_crop_holding/' . $formattedFileName;
 		}
 
-//		try {
+		try {
 			if (config('bladeimagecrop.compress_held_image') == 'true' ?? false) {
 				if (extension_loaded('imagick')) {
-					Log::info('Using Imagick');
-					$this->holdFileWithImageMagick($formattedFileName);
+					try {
+						Log::info('Using Imagick');
+						$this->holdFileWithImageMagick($formattedFileName);
+					} catch (\Exception $e) {
+						Log::error('Imagick Library failed. Reduce Image size. ' . $formattedFileName);
+					}
 				} else {
 					try {
 						Log::info('Using GD Library');
 						$this->holdFileWithGDLibrary($extension, $formattedFileName);
 					} catch (\Exception $e) {
 						Log::error('GD Library failed. Reduce Image size or install Imagick. ' . $formattedFileName);
-						throw new \Exception('GD Library failed.');
 					}
 				}
 			} else {
@@ -66,9 +69,9 @@ class HoldImage
 				$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $file);
 				return 'blade_image_crop_holding/' . $formattedFileName;
 			}
-//		} catch (\Exception $e) {
-//			return 'FILE NOT FOUND';
-//		}
+		} catch (\Exception $e) {
+			return 'FILE NOT FOUND';
+		}
 
 		return 'blade_image_crop_holding/' . $formattedFileName;
 	}
