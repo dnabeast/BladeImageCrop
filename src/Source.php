@@ -33,15 +33,15 @@ class Source
 	}
 
 	public function render(){
-		$srcsetLines = $this->srcsetLines();
-		$mediaResult = $this->mediaResult();
-		$sizesResult = $this->sizesResult();
-		$mimeResult = $this->mimeResult();
+//		$srcsetLines = $this->srcsetLines();
+//		$mediaResult = $this->mediaResult();
+//		$sizesResult = $this->sizesResult();
+//		$mimeResult = $this->mimeResult();
 //		dump($srcsetLines,$mediaResult,$sizesResult,$mimeResult);
 
-			return <<<EOT
-			<source {$mediaResult} {$mimeResult} srcset="{$srcsetLines}" $sizesResult}>
-			EOT;
+//			return <<<EOT
+//			<source {$mediaResult} {$mimeResult} srcset="{$srcsetLines}" $sizesResult}>
+//			EOT;
 
 //		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
 //			return <<<EOT

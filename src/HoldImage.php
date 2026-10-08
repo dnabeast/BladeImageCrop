@@ -42,8 +42,6 @@ class HoldImage
 			return 'blade_image_crop_holding/' . $formattedFileName;
 		}
 
-		return 'no holding';
-
 		try {
 			if (config('bladeimagecrop.compress_held_image') == 'true' ?? false) {
 				if (extension_loaded('imagick')) {
