@@ -73,9 +73,7 @@ class Source
 		return $this->calcProperties()
 			->map(function($properties, $key) use ($pixelRatios){
 				$measurement = $this->pixelRatios?$pixelRatios[$key]:$properties['dimensions']['width'].'w';
-				dump($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format );
 				$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
-				return 'dan test'.$newImageUri;
 				return $newImageUri.' '.$measurement;
 			})
 			->implode(",");
