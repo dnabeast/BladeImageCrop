@@ -33,7 +33,7 @@ class Source
 	}
 
 	public function render(){
-		dump($this->srcsetLines(), $this->mediaResult(), $this->mimeResult(), $this->sizesResult());
+		dump($this->srcsetLines());
 
 			return <<<EOT
 			<source srcset="{$this->srcsetLines()}">
