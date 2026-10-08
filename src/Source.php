@@ -35,7 +35,9 @@ class Source
 	public function render(){
 		$srcsetLines = $this->srcsetLines();
 		$mediaResult = $this->mediaResult();
-		dump($srcsetLines,$mediaResult);
+		$sizesResult = $this->sizesResult();
+		$mimeResult = $this->mimeResult();
+		dump($srcsetLines,$mediaResult,$sizesResult,$mimeResult);
 
 			return <<<EOT
 			<source srcset="{$srcsetLines}">
