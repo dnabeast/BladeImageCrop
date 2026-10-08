@@ -33,7 +33,7 @@ class Source
 	}
 
 	public function render(){
-		dump($this->mediaResult(), $this->mimeResult(), $this->sizesResult());
+		dump($this->srcsetLines());
 		return 'source';
 
 //		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
@@ -73,6 +73,7 @@ class Source
 		return $this->calcProperties()
 			->map(function($properties, $key) use ($pixelRatios){
 				$measurement = $this->pixelRatios?$pixelRatios[$key]:$properties['dimensions']['width'].'w';
+				return 'dan test';
 				$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
 				return $newImageUri.' '.$measurement;
 			})
