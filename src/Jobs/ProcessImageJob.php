@@ -5,21 +5,13 @@ namespace DNABeast\BladeImageCrop\Jobs;
 use DNABeast\BladeImageCrop\ImageBuilder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 
-class ProcessImage implements ShouldQueue
+class ProcessImageJob implements ShouldQueue
 {
-	use Queueable;
+	use Dispatchable, Queueable;
 
-
-	public $path;
-	public $format;
-	public $options;
-	public $uri;
-
-	/**
-	 * Create a new job instance.
-	 */
 	public function __construct($path, $format, $options, $uri)
 	{
 		$this->path = $path;
@@ -28,9 +20,6 @@ class ProcessImage implements ShouldQueue
 		$this->uri = $uri;
 	}
 
-	/**
-	 * Execute the job.
-	 */
 	public function handle(): void
 	{
 		Log::info('Processing image: ' . $this->path);

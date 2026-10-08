@@ -2,7 +2,7 @@
 
 namespace DNABeast\BladeImageCrop;
 
-use DNABeast\BladeImageCrop\Jobs\ProcessImage;
+use DNABeast\BladeImageCrop\Jobs\ProcessImageJob;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -108,7 +108,7 @@ class BladeImageCrop
 		$uri = $this->updateUrl($path, $dimensions, $offset, $format);
 
 		dispatch(
-			new ProcessImage(
+			new ProcessImageJob(
 				$path, $format, $options, $uri
 			)
 		);
