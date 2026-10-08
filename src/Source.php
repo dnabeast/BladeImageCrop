@@ -33,8 +33,10 @@ class Source
 	}
 
 	public function render(){
+		dump($this->srcsetLines(), $this->mediaResult(), $this->mimeResult(), $this->sizesResult());
+
 			return <<<EOT
-			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}">
+			<source srcset="{$this->srcsetLines()}">
 			EOT;
 
 //		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
