@@ -33,11 +33,14 @@ class Source
 	}
 
 	public function render(){
+			return <<<EOT
+			<source srcset="{$this->srcsetLines()}">
+			EOT;
 
 //		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
-			return <<<EOT
-			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
-			EOT;
+//			return <<<EOT
+//			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
+//			EOT;
 //		}
 	}
 
