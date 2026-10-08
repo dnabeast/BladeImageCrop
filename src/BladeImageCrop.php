@@ -107,11 +107,11 @@ class BladeImageCrop
 
 		$uri = $this->updateUrl($path, $dimensions, $offset, $format);
 
-//		dispatch(
-//			new ProcessImageJob(
-//				$path, $format, $options, $uri
-//			)
-//		);
+		dispatch(
+			new ProcessImageJob(
+				$path, $format, $options, $uri
+			)
+		);
 
 		Log::info('This is where the processed image was supposed ot happen.');
 	}

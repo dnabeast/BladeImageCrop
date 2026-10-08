@@ -33,6 +33,7 @@ class Source
 	}
 
 	public function render(){
+		return 'source';
 //		$srcsetLines = $this->srcsetLines();
 //		$mediaResult = $this->mediaResult();
 //		$sizesResult = $this->sizesResult();
