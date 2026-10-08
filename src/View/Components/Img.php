@@ -73,7 +73,7 @@ class Img extends Component
 		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
 
 		return [
-			'sources' => '$sourcesString',
+			'sources' => $sourcesString,
 			'background' => '$backgroundString??null',
 			'src' => '$defaultImageSrc',
 			'attributes' => 'class="" alt=""'
