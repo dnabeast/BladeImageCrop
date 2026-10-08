@@ -2,6 +2,8 @@
 
 namespace DNABeast\BladeImageCrop\Builder;
 
+use DNABeast\BladeImageCrop\TempStorage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
 use Log;
@@ -18,14 +20,17 @@ class IM_WebPBuilder extends ImageTypeBuilder
 	}
 
 	public function makeImage(){
-		Log::info('Trying to make. '. $this->originPath);;
-		$image = new Imagick($this->originPath);
+		Log::info('Trying to make. '. $this->originPath);
+		$tempFilePath = TempStorage::fire( Storage::disk(config('bladeimagecrop.disk'))->url($this->originPath) );
+		$image = new Imagick($tempFilePath);
 		return $image;
 	}
 
 	public function resize($options){
+		Log::info('Trying to resize. '. $this->originPath);
+
 		if ($this->image->getNumberImages() == 0){
-			Log::info('Image is somehow missing. '. $this->originPath);;
+			Log::info('Image is somehow missing. '. $this->originPath);
 			return null;
 		}
 		$this->image->autoOrient();
@@ -35,8 +40,10 @@ class IM_WebPBuilder extends ImageTypeBuilder
 	}
 
 	public function save($destinationPath){
+		Log::info('Trying to save. '. $this->originPath);
+
 		if ($this->image->getNumberImages() == 0){
-			Log::info('Image is somehow missing. '. $this->originPath);;
+			Log::info('Image is somehow missing. '. $this->originPath);
 			return null;
 		}
 		$this->image->setImageFormat( 'webp');

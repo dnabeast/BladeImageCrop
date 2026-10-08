@@ -11,6 +11,7 @@ class ImageBuilder
 
 	public function __construct($path, $format)
 	{
+		\Log::info('building '.$path);
 		$this->path = $path;
 		$this->format = $format;
 		$this->class = $this->buildClass();

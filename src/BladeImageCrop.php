@@ -11,6 +11,12 @@ use Log;
 
 class BladeImageCrop
 {
+	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
+
+	public function __construct()
+	{
+		$this->disk = Storage::disk(config('bladeimagecrop.disk'));
+	}
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
@@ -19,33 +25,33 @@ class BladeImageCrop
 			if (!\App::environment(['local'])) {
 				return 'IMAGE_NOT_FOUND';
 			}
-			return 'IMAGE_NOT_FOUND-' . Storage::disk(config('bladeimagecrop.disk'))->path($path);
+			return 'IMAGE_NOT_FOUND-' . $this->disk->path($path);
 		}
 
 		$newImageUrl = $this->updateUrl($path, $dimensions, $offset, $format);
 
-		$fixedNewImageUrl = parse_url(Storage::disk(config('bladeimagecrop.disk'))->url($newImageUrl))['path'];
+		$fixedNewImageUrl = parse_url($this->disk->url($newImageUrl))['path'];
 
 		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
 			return $matches[1];
 		});
 
-		if (Storage::disk(config('bladeimagecrop.disk'))->has($oldUblockUnfriendlyUrl)) {
-			Storage::disk(config('bladeimagecrop.disk'))->move($oldUblockUnfriendlyUrl, $newImageUrl);
+		if ($this->disk->has($oldUblockUnfriendlyUrl)) {
+			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
 		}
 
-		if (Storage::disk(config('bladeimagecrop.disk'))->has($newImageUrl)) {
-			return Storage::disk(config('bladeimagecrop.disk'))->url($newImageUrl);
+		if ($this->disk->has($newImageUrl)) {
+			return $this->disk->url($newImageUrl);
 		}
 
 		$this->alterImage($path, $dimensions, $offset, $format);
 
-		return Storage::disk(config('bladeimagecrop.disk'))->url($path);
+		return $this->disk->url($path);
 	}
 
 	public function fileNotImage($path)
 	{
-		$disk = Storage::disk(config('bladeimagecrop.disk'));
+		$disk = $this->disk;
 
 		if (method_exists($disk, 'fileExists')) {
 			$fileExists = $disk->fileExists($path);
@@ -57,12 +63,12 @@ class BladeImageCrop
 			return true;
 		}
 
-		if (pathinfo(Storage::disk(config('bladeimagecrop.disk'))->url($path), PATHINFO_EXTENSION) === '') {
+		if (pathinfo($this->disk->url($path), PATHINFO_EXTENSION) === '') {
 			return true;
 		}
 
-		if (@is_array(Cache::remember('bic_props_'. Storage::disk(config('bladeimagecrop.disk'))->path($path), now()->addMinutes(3), function() use ($path){
-			return getimagesize(Storage::disk(config('bladeimagecrop.disk'))->path($path));
+		if (@is_array(Cache::remember('bic_props_'. $this->disk->path($path), now()->addMinutes(3), function() use ($path){
+			return getimagesize($this->disk->url($path));
 		}))) {
 			return false;
 		}
@@ -88,12 +94,9 @@ class BladeImageCrop
 
 	public function alterImage($path, $dimensions, $offset, $format)
 	{
-		Log::info('altering image');
-		$heldImagePath = Storage::disk(config('bladeimagecrop.disk'))->path($path);
-
 		try {
-			$data = Cache::remember('bic_props_'. $heldImagePath, now()->addMinutes(3), function() use ($heldImagePath){
-				return getimagesize( $heldImagePath );
+			$data = Cache::remember('bic_props_'. $path, now()->addMinutes(3), function() use ($path){
+				return getimagesize($this->disk->url($path));
 			});
 		} catch (Exception $e) {
 			Log::alert($e->getMessage());
@@ -106,7 +109,7 @@ class BladeImageCrop
 
 		dispatch(
 			new ProcessImage(
-				$heldImagePath, $format, $options, $uri
+				$path, $format, $options, $uri
 			)
 		);
 

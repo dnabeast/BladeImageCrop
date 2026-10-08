@@ -42,7 +42,7 @@ class HoldImage
 			return 'blade_image_crop_holding/' . $formattedFileName;
 		}
 
-		try {
+//		try {
 			if (config('bladeimagecrop.compress_held_image') == 'true' ?? false) {
 				if (extension_loaded('imagick')) {
 					Log::info('Using Imagick');
@@ -66,9 +66,9 @@ class HoldImage
 				$this->storageDisk->put('blade_image_crop_holding/' . $formattedFileName, $file);
 				return 'blade_image_crop_holding/' . $formattedFileName;
 			}
-		} catch (\Exception $e) {
-			return 'FILE NOT FOUND';
-		}
+//		} catch (\Exception $e) {
+//			return 'FILE NOT FOUND';
+//		}
 
 		return 'blade_image_crop_holding/' . $formattedFileName;
 	}
@@ -81,12 +81,7 @@ class HoldImage
 	public function holdFileWithImageMagick(string $formattedFileName): void
 	{
 
-		$tempFilePath = tempnam(sys_get_temp_dir(), 'img_');
-		$response = Http::withOptions(['stream' => true])->get($this->src);
-
-		$inputStream = fopen($tempFilePath, 'w+');
-		stream_copy_to_stream($response->toPsrResponse()->getBody()->detach(), $inputStream);
-		fclose($inputStream);
+		$tempFilePath = TempStorage::fire($this->src);
 
 		$image = new Imagick($tempFilePath);
 
@@ -108,9 +103,12 @@ class HoldImage
 	 */
 	public function holdFileWithGDLibrary(string $extension, string $formattedFileName): void
 	{
-		$body = Http::withOptions(['stream' => true])->get($this->src)->body();
-
-		$image = @imagecreatefromstring($body);
+		$response = Http::withOptions(['stream' => true])->get($this->src);
+		if ($response->failed()) {
+			Log::error('HTTP GD call failed ' . $formattedFileName);
+			return;
+		}
+		$image = @imagecreatefromstring($response->body());
 
 		if ($image) {
 			$outputStream = fopen('php://temp', 'w+');
