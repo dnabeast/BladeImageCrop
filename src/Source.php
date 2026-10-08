@@ -37,10 +37,10 @@ class Source
 		$mediaResult = $this->mediaResult();
 		$sizesResult = $this->sizesResult();
 		$mimeResult = $this->mimeResult();
-		dump($srcsetLines,$mediaResult,$sizesResult,$mimeResult);
+//		dump($srcsetLines,$mediaResult,$sizesResult,$mimeResult);
 
 			return <<<EOT
-			<source srcset="{$srcsetLines}">
+			<source {$mediaResult} {$mimeResult} srcset="{$srcsetLines}" $sizesResult}>
 			EOT;
 
 //		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
