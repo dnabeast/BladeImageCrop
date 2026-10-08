@@ -33,6 +33,7 @@ class Source
 	}
 
 	public function render(){
+		dump($this->mediaResult(), $this->mimeResult(), $this->sizesResult());
 		return 'source';
 
 //		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
