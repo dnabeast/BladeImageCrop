@@ -74,13 +74,6 @@ class Img extends Component
 
 		return [
 			'sources' => $sourcesString,
-			'background' => '$backgroundString??null',
-			'src' => '$defaultImageSrc',
-			'attributes' => 'class="" alt=""'
-		];
-
-		return [
-			'sources' => $sourcesString,
 			'background' => $backgroundString??null,
 			'src' => $defaultImageSrc,
 			'attributes' => 'class="" alt=""'
