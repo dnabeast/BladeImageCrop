@@ -28,9 +28,9 @@ class Pic extends Component
 		return function (array $data){
 			$attributes = $data['attributes']->toHtml();
 			$propertyString = is_string($this->properties)?$this->properties:"[".implode(",", $this->properties)."]";
-//				<x-img sources="false" src="$this->src" :properties="$propertyString" $attributes />
 			return <<<blade
-				<x-sources src="$this->src" :properties="$propertyString" />
+			<x-img sources="false" src="$this->src" :properties="$propertyString" $attributes />
+			<x-sources src="$this->src" :properties="$propertyString" />
 			blade;
 		};
 
