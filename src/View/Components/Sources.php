@@ -55,8 +55,7 @@ class Sources extends Component
 					'pixelRatios' => isset($this->properties[0][1])?false:true,
 					'attributes' => $data['attributes']
 				];
-				return 'source render';
-//				return Source::make($options)->render();
+				return Source::make($options)->render();
 			})->implode("\n");
 
 		};
