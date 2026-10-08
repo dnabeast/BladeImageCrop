@@ -15,7 +15,10 @@ class TempStorage
 
 		if ($response->failed()) {
 			Log::error('HTTP call failed ' . $url);
-			return;
+			if (file_exists($tempFilePath)) {
+				unlink($tempFilePath);
+			}
+			throw new \Exception('HTTP call failed ' . $url);
 		}
 
 		$inputStream = fopen($tempFilePath, 'w+');
