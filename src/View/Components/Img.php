@@ -42,16 +42,13 @@ class Img extends Component
 			return '<img style="width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
 		}
 
+		return function (array $data){
+			$build = $this->build();
 
-		return '<img rand="'.rand().'" src="https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp'.'" />';
-
-//		return function (array $data){
-//			$build = $this->build();
-//
-//			return <<<EOT
-//			<img {$build['sources']} {$build['background']} src="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
-//			EOT;
-//		};
+			return <<<EOT
+			<img {$build['sources']} {$build['background']} src="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
+			EOT;
+		};
 
 	}
 
