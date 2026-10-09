@@ -12,6 +12,11 @@ class ProcessImageJob implements ShouldQueue
 {
 	use Dispatchable, Queueable;
 
+	public $path;
+	public $format;
+	public $options;
+	public $uri;
+
 	public function __construct($path, $format, $options, $uri)
 	{
 		$this->path = $path;

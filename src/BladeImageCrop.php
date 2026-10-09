@@ -20,7 +20,6 @@ class BladeImageCrop
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-
 		if ($this->fileNotImage($path)) {
 			if (!\App::environment(['local'])) {
 				return 'IMAGE_NOT_FOUND';
@@ -113,7 +112,6 @@ class BladeImageCrop
 			)
 		);
 
-		Log::info('This is where the processed image was supposed ot happen.');
 	}
 
 	public function options($data, $dimensions, $offset)

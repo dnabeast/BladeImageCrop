@@ -33,22 +33,11 @@ class Source
 	}
 
 	public function render(){
-		return 'source';
-//		$srcsetLines = $this->srcsetLines();
-//		$mediaResult = $this->mediaResult();
-//		$sizesResult = $this->sizesResult();
-//		$mimeResult = $this->mimeResult();
-//		dump($srcsetLines,$mediaResult,$sizesResult,$mimeResult);
-
-//			return <<<EOT
-//			<source {$mediaResult} {$mimeResult} srcset="{$srcsetLines}" $sizesResult}>
-//			EOT;
-
-//		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
-//			return <<<EOT
-//			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
-//			EOT;
-//		}
+		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
+			return <<<EOT
+			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
+			EOT;
+		}
 	}
 
 	public function mimeResult(){
@@ -82,6 +71,7 @@ class Source
 			->map(function($properties, $key) use ($pixelRatios){
 				$measurement = $this->pixelRatios?$pixelRatios[$key]:$properties['dimensions']['width'].'w';
 				$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
+				\Log::debug("New Image URI: ".$newImageUri);
 				return $newImageUri.' '.$measurement;
 			})
 			->implode(",");

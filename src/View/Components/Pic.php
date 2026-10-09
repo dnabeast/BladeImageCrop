@@ -24,7 +24,6 @@ class Pic extends Component
 	 */
 	public function render()
 	{
-
 		return function (array $data){
 			$attributes = $data['attributes']->toHtml();
 			$propertyString = is_string($this->properties)?$this->properties:"[".implode(",", $this->properties)."]";
