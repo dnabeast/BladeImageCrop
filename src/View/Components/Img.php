@@ -69,15 +69,15 @@ class Img extends Component
 
         $lines = Source::make($options)->srcsetLines();
 
-		$defaultImageSrc = explode(" ", $lines)[0];
-
-		if (config('bladeimagecrop.backgrounds')){
-			\Log::info('backgrounds');
-            $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
-            $backgroundString = (new Background($backgroundLocation))->render();
-		}
-
-		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
+//		$defaultImageSrc = explode(" ", $lines)[0];
+//
+//		if (config('bladeimagecrop.backgrounds')){
+//			\Log::info('backgrounds');
+//            $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
+//            $backgroundString = (new Background($backgroundLocation))->render();
+//		}
+//
+//		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
 
 		return [
 			'sources' => '$sourcesString',
