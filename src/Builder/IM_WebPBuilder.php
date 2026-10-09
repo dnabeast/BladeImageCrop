@@ -53,7 +53,7 @@ class IM_WebPBuilder extends ImageTypeBuilder
 		$this->image->setImageCompressionQuality( 80 );
 		Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
 		$this->image->clear();
-		if (file_exists($this->tempFilePath)) {
+		if ($this->tempFilePath && file_exists($this->tempFilePath)) {
 			unlink($this->tempFilePath);
 		}
 	}

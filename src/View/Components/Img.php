@@ -43,6 +43,8 @@ class Img extends Component
 		}
 
 		return function (array $data){
+			return '<img src="#">';
+
 			$build = $this->build();
 
 			return <<<EOT
