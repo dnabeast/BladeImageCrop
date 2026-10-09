@@ -20,8 +20,6 @@ class BladeImageCrop
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		Log::info($path);
-		return 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp';
 //		if ($this->fileNotImage($path)) {
 //			if (!\App::environment(['local'])) {
 //				return 'IMAGE_NOT_FOUND';
@@ -40,9 +38,7 @@ class BladeImageCrop
 		}
 
 		if ($this->disk->has($newImageUrl)) {
-			Log::info($path);
-			return 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp';
-
+			Log::info($newImageUrl);
 			return $this->disk->url($newImageUrl);
 		}
 
@@ -84,12 +80,11 @@ class BladeImageCrop
 
 	public function updateUrl($url, $dimensions, $offset, $format)
 	{
-
 		$segments = collect(explode('/', $url));
 		$filename = $segments->pop();
 
 		$path = '/bic/' . $segments->implode('/')
-			. '/' . str_replace('.', '_', $filename)
+			. ($segments->count()?'/':'') . str_replace('.', '_', $filename)
 			. '/bic_' . implode('x', $dimensions)
 			. '_' . implode('_', $offset)
 			. '.' . $format;
