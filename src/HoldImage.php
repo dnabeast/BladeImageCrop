@@ -27,6 +27,7 @@ class HoldImage
 
 	public function file()
 	{
+		return str($this->src)->after($this->storageDisk->url('/'));
 		$extension = strtolower($this->src->explode('.')->last());
 
 		if (config('bladeimagecrop.remove_domain')) {

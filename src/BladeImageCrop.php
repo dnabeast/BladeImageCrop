@@ -20,6 +20,7 @@ class BladeImageCrop
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
+
 //		if ($this->fileNotImage($path)) {
 //			if (!\App::environment(['local'])) {
 //				return 'IMAGE_NOT_FOUND';
@@ -79,7 +80,7 @@ class BladeImageCrop
 		$segments = collect(explode('/', $url));
 		$filename = $segments->pop();
 
-		$path = '/' . $segments->implode('/')
+		$path = '/bic/' . $segments->implode('/')
 			. '/' . str_replace('.', '_', $filename)
 			. '/bic_' . implode('x', $dimensions)
 			. '_' . implode('_', $offset)
