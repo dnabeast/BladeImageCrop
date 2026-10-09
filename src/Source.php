@@ -33,21 +33,13 @@ class Source
 	}
 
 	public function render(){
-		return function (){
-			$srcsetLines = $this->srcsetLines();
-			return <<<EOT
-			<source srcset="{$srcsetLines}">
-			EOT;
-		};
-//			return <<<EOT
-//			<source srcset="{$this->srcsetLines()}">
-//			EOT;
+		return "FAKE SOURCE";
 
-//		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
-//			return <<<EOT
-//			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
-//			EOT;
-//		}
+		if( !Str::of($this->srcsetLines())->startsWith('IMAGENOTFOUND') || config('bladeimagecrop.render_source_tag_if_unavailable') ){
+			return <<<EOT
+			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
+			EOT;
+		}
 	}
 
 	public function mimeResult(){

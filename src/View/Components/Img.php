@@ -62,11 +62,13 @@ class Img extends Component
 			'pixelRatios' => isset($this->properties[0][1])?false:true
 		];
 
-        $lines = Source::make($options)->srcsetLines();
+        $lines = "fakeLines";
+//        $lines = Source::make($options)->srcsetLines();
 
 		$defaultImageSrc = explode(" ", $lines)[0];
 
 		if (config('bladeimagecrop.backgrounds')){
+			\Log::info('backgrounds');
             $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
             $backgroundString = (new Background($backgroundLocation))->render();
 		}
