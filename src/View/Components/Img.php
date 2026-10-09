@@ -62,8 +62,7 @@ class Img extends Component
 			'pixelRatios' => isset($this->properties[0][1])?false:true
 		];
 
-//        $lines = Source::make($options)->srcsetLines();
-        $lines = 'FAKESRCSET';
+        $lines = Source::make($options)->srcsetLines();
 
 		$defaultImageSrc = explode(" ", $lines)[0];
 
