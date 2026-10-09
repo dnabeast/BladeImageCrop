@@ -55,6 +55,13 @@ class Img extends Component
 
 	public function build(){
 
+		return [
+			'sources' => '$sourcesString,',
+			'background' => '$backgroundString??null,',
+			'src' => '$defaultImageSrc,',
+			'attributes' => 'class="" alt=""'
+		];
+
 		$options = [
 			'src' => $this->image->file(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
