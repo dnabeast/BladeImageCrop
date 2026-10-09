@@ -43,7 +43,13 @@ class Img extends Component
 		}
 
 		$build = $this->build();
-		return function (array $data) use ($build){
+
+		return <<<EOT
+			<img {$build['sources']} {$build['background']} src="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" >
+			EOT;
+
+		return function (array $data){
+			$build = $this->build();
 
 			return <<<EOT
 			<img {$build['sources']} {$build['background']} src="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
