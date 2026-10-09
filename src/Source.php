@@ -33,8 +33,12 @@ class Source
 	}
 
 	public function render(){
-		return '<source srcset="#">';
-
+		return function (){
+			$srcsetLines = $this->srcsetLines();
+			return <<<EOT
+			<source srcset="{$srcsetLines}">
+			EOT;
+		};
 //			return <<<EOT
 //			<source srcset="{$this->srcsetLines()}">
 //			EOT;
