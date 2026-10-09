@@ -72,8 +72,7 @@ class Source
 		$lines =  $this->calcProperties()
 			->map(function($properties, $key) use ($pixelRatios){
 				$measurement = $this->pixelRatios?$pixelRatios[$key]:$properties['dimensions']['width'].'w';
-				$newImageUri = 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp';
-//				$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
+				$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
 				\Log::debug("New Image URI: ".$newImageUri);
 				return $newImageUri.' '.$measurement;
 			})
