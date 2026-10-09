@@ -42,7 +42,7 @@ class Img extends Component
 			return '<img style="width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
 		}
 
-		return function {
+		return function (){
 			$build = $this->build();
 			return 'blank';
 		};
