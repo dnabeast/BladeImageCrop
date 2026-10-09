@@ -43,12 +43,11 @@ class Img extends Component
 		}
 
 		$build = $this->build();
+return '<p>BLAH</p>';
+//		return <<<EOT
+//<p>BLAH</p>
+//EOT;
 
-		return <<<EOT
-<p>BLAH</p>
-EOT;
-
-			EOT;
 
 		return function (array $data){
 			$build = $this->build();
