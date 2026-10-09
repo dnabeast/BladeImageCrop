@@ -20,7 +20,6 @@ class BladeImageCrop
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		return 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp';
 
 //		if ($this->fileNotImage($path)) {
 //			if (!\App::environment(['local'])) {
@@ -38,9 +37,10 @@ class BladeImageCrop
 		if ($this->disk->has($oldUblockUnfriendlyUrl)) {
 			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
 		}
+		return 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp';
 
 		if ($this->disk->has($newImageUrl)) {
-			Log::info($newImageUrl);
+			Log::info('If Has: '.$newImageUrl);
 			return 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp';
 
 			return $this->disk->url($newImageUrl);
