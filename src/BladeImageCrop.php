@@ -33,10 +33,10 @@ class BladeImageCrop
 		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
 			return $matches[1];
 		});
-
-		if ($this->disk->has($oldUblockUnfriendlyUrl)) {
-			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
-		}
+//
+//		if ($this->disk->has($oldUblockUnfriendlyUrl)) {
+//			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
+//		}
 		return 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud/bic/filament/315/IslandsofTahiti_BoraBora_Wedding_LeBoraBorabyPearlResorts_BBPBR---wedding---GLB-23_jpg/bic_361x90_50_50.webp';
 
 		if ($this->disk->has($newImageUrl)) {
