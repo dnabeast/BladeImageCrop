@@ -42,8 +42,9 @@ class BladeImageCrop
 			return $this->disk->url($newImageUrl);
 		}
 
-		$this->alterImage($path, $dimensions, $offset, $format);
+//		$this->alterImage($path, $dimensions, $offset, $format);
 
+		return "";
 		return $this->disk->url($path);
 	}
 
