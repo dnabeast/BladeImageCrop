@@ -55,13 +55,6 @@ class Img extends Component
 
 	public function build(){
 
-		return [
-			'sources' => '$sourcesString,',
-			'background' => '$backgroundString??null,',
-			'src' => '$defaultImageSrc,',
-			'attributes' => 'class="" alt=""'
-		];
-
 		$options = [
 			'src' => $this->image->file(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
@@ -69,7 +62,8 @@ class Img extends Component
 			'pixelRatios' => isset($this->properties[0][1])?false:true
 		];
 
-        $lines = Source::make($options)->srcsetLines();
+//        $lines = Source::make($options)->srcsetLines();
+        $lines = 'FAKESRCSET';
 
 		$defaultImageSrc = explode(" ", $lines)[0];
 
