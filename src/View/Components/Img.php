@@ -42,7 +42,7 @@ class Img extends Component
 			return '<img style="width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
 		}
 
-		return function (array $data) {
+		return function {
 			$build = $this->build();
 			return 'blank';
 		};
@@ -78,6 +78,13 @@ class Img extends Component
 		}
 
 		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
+
+		return [
+			'sources' => '$sourcesString',
+			'background' => '$backgroundString??null',
+			'src' => '$defaultImageSrc',
+			'attributes' => 'class="" alt=""'
+		];
 
 		return [
 			'sources' => $sourcesString,
