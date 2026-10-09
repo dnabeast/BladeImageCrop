@@ -20,16 +20,14 @@ class BladeImageCrop
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		if ($this->fileNotImage($path)) {
-			if (!\App::environment(['local'])) {
-				return 'IMAGE_NOT_FOUND';
-			}
-			return 'IMAGE_NOT_FOUND-' . $this->disk->path($path);
-		}
+//		if ($this->fileNotImage($path)) {
+//			if (!\App::environment(['local'])) {
+//				return 'IMAGE_NOT_FOUND';
+//			}
+//			return 'IMAGE_NOT_FOUND-' . $this->disk->path($path);
+//		}
 
 		$newImageUrl = $this->updateUrl($path, $dimensions, $offset, $format);
-
-		$fixedNewImageUrl = parse_url($this->disk->url($newImageUrl))['path'];
 
 		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
 			return $matches[1];
