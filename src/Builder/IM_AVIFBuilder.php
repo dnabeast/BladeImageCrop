@@ -48,8 +48,8 @@ class IM_AVIFBuilder extends ImageTypeBuilder
 			Log::info('Image is somehow missing. '. $this->originUrl);
 			return null;
 		}
-		$this->image->setImageFormat( 'avif');
-		$this->image->setImageCompressionQuality( 80 );
+		$this->image->setImageFormat('avif');
+		$this->image->setCompressionQuality( 60 );
 
 		Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
 		$this->image->clear();

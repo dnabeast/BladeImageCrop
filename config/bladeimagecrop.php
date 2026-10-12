@@ -10,7 +10,7 @@ return [
 	'backgrounds' => true,
 	'build_classes' => [
 		// 'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
-//		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
+		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
 		'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
 	],
 	'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
