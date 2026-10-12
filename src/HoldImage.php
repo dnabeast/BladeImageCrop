@@ -13,13 +13,11 @@ class HoldImage
 {
 	public $src;
 	public $storageDisk;
-	private Helper $helper;
 
 	public function __construct($src)
 	{
 		$this->src = Str::of($src);
 		$this->storageDisk = Storage::disk(config('bladeimagecrop.disk'));
-		$this->helper = new Helper();
 	}
 
 	public function path()
@@ -29,7 +27,7 @@ class HoldImage
 
 	public function file()
 	{
-		return str($this->src)->after($this->helper->cachedUrl());
+		return str($this->src)->after((new Helper)->cachedUrl());
 
 		$extension = strtolower($this->src->explode('.')->last());
 

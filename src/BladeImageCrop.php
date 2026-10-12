@@ -14,21 +14,14 @@ class BladeImageCrop
 	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
 	private Helper $helper;
 
-	public function __construct()
+	public function __construct(Helper $helper)
 	{
 		$this->disk = Storage::disk(config('bladeimagecrop.disk'));
-		$this->helper = new Helper();
+		$this->helper = $helper;
 	}
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-
-//		if ($this->fileNotImage($path)) {
-//			if (!\App::environment(['local'])) {
-//				return 'IMAGE_NOT_FOUND';
-//			}
-//			return 'IMAGE_NOT_FOUND-' . $this->disk->path($path);
-//		}
 
 		$newImageUrl = $this->updateUrl($path, $dimensions, $offset, $format);
 

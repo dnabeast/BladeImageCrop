@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 class Helper
 {
 	protected $disk;
+
 	public function __construct()
 	{
 		$this->disk = Storage::disk(config('bladeimagecrop.disk'));

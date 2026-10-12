@@ -13,19 +13,17 @@ class IM_WebPBuilder extends ImageTypeBuilder
 	public $originPath;
 	public $image;
 	public $tempFilePath;
-	public $helper;
 
 	public function __construct($originPath)
 	{
 		$this->originPath = $originPath;
 		$this->image = $this->makeImage();
 		$this->tempFilePath = null;
-		$this->helper = new Helper();
 	}
 
 	public function makeImage(){
 		Log::info('Trying to make. '. $this->originPath);
-		$this->tempFilePath = TempStorage::fire( $this->helper->cachedUrl().$this->originPath );
+		$this->tempFilePath = TempStorage::fire( (new Helper)->cachedUrl().$this->originPath );
 		Log::info('Temp Path. '. $this->tempFilePath);
 		return new Imagick($this->tempFilePath);
 	}
