@@ -23,7 +23,7 @@ class IM_WebPBuilder extends ImageTypeBuilder
 
 	public function makeImage(){
 		Log::info('Trying to make. '. $this->originPath);
-		$this->tempFilePath = TempStorage::fire( Storage::disk(config('bladeimagecrop.disk'))->url($this->originPath) );
+		$this->tempFilePath = TempStorage::fire( $this->helper->cachedUrl().$this->originPath );
 		Log::info('Temp Path. '. $this->tempFilePath);
 		$image = new Imagick($this->tempFilePath);
 		return $image;

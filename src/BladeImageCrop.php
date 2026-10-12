@@ -12,10 +12,12 @@ use Log;
 class BladeImageCrop
 {
 	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
+	private Helper $helper;
 
 	public function __construct()
 	{
 		$this->disk = Storage::disk(config('bladeimagecrop.disk'));
+		$this->helper = new Helper();
 	}
 
 	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
@@ -32,23 +34,19 @@ class BladeImageCrop
 
 		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
 			return $matches[1];
-		});
-//
-//		if ($this->disk->has($oldUblockUnfriendlyUrl)) {
-//			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
-//		}
-		return $this->disk->url($newImageUrl);
+		})->toString();
 
-		if ($this->disk->has($newImageUrl)) {
-			Log::info('If Has: '.$newImageUrl);
-
-			return $this->disk->url($newImageUrl);
+		if ($this->helper->cachedFiles()->contains($oldUblockUnfriendlyUrl)) {
+			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
 		}
 
-//		$this->alterImage($path, $dimensions, $offset, $format);
+		if ($this->helper->cachedFiles()->contains($newImageUrl)) {
+			return $this->helper->cachedUrl().$newImageUrl;
+		}
 
-		return "";
-		return $this->disk->url($path);
+		$this->alterImage($path, $dimensions, $offset, $format);
+
+		return $this->helper->cachedUrl().$path;
 	}
 
 	public function fileNotImage($path)
@@ -157,6 +155,7 @@ class BladeImageCrop
 			'targetHeight' => (int)$targetHeight,
 		];
 	}
+
 
 
 }
