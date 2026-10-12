@@ -2,8 +2,8 @@
 
 namespace DNABeast\BladeImageCrop\Builder;
 
+use DNABeast\BladeImageCrop\Helper;
 use DNABeast\BladeImageCrop\TempStorage;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
 use Log;
@@ -13,20 +13,21 @@ class IM_WebPBuilder extends ImageTypeBuilder
 	public $originPath;
 	public $image;
 	public $tempFilePath;
+	public $helper;
 
 	public function __construct($originPath)
 	{
 		$this->originPath = $originPath;
 		$this->image = $this->makeImage();
 		$this->tempFilePath = null;
+		$this->helper = new Helper();
 	}
 
 	public function makeImage(){
 		Log::info('Trying to make. '. $this->originPath);
 		$this->tempFilePath = TempStorage::fire( $this->helper->cachedUrl().$this->originPath );
 		Log::info('Temp Path. '. $this->tempFilePath);
-		$image = new Imagick($this->tempFilePath);
-		return $image;
+		return new Imagick($this->tempFilePath);
 	}
 
 	public function resize($options){
