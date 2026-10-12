@@ -35,6 +35,7 @@ class Sources extends Component
 	 */
 	public function render()
 	{
+		return "";
 		if (!config('bladeimagecrop.enabled', true)){
 			return '';
 		}
