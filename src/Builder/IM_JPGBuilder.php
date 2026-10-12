@@ -2,37 +2,60 @@
 
 namespace DNABeast\BladeImageCrop\Builder;
 
+use DNABeast\BladeImageCrop\Helper;
+use DNABeast\BladeImageCrop\TempStorage;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
+use Log;
 
 class IM_JPGBuilder extends ImageTypeBuilder
 {
-		public $originPath;
-        public $image;
+	public $originUrl;
+	public $image;
+	public $tempFilePath;
 
-		public function __construct($originPath)
-		{
-			$this->originPath = $originPath;
-			$this->image = $this->makeImage();
-		}
+	public function __construct($originUrl)
+	{
+		$this->originUrl = $originUrl;
+		$this->image = $this->makeImage();
+		$this->tempFilePath = null;
+	}
 
 	public function makeImage(){
-		$image = new Imagick($this->originPath);
-		$image->autoOrient();
-		return $image;
+		Log::info('Trying to make. '. $this->originUrl);
+		$this->tempFilePath = TempStorage::fire( $this->originUrl );
+		Log::info('Temp Path. '. $this->tempFilePath);
+		return new Imagick($this->tempFilePath);
 	}
 
-		public function resize($options){
-			$this->image->cropImage( $options['cropWidth'], $options['cropHeight'], $options['x'], $options['y'] );
-			$this->image->resizeImage( $options['targetWidth'], $options['targetHeight'], 7, 1 );
-			return $this;
-		}
+	public function resize($options){
+		Log::info('Trying to resize. '. $this->originUrl);
 
-		public function save($destinationPath){
-			$this->image->setImageFormat( 'jpg');
-			$this->image->setImageCompressionQuality(75);
-			return Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
+		if ($this->image->getNumberImages() == 0){
+			Log::info('Image is somehow missing. '. $this->originUrl);
+			return null;
 		}
-
+		$this->image->autoOrient();
+		$this->image->cropImage( $options['cropWidth'], $options['cropHeight'], $options['x'], $options['y'] );
+		$this->image->resizeImage( $options['targetWidth'], $options['targetHeight'], 7, 1 );
+		return $this;
 	}
 
+	public function save($destinationPath){
+		Log::info('Trying to save. '. $this->originUrl);
+
+		if ($this->image->getNumberImages() == 0){
+			Log::info('Image is somehow missing. '. $this->originUrl);
+			return null;
+		}
+		$this->image->setImageFormat( 'jpeg');
+		$this->image->setImageCompressionQuality( 80 );
+
+		Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
+		$this->image->clear();
+		if ($this->tempFilePath && file_exists($this->tempFilePath)) {
+			unlink($this->tempFilePath);
+		}
+	}
+
+}

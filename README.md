@@ -1,7 +1,7 @@
 # Blade Image Crop
 
 
-## About Blade Image Crop 4
+## About Blade Image Crop 5
 
 Use WebP without the headache. Provide alternate image sizes for your user's preferred display. Reference one image on your server then specify its dimensions in a blade component.
 
@@ -13,7 +13,7 @@ It supports
 - Automatic cropping to a specified aspect ratio and focus point
 - Multiple files for different DPI
 - webp with jpeg as a fallback (In a picture tag)
-- Inline backgrounds that display first on slow connections
+- (X) Inline backgrounds that display first on slow connections (currently broken)
 - Mobile and desktop versions
 - local AND online images
 - queuing the image processing

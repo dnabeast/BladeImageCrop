@@ -2,37 +2,60 @@
 
 namespace DNABeast\BladeImageCrop\Builder;
 
+use DNABeast\BladeImageCrop\Helper;
+use DNABeast\BladeImageCrop\TempStorage;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
+use Log;
 
 class IM_AVIFBuilder extends ImageTypeBuilder
 {
-	public $imageString;
-    public $image;
+	public $originUrl;
+	public $image;
+	public $tempFilePath;
 
-	public function __construct($imageString)
+	public function __construct($originUrl)
 	{
-		$this->imageString = $imageString;
+		$this->originUrl = $originUrl;
 		$this->image = $this->makeImage();
+		$this->tempFilePath = null;
 	}
 
 	public function makeImage(){
-		$image = (new Imagick);
-		$image->readImageBlob($this->imageString);
-		$image->autoOrient();
-		return $image;
+		Log::info('Trying to make. '. $this->originUrl);
+		$this->tempFilePath = TempStorage::fire( $this->originUrl );
+		Log::info('Temp Path. '. $this->tempFilePath);
+		return new Imagick($this->tempFilePath);
 	}
 
 	public function resize($options){
+		Log::info('Trying to resize. '. $this->originUrl);
+
+		if ($this->image->getNumberImages() == 0){
+			Log::info('Image is somehow missing. '. $this->originUrl);
+			return null;
+		}
+		$this->image->autoOrient();
 		$this->image->cropImage( $options['cropWidth'], $options['cropHeight'], $options['x'], $options['y'] );
 		$this->image->resizeImage( $options['targetWidth'], $options['targetHeight'], 7, 1 );
 		return $this;
 	}
 
-	public function save($path){
-		$this->image->setImageFormat( 'avif' );
-		$this->image->setCompressionQuality( 60 );
-		return Storage::disk( config('bladeimagecrop.disk') )->put($path, $this->image);
+	public function save($destinationPath){
+		Log::info('Trying to save. '. $this->originUrl);
+
+		if ($this->image->getNumberImages() == 0){
+			Log::info('Image is somehow missing. '. $this->originUrl);
+			return null;
+		}
+		$this->image->setImageFormat( 'avif');
+		$this->image->setImageCompressionQuality( 80 );
+
+		Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
+		$this->image->clear();
+		if ($this->tempFilePath && file_exists($this->tempFilePath)) {
+			unlink($this->tempFilePath);
+		}
 	}
 
 }

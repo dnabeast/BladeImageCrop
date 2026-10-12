@@ -22,9 +22,10 @@ class BladeImageCrop
 
 	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		$originPath = str($originUrl)->replace([(new Helper)->cachedUrl(), url('')], '')->trim('/')->value();
+		$uri = str($originUrl)->toUri();
+		$originPath = $uri->path();
 
-		$newImageUrl = $this->updateUrl($originPath, $dimensions, $offset, $format);;
+		$newImageUrl = $this->updateUrl($uri->host().'/'.$originPath, $dimensions, $offset, $format);;
 
 		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
 			return $matches[1];
@@ -72,7 +73,7 @@ class BladeImageCrop
 		}
 
 		$options = $this->options($data, $dimensions, $offset);
-		$originPath = str($originUrl)->replace([(new Helper)->cachedUrl(), url('')], '')->trim('/')->value();
+		$originPath = str($originUrl)->toUri()->host().'/'.str($originUrl)->toUri()->path();
 
 		$destinationPath = $this->updateUrl($originPath, $dimensions, $offset, $format);;
 

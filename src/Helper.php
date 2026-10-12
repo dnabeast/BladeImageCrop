@@ -16,13 +16,13 @@ class Helper
 
 	public function cachedFiles()
 	{
-		return collect(Cache::remember('bic_all_files', now()->addSeconds(12), function() {
+		return collect(Cache::remember('bic_all_files', now()->addSeconds((int) config('bladeimagecrop.cache_reset')), function() {
 			return $this->disk->allFiles('bic');
 		}));
 	}
 
 	public function cachedUrl(){
-		return Cache::remember('bic_disk_url', now()->addSeconds(12), function() {
+		return Cache::remember('bic_disk_url', now()->addSeconds((int) config('bladeimagecrop.cache_reset')), function() {
 			return $this->disk->url('/');
 		});
 	}

@@ -28,8 +28,8 @@ class Pic extends Component
 			$attributes = $data['attributes']->toHtml();
 			$propertyString = is_string($this->properties)?$this->properties:"[".implode(",", $this->properties)."]";
 			return <<<blade
-			<x-img sources="false" src="$this->src" :properties="$propertyString" $attributes />
 			<x-sources src="$this->src" :properties="$propertyString" />
+			<x-img sources="false" src="$this->src" :properties="$propertyString" $attributes />
 			blade;
 		};
 

@@ -57,7 +57,7 @@ class Img extends Component
 	public function build(){
 
 		$options = [
-			'src' => $this->image->file(),
+			'src' => $this->image->url(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
 			'properties' => $this->calculatedProperties(),
 			'pixelRatios' => isset($this->properties[0][1])?false:true
@@ -95,10 +95,9 @@ class Img extends Component
 	}
 
 	public function aspectFromImage(){
-		$this->image->path();
 		try {
-			$originalImage = Cache::remember('bic_props_'. $this->image->path(), now()->addMinutes(3), function(){
-				return getimagesize( $this->image->path() );
+			$originalImage = Cache::remember('bic_props_'. $this->image->url(), now()->addMinutes(3), function(){
+				return getimagesize( $this->image->url() );
 			});
 			return $originalImage[1]/$originalImage[0];
 		} catch (\Exception $e) {

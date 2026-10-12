@@ -2,21 +2,16 @@
 
 return [
 	'enabled' => env('BLADE_CROP_ENABLED', true),
-	'remove_domain' => env('BLADE_REMOVE_DOMAIN', false),
+	'cache_reset' => env('BLADE_CROP_CACHE_RESET', 12), // file check cache reset in seconds
 	'disk' => 'public',
 	'offset_x' => 50, // percentage
 	'offset_y' => 50,
 	'pixel_device_ratios' => ['1x', '2x'], // add multipliers here for ultra high def screens
 	'backgrounds' => true,
-    'compress_held_image' => env('BLADE_CROP_COMPRESS_HELD_IMAGE', true), // converts lossless photos to slightly compressed images to save space
-	'render_source_tag_if_unavailable' => env('BLADE_CROP_RENDER_SOURCE', false),
 	'build_classes' => [
 		// 'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
-		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
-		// 'webp' => 'DNABeast\BladeImageCrop\Builder\GD_WebPBuilder',
-//		'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
-//		 'jpg' => 'DNABeast\BladeImageCrop\Builder\GD_JPGBuilder',
-		// 'jpg' => 'DNABeast\BladeImageCrop\Builder\ShortPixelJPGBuilder',
+//		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
+		'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
 	],
 	'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
 ];
