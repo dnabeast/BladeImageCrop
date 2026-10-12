@@ -10,29 +10,29 @@ use Log;
 
 class IM_WebPBuilder extends ImageTypeBuilder
 {
-	public $originPath;
+	public $originUrl;
 	public $image;
 	public $tempFilePath;
 
-	public function __construct($originPath)
+	public function __construct($originUrl)
 	{
-		$this->originPath = $originPath;
+		$this->originUrl = $originUrl;
 		$this->image = $this->makeImage();
 		$this->tempFilePath = null;
 	}
 
 	public function makeImage(){
-		Log::info('Trying to make. '. $this->originPath);
-		$this->tempFilePath = TempStorage::fire( (new Helper)->cachedUrl().$this->originPath );
+		Log::info('Trying to make. '. $this->originUrl);
+		$this->tempFilePath = TempStorage::fire( $this->originUrl );
 		Log::info('Temp Path. '. $this->tempFilePath);
 		return new Imagick($this->tempFilePath);
 	}
 
 	public function resize($options){
-		Log::info('Trying to resize. '. $this->originPath);
+		Log::info('Trying to resize. '. $this->originUrl);
 
 		if ($this->image->getNumberImages() == 0){
-			Log::info('Image is somehow missing. '. $this->originPath);
+			Log::info('Image is somehow missing. '. $this->originUrl);
 			return null;
 		}
 		$this->image->autoOrient();
@@ -42,10 +42,10 @@ class IM_WebPBuilder extends ImageTypeBuilder
 	}
 
 	public function save($destinationPath){
-		Log::info('Trying to save. '. $this->originPath);
+		Log::info('Trying to save. '. $this->originUrl);
 
 		if ($this->image->getNumberImages() == 0){
-			Log::info('Image is somehow missing. '. $this->originPath);
+			Log::info('Image is somehow missing. '. $this->originUrl);
 			return null;
 		}
 		$this->image->setImageFormat( 'webp');

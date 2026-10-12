@@ -12,22 +12,22 @@ class ProcessImageJob implements ShouldQueue
 {
 	use Dispatchable, Queueable;
 
-	public $path;
+	public $originUrl;
 	public $format;
 	public $options;
-	public $uri;
+	public $destinationPath;
 
-	public function __construct($path, $format, $options, $uri)
+	public function __construct($originUrl, $format, $options, $destinationPath)
 	{
-		$this->path = $path;
+		$this->originUrl = $originUrl;
 		$this->format = $format;
 		$this->options = $options;
-		$this->uri = $uri;
+		$this->destinationPath = $destinationPath;
 	}
 
 	public function handle(): void
 	{
-		Log::info('Processing image: ' . $this->path);
-		(new ImageBuilder($this->path, $this->format))->resize($this->options)->save($this->uri);
+		Log::info('Processing image: ' . $this->originUrl);
+		(new ImageBuilder($this->originUrl, $this->format))->resize($this->options)->save($this->destinationPath);
 	}
 }

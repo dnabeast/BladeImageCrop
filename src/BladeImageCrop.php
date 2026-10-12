@@ -20,10 +20,11 @@ class BladeImageCrop
 		$this->helper = $helper;
 	}
 
-	public function fire($path, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
+	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
+		$originPath = str($originUrl)->replace([(new Helper)->cachedUrl(), url('')], '')->trim('/')->value();
 
-		$newImageUrl = $this->updateUrl($path, $dimensions, $offset, $format);
+		$newImageUrl = $this->updateUrl($originPath, $dimensions, $offset, $format);;
 
 		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
 			return $matches[1];
@@ -34,39 +35,13 @@ class BladeImageCrop
 		}
 
 		if ($this->helper->cachedFiles()->contains($newImageUrl)) {
-			return $this->helper->cachedUrl().$newImageUrl;
+			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 
-		$this->alterImage($path, $dimensions, $offset, $format);
+		$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
+		if (!$imageExists) { return 'FILE_NOT_FOUND__'.$originUrl;}
 
-		return $this->helper->cachedUrl().$path;
-	}
-
-	public function fileNotImage($path)
-	{
-		$disk = $this->disk;
-
-		if (method_exists($disk, 'fileExists')) {
-			$fileExists = $disk->fileExists($path);
-		} else {
-			$fileExists = $disk->has($path);
-		}
-
-		if (!$fileExists) {
-			return true;
-		}
-
-		if (pathinfo($this->disk->url($path), PATHINFO_EXTENSION) === '') {
-			return true;
-		}
-
-		if (@is_array(Cache::remember('bic_props_'. $this->disk->path($path), now()->addMinutes(3), function() use ($path){
-			return getimagesize($this->disk->url($path));
-		}))) {
-			return false;
-		}
-
-		return true;
+		return $originUrl;
 	}
 
 	public function updateUrl($url, $dimensions, $offset, $format)
@@ -75,7 +50,7 @@ class BladeImageCrop
 		$filename = $segments->pop();
 
 		$path = '/bic/' . $segments->implode('/')
-			. ($segments->count()?'/':'') . str_replace('.', '_', $filename)
+			. ($segments->count() ? '/' : '') . str_replace('.', '_', $filename)
 			. '/bic_' . implode('x', $dimensions)
 			. '_' . implode('_', $offset)
 			. '.' . $format;
@@ -84,26 +59,30 @@ class BladeImageCrop
 
 	}
 
-	public function alterImage($path, $dimensions, $offset, $format)
+	public function alterImage($originUrl, $dimensions, $offset, $format)
 	{
+
 		try {
-			$data = Cache::remember('bic_props_'. $path, now()->addMinutes(3), function() use ($path){
-				return getimagesize($this->disk->url($path));
+			$data = Cache::remember('bic_props_' . $originUrl, now()->addMinutes(3), function () use ($originUrl) {
+				return getimagesize($originUrl);
 			});
 		} catch (Exception $e) {
 			Log::alert($e->getMessage());
-			return;
+			return false;
 		}
 
 		$options = $this->options($data, $dimensions, $offset);
+		$originPath = str($originUrl)->replace([(new Helper)->cachedUrl(), url('')], '')->trim('/')->value();
 
-		$uri = $this->updateUrl($path, $dimensions, $offset, $format);
+		$destinationPath = $this->updateUrl($originPath, $dimensions, $offset, $format);;
 
 		dispatch(
 			new ProcessImageJob(
-				$path, $format, $options, $uri
+				$originUrl, $format, $options, $destinationPath
 			)
 		);
+
+		return true;
 
 	}
 
@@ -149,6 +128,32 @@ class BladeImageCrop
 		];
 	}
 
+	public function fileNotImage($path)
+	{
+		$disk = $this->disk;
+
+		if (method_exists($disk, 'fileExists')) {
+			$fileExists = $disk->fileExists($path);
+		} else {
+			$fileExists = $disk->has($path);
+		}
+
+		if (!$fileExists) {
+			return true;
+		}
+
+		if (pathinfo($this->disk->url($path), PATHINFO_EXTENSION) === '') {
+			return true;
+		}
+
+		if (@is_array(Cache::remember('bic_props_' . $this->disk->path($path), now()->addMinutes(3), function () use ($path) {
+			return getimagesize($this->disk->url($path));
+		}))) {
+			return false;
+		}
+
+		return true;
+	}
 
 
 }

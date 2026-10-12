@@ -11,6 +11,7 @@ class TempStorage
 	public static function fire($url){
 
 		$tempFilePath = tempnam(sys_get_temp_dir(), 'img_');
+
 		$response = Http::withOptions(['stream' => true])->get($url);
 
 		if ($response->failed()) {

@@ -27,7 +27,8 @@ class HoldImage
 
 	public function file()
 	{
-		return str($this->src)->after((new Helper)->cachedUrl());
+		return $this->src;
+		return str($this->src)->replace([(new Helper)->cachedUrl(), url('')], '')->trim('/')->value();
 
 		$extension = strtolower($this->src->explode('.')->last());
 

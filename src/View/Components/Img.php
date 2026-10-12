@@ -39,14 +39,15 @@ class Img extends Component
 	{
 		if (!config('bladeimagecrop.enabled', true)){
 			$propertyArray = is_array($this->properties)?['width'=>$this->properties[0].'px', 'height'=>isset($this->properties[1])?$this->properties[1].'px':'auto']:['width' => $this->properties.'px', 'height'=>'auto'];
-			return '<img style="width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
+			return '<img style="object-fit: cover; width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
 		}
 
 		return function (array $data){
 			$build = $this->build();
+			$srcAttributeKey = (str($build['src'])->startsWith('FILE_NOT_FOUND')?'src="#" data':'src');
 
 			return <<<EOT
-			<img {$build['sources']} {$build['background']} src="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
+			<img {$build['sources']} {$build['background']} {$srcAttributeKey}="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
 			EOT;
 		};
 
