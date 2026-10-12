@@ -49,7 +49,7 @@ class IM_AVIFBuilder extends ImageTypeBuilder
 			return null;
 		}
 		$this->image->setImageFormat('avif');
-		$this->image->setCompressionQuality( 60 );
+		$this->image->setCompressionQuality( 70 );
 
 		Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
 		$this->image->clear();
