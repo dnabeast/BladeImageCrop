@@ -44,10 +44,8 @@ class Source
 
 	public function srcsetLines()
 	{
-
-		return Cache::flexible(Str::slug($this->src.$this->image_format.$this->calcProperties()->implode('-')), [ now()->addMinutes(5), now()->addDay()],function () {
+		return Cache::flexible(Str::slug($this->src.$this->image_format.$this->calcProperties()->flatten()->implode('_')), [ now()->addMinutes(5), now()->addDay()],function () {
 			$pixelRatios = config('bladeimagecrop.pixel_device_ratios');
-
 			return $this->calcProperties()
 				->map(function ($properties, $key) use ($pixelRatios) {
 					$measurement = $this->pixelRatios ? $pixelRatios[$key] : $properties['dimensions']['width'] . 'w';
