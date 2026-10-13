@@ -3,6 +3,7 @@
 return [
 	'enabled' => env('BLADE_CROP_ENABLED', true),
 	'cache_reset' => env('BLADE_CROP_CACHE_RESET', 12), // file check cache reset in seconds
+	'update_legacy_image_names' => env('BLADE_CROP_UPDATE_LEGACY_IMAGE_NAMES', true),
 	'disk' => 'public',
 	'offset_x' => 50, // percentage
 	'offset_y' => 50,

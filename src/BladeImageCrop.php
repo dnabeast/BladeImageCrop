@@ -25,25 +25,26 @@ class BladeImageCrop
 		$uri = str($originUrl)->toUri();
 		$originPath = $uri->path();
 
-		$newImageUrl = $this->updateUrl($uri->host().'/'.$originPath, $dimensions, $offset, $format);;
+		$newImageUrl = $this->updateUrl($uri->host() . '/' . $originPath, $dimensions, $offset, $format);;
 
-//		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
-//			return $matches[1];
-//		})->toString();
-//
-//		if ($this->helper->cachedFiles()->contains($oldUblockUnfriendlyUrl)) {
-//			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
-//		}
+		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
+			$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
+				return $matches[1];
+			})->toString();
+
+			if ($this->helper->cachedFiles()->contains($oldUblockUnfriendlyUrl)) {
+				$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
+			}
+		}
 
 		if ($this->helper->cachedFiles()->contains($newImageUrl)) {
-			return 'IMAGE_NOT_FOUND__'.$originUrl;
-
+			return 'IMAGE_NOT_FOUND__' . $originUrl;
 			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 
-//		$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
-//		if (!$imageExists) { return 'IMAGE_NOT_FOUND__'.$originUrl;}
-		return 'IMAGE_NOT_FOUND__'.$originUrl;
+		$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
+		if (!$imageExists) { return 'IMAGE_NOT_FOUND__'.$originUrl;}
+
 		return $originUrl;
 	}
 
@@ -75,7 +76,7 @@ class BladeImageCrop
 		}
 
 		$options = $this->options($data, $dimensions, $offset);
-		$originPath = str($originUrl)->toUri()->host().'/'.str($originUrl)->toUri()->path();
+		$originPath = str($originUrl)->toUri()->host() . '/' . str($originUrl)->toUri()->path();
 
 		$destinationPath = $this->updateUrl($originPath, $dimensions, $offset, $format);;
 

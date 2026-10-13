@@ -22,17 +22,13 @@ class IM_AVIFBuilder extends ImageTypeBuilder
 	}
 
 	public function makeImage(){
-		Log::info('Trying to make. '. $this->originUrl);
 		$this->tempFilePath = TempStorage::fire( $this->originUrl );
-		Log::info('Temp Path. '. $this->tempFilePath);
 		return new Imagick($this->tempFilePath);
 	}
 
 	public function resize($options){
-		Log::info('Trying to resize. '. $this->originUrl);
-
 		if ($this->image->getNumberImages() == 0){
-			Log::info('Image is somehow missing. '. $this->originUrl);
+			Log::info('resizing image is somehow missing. '. $this->originUrl);
 			return null;
 		}
 		$this->image->autoOrient();
@@ -42,14 +38,12 @@ class IM_AVIFBuilder extends ImageTypeBuilder
 	}
 
 	public function save($destinationPath){
-		Log::info('Trying to save. '. $this->originUrl);
-
 		if ($this->image->getNumberImages() == 0){
-			Log::info('Image is somehow missing. '. $this->originUrl);
+			Log::info('Saving image is somehow missing. '. $this->originUrl);
 			return null;
 		}
-		$this->image->setImageFormat('avif');
-		$this->image->setCompressionQuality( 70 );
+		$this->image->setImageFormat( 'avif');
+		$this->image->setImageCompressionQuality( 70 );
 
 		Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, $this->image);
 		$this->image->clear();

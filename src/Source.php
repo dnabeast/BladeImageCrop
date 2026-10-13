@@ -67,16 +67,13 @@ class Source
 	public function srcsetLines(){
 		$pixelRatios = config('bladeimagecrop.pixel_device_ratios');
 
-		$lines =  $this->calcProperties()
+		return $this->calcProperties()
 			->map(function($properties, $key) use ($pixelRatios){
 				$measurement = $this->pixelRatios?$pixelRatios[$key]:$properties['dimensions']['width'].'w';
 				$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
-				\Log::debug("New Image URI: ".$newImageUri);
 				return $newImageUri.' '.$measurement;
 			})
 			->implode(",");
-		\Log::debug("Srcset lines: ".$lines);
-		return $lines;
 	}
 
 	public function calcProperties(){
