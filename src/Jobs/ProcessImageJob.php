@@ -27,7 +27,6 @@ class ProcessImageJob implements ShouldQueue
 
 	public function handle(): void
 	{
-		Log::info('Processing image: ' . $this->originUrl);
 		(new ImageBuilder($this->originUrl, $this->format))->resize($this->options)->save($this->destinationPath);
 	}
 }

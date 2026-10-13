@@ -68,7 +68,6 @@ class Img extends Component
 		$defaultImageSrc = explode(" ", $lines)[0];
 
 		if (config('bladeimagecrop.backgrounds')){
-			\Log::info('backgrounds');
             $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
             $backgroundString = (new Background($backgroundLocation))->render();
 		}
@@ -95,6 +94,8 @@ class Img extends Component
 	}
 
 	public function aspectFromImage(){
+		return 3/4; // default failed image shape
+
 		try {
 			$originalImage = Cache::remember('bic_props_'. $this->image->url(), now()->addMinutes(3), function(){
 				return getimagesize( $this->image->url() );

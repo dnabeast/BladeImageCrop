@@ -11,7 +11,6 @@ class ImageBuilder
 
 	public function __construct($originUrl, $format)
 	{
-		\Log::info('building '.$originUrl);
 		$this->originUrl = $originUrl;
 		$this->format = $format;
 		$this->class = $this->buildClass();

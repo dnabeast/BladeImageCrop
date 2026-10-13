@@ -22,6 +22,12 @@ class Helper
 		}));
 	}
 
+	public function cachedFileExists($path){
+		return Cache::remember('bic_file_'.$path, now()->addDay(), function() use ($path) {
+			return $this->cachedFiles()->contains($path);
+		});
+	}
+
 	public function cachedUrl(){
 		return Cache::remember('bic_disk_url', now()->addSeconds((int) config('bladeimagecrop.cache_reset')), function() {
 			return $this->disk->url('/');

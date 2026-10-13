@@ -32,13 +32,12 @@ class BladeImageCrop
 				return $matches[1];
 			})->toString();
 
-			if ($this->helper->cachedFiles()->contains($oldUblockUnfriendlyUrl)) {
+			if ($this->helper->cachedFileExists($oldUblockUnfriendlyUrl)) {
 				$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
 			}
 		}
 
-		if ($this->helper->cachedFiles()->contains($newImageUrl)) {
-			return 'IMAGE_NOT_FOUND__' . $originUrl;
+		if ($this->helper->cachedFileExists($newImageUrl)) {
 			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 

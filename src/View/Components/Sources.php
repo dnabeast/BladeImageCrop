@@ -67,6 +67,8 @@ class Sources extends Component
 	}
 
 	public function aspectFromImage(){
+		return 3/4; // default failed image shape
+
 		try {
 			$originalImage = Cache::remember('bic_props_'. $this->image->url(), now()->addMinutes(3), function(){
 				return getimagesize( $this->image->url() );
