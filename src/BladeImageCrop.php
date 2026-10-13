@@ -27,15 +27,17 @@ class BladeImageCrop
 
 		$newImageUrl = $this->updateUrl($uri->host().'/'.$originPath, $dimensions, $offset, $format);;
 
-		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
-			return $matches[1];
-		})->toString();
-
-		if ($this->helper->cachedFiles()->contains($oldUblockUnfriendlyUrl)) {
-			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
-		}
+//		$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
+//			return $matches[1];
+//		})->toString();
+//
+//		if ($this->helper->cachedFiles()->contains($oldUblockUnfriendlyUrl)) {
+//			$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
+//		}
 
 		if ($this->helper->cachedFiles()->contains($newImageUrl)) {
+			return 'IMAGE_NOT_FOUND__'.$originUrl;
+
 			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 
