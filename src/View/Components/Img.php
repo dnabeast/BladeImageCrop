@@ -44,7 +44,7 @@ class Img extends Component
 
 		return function (array $data){
 			$build = $this->build();
-			$srcAttributeKey = (str($build['src'])->startsWith('FILE_NOT_FOUND')?'src="#" data':'src');
+			$srcAttributeKey = (str($build['src'])->startsWith('IMAGE_NOT_FOUND__')?'src="#" data':'src');
 
 			return <<<EOT
 			<img {$build['sources']} {$build['background']} {$srcAttributeKey}="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>

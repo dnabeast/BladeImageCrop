@@ -17,6 +17,7 @@ class Helper
 	public function cachedFiles()
 	{
 		return collect(Cache::remember('bic_all_files', now()->addSeconds((int) config('bladeimagecrop.cache_reset')), function() {
+			\Log::debug('Cache miss',$this->disk->allFiles('bic'));
 			return $this->disk->allFiles('bic');
 		}));
 	}

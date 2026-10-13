@@ -39,9 +39,9 @@ class BladeImageCrop
 			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 
-		$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
-		if (!$imageExists) { return 'FILE_NOT_FOUND__'.$originUrl;}
-
+//		$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
+//		if (!$imageExists) { return 'IMAGE_NOT_FOUND__'.$originUrl;}
+		return 'IMAGE_NOT_FOUND__'.$originUrl;
 		return $originUrl;
 	}
 
