@@ -43,10 +43,7 @@ class Img extends Component
 		}
 
 		return function (array $data){
-			\Log::info('BUILDING: '.$this->src);
-
 			$build = $this->build();
-			return '<img src="'.$build['src'].'">';
 			$srcAttributeKey = (str($build['src'])->startsWith('IMAGE_NOT_FOUND__')?'src="#" data':'src');
 
 			return <<<EOT
@@ -59,6 +56,15 @@ class Img extends Component
 
 	public function build(){
 
+		\Log::info('BUILDING: Fake return ');
+
+		return [
+			'sources' => '$sourcesString',
+			'background' => '$backgroundString??null',
+			'src' => '$defaultImageSrc',
+			'attributes' => 'class="" alt=""'
+		];
+
 		$options = [
 			'src' => $this->image->url(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
@@ -67,7 +73,6 @@ class Img extends Component
 		];
         $lines = 'LINES:'.json_encode($options);//Source::make($options)->srcsetLines();
 
-\Log::info('BUILDING: '.$lines);
 
 		$defaultImageSrc = explode(" ", $lines)[0];
 
