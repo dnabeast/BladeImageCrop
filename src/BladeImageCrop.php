@@ -22,10 +22,9 @@ class BladeImageCrop
 
 	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		$uri = str($originUrl)->toUri();
-		$originPath = $uri->path();
 
-		$newImageUrl = $this->updateUrl($uri->host() . '/' . $originPath, $dimensions, $offset, $format);;
+
+		$newImageUrl = $this->updatePath( $originUrl, $dimensions, $offset, $format);;
 
 		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
 			$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
@@ -47,18 +46,25 @@ class BladeImageCrop
 		return $originUrl;
 	}
 
-	public function updateUrl($url, $dimensions, $offset, $format)
+	public function updatePath($originUrl, $dimensions, $offset, $format)
 	{
-		$segments = collect(explode('/', $url));
+		$uri = str($originUrl)->toUri();
+		$originPath = $uri->path();
+
+		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
+			$originPath = $uri->host() . '/' .$originPath;
+		}
+
+		$segments = collect(explode('/', $originPath));
 		$filename = $segments->pop();
 
-		$path = '/bic/' . $segments->implode('/')
+		$destinationPath = '/bic/' . $segments->implode('/')
 			. ($segments->count() ? '/' : '') . str_replace('.', '_', $filename)
 			. '/bic_' . implode('x', $dimensions)
 			. '_' . implode('_', $offset)
 			. '.' . $format;
 
-		return trim($path, '/');
+		return trim($destinationPath, '/');
 
 	}
 
@@ -75,9 +81,8 @@ class BladeImageCrop
 		}
 
 		$options = $this->options($data, $dimensions, $offset);
-		$originPath = str($originUrl)->toUri()->host() . '/' . str($originUrl)->toUri()->path();
 
-		$destinationPath = $this->updateUrl($originPath, $dimensions, $offset, $format);;
+		$destinationPath = $this->updatePath($originUrl, $dimensions, $offset, $format);;
 
 		dispatch(
 			new ProcessImageJob(
