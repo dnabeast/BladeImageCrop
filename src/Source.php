@@ -48,12 +48,12 @@ class Source
 		$cacheKey = Str::slug($this->src . $this->image_format . $properties->flatten()->implode('_'));
 		$timeout = substr(basename($this->src), 0,4) == 'bic_' ? now()->addDay() : now()->addMinutes(5);
 
-		return Cache::remember($cacheKey, $timeout,function () {
+		return Cache::remember($cacheKey, $timeout,function () use ($properties){
 			$pixelRatios = config('bladeimagecrop.pixel_device_ratios');
-			return $this->calcProperties()
-				->map(function ($properties, $key) use ($pixelRatios) {
-					$measurement = $this->pixelRatios ? $pixelRatios[$key] : $properties['dimensions']['width'] . 'w';
-					$newImageUri = $this->bladeImageCrop->fire($this->src, $properties['dimensions'], $properties['offsets'], $this->image_format);
+			return $properties
+				->map(function ($property, $key) use ($pixelRatios) {
+					$measurement = $this->pixelRatios ? $pixelRatios[$key] : $property['dimensions']['width'] . 'w';
+					$newImageUri = $this->bladeImageCrop->fire($this->src, $property['dimensions'], $property['offsets'], $this->image_format);
 					return $newImageUri . ' ' . $measurement;
 				})
 				->implode(",");
