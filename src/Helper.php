@@ -21,9 +21,9 @@ class Helper
 	}
 
 	public function cachedFileExists($path){
-		return Cache::remember('bic_file_'.$path, now()->addDay(), function() use ($path) {
+//		return Cache::remember('bic_file_'.$path, now()->addDay(), function() use ($path) {
 			return $this->cachedFiles()->contains($path);
-		});
+//		});
 	}
 
 	public function cachedUrl(){
