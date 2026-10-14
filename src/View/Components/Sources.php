@@ -38,6 +38,7 @@ class Sources extends Component
 		if (!config('bladeimagecrop.enabled', true)){
 			return '';
 		}
+		return '';
 		return $this->build();
 	}
 
