@@ -9,7 +9,7 @@ return [
 	'offset_x' => 50, // percentage
 	'offset_y' => 50,
 	'pixel_device_ratios' => ['1x', '2x'], // add multipliers here for ultra high def screens
-	'backgrounds' => true,
+	'backgrounds' => false,
 	'build_classes' => [
 		// 'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
 		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',

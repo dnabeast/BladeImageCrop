@@ -56,24 +56,21 @@ class Img extends Component
 
 	public function build(){
 
-
-
 		$options = [
 			'src' => $this->image->url(),
 			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
 			'properties' => $this->calculatedProperties(),
 			'pixelRatios' => isset($this->properties[0][1])?false:true
 		];
-        $lines = 'LINES:'.json_encode($options);//Source::make($options)->srcsetLines();
-
-		\Log::info('BUILDING: Fake return ');
+        $lines = Source::make($options)->srcsetLines();
 
 		$defaultImageSrc = explode(" ", $lines)[0];
 
-//		if (config('bladeimagecrop.backgrounds')){
-//            $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
-//            $backgroundString = (new Background($backgroundLocation))->render();
-//		}
+		if (config('bladeimagecrop.backgrounds')){
+			\Log::info('BUILDING: Background');
+            $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
+            $backgroundString = (new Background($backgroundLocation))->render();
+		}
 
 		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
 
