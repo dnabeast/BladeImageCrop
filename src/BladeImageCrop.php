@@ -11,18 +11,17 @@ use Log;
 
 class BladeImageCrop
 {
-	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
+//	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
 	private Helper $helper;
 
 	public function __construct(Helper $helper)
 	{
-		$this->disk = Storage::disk(config('bladeimagecrop.disk'));
+//		$this->disk = Storage::disk(config('bladeimagecrop.disk'));
 		$this->helper = $helper;
 	}
 
 	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-
 
 		$newImageUrl = $this->updatePath( $originUrl, $dimensions, $offset, $format);;
 
@@ -32,7 +31,7 @@ class BladeImageCrop
 			})->toString();
 
 			if ($this->helper->cachedFileExists($oldUblockUnfriendlyUrl)) {
-				$this->disk->move($oldUblockUnfriendlyUrl, $newImageUrl);
+				Storage::disk(config('bladeimagecrop.disk'))->move($oldUblockUnfriendlyUrl, $newImageUrl);
 			}
 		}
 
@@ -140,32 +139,32 @@ class BladeImageCrop
 		];
 	}
 
-	public function fileNotImage($path)
-	{
-		$disk = $this->disk;
-
-		if (method_exists($disk, 'fileExists')) {
-			$fileExists = $disk->fileExists($path);
-		} else {
-			$fileExists = $disk->has($path);
-		}
-
-		if (!$fileExists) {
-			return true;
-		}
-
-		if (pathinfo($this->disk->url($path), PATHINFO_EXTENSION) === '') {
-			return true;
-		}
-
-		if (@is_array(Cache::remember('bic_props_' . $this->disk->path($path), now()->addMinutes(3), function () use ($path) {
-			return getimagesize($this->disk->url($path));
-		}))) {
-			return false;
-		}
-
-		return true;
-	}
+//	public function fileNotImage($path)
+//	{
+//		$disk = $this->disk;
+//
+//		if (method_exists($disk, 'fileExists')) {
+//			$fileExists = $disk->fileExists($path);
+//		} else {
+//			$fileExists = $disk->has($path);
+//		}
+//
+//		if (!$fileExists) {
+//			return true;
+//		}
+//
+//		if (pathinfo($this->disk->url($path), PATHINFO_EXTENSION) === '') {
+//			return true;
+//		}
+//
+//		if (@is_array(Cache::remember('bic_props_' . $this->disk->path($path), now()->addMinutes(3), function () use ($path) {
+//			return getimagesize($this->disk->url($path));
+//		}))) {
+//			return false;
+//		}
+//
+//		return true;
+//	}
 
 
 }
