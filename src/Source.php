@@ -17,6 +17,7 @@ class Source
 	public $sizes;
 	public $pixelRatios;
 	protected $cachedSrcsetLines = null;
+	protected static array $staticCache = [];
 
 	public function __construct($options, BladeImageCrop $bladeImageCrop)
 	{
@@ -52,9 +53,14 @@ class Source
 
 		$properties = $this->calcProperties();
 		$cacheKey = Str::slug($this->src . $this->image_format . $properties->flatten()->implode('_'));
+
+		if (isset(static::$staticCache[$cacheKey])) {
+			return $this->cachedSrcsetLines = static::$staticCache[$cacheKey];
+		}
+
 		$timeout = substr(basename($this->src), 0,4) == 'bic_' ? now()->addDay() : now()->addMinutes(5);
 
-		return $this->cachedSrcsetLines = Cache::remember($cacheKey, $timeout,function () use ($properties){
+		$result = Cache::remember($cacheKey, $timeout,function () use ($properties){
 			$pixelRatios = config('bladeimagecrop.pixel_device_ratios');
 			return $properties
 				->map(function ($property, $key) use ($pixelRatios) {
@@ -64,6 +70,11 @@ class Source
 				})
 				->implode(",");
 		});
+
+		static::$staticCache[$cacheKey] = $result;
+
+		return $this->cachedSrcsetLines = $result;
+
 	}
 
 	public function calcProperties()
