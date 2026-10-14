@@ -68,19 +68,12 @@ class Img extends Component
 
 		\Log::info('BUILDING: Fake return ');
 
-		return [
-			'sources' => '$sourcesString',
-			'background' => '$backgroundString??null',
-			'src' => '$defaultImageSrc',
-			'attributes' => 'class="" alt=""'
-		];
-
 		$defaultImageSrc = explode(" ", $lines)[0];
 
-		if (config('bladeimagecrop.backgrounds')){
-            $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
-            $backgroundString = (new Background($backgroundLocation))->render();
-		}
+//		if (config('bladeimagecrop.backgrounds')){
+//            $backgroundLocation = 'blade_image_crop_holding/'.Str::of($defaultImageSrc)->after('blade_image_crop_holding');
+//            $backgroundString = (new Background($backgroundLocation))->render();
+//		}
 
 		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
 
