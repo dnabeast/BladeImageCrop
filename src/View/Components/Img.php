@@ -45,8 +45,8 @@ class Img extends Component
 		return function (array $data){
 			\Log::info('BUILDING: '.$this->src);
 
-			return '<img src="#">';
 			$build = $this->build();
+			return '<img src="'.$build['src'].'">';
 			$srcAttributeKey = (str($build['src'])->startsWith('IMAGE_NOT_FOUND__')?'src="#" data':'src');
 
 			return <<<EOT
