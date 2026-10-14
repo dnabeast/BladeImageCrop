@@ -20,10 +20,7 @@ class BladeImageCrop
 
 	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		\Log::info('Compressed File: Time where returned.');
 		$newImageUrl = $this->updatePath( $originUrl, $dimensions, $offset, $format);;
-		return 'https://fls-a2dba409-6fe0-437c-8842-cc19bc5f3571.laravel.cloud' . $newImageUrl;
-
 
 		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
 			$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
