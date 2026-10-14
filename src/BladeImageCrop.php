@@ -44,6 +44,8 @@ class BladeImageCrop
 			if (!$imageExists) {
 				return 'IMAGE_NOT_FOUND__' . $originUrl;
 			}
+		} else {
+			\Log::info('Time where no process');
 		}
 
 		return $originUrl;

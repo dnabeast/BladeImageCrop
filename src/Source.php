@@ -44,7 +44,11 @@ class Source
 
 	public function srcsetLines()
 	{
-		return Cache::flexible(Str::slug($this->src.$this->image_format.$this->calcProperties()->flatten()->implode('_')), [ now()->addMinutes(5), now()->addDay()],function () {
+		$properties = $this->calcProperties();
+		$cacheKey = Str::slug($this->src . $this->image_format . $properties->flatten()->implode('_'));
+		$timeout = substr(basename($this->src), 0,4) == 'bic_' ? now()->addDay() : now()->addMinutes(5);
+
+		return Cache::remember($cacheKey, $timeout,function () {
 			$pixelRatios = config('bladeimagecrop.pixel_device_ratios');
 			return $this->calcProperties()
 				->map(function ($properties, $key) use ($pixelRatios) {

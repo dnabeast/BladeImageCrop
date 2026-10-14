@@ -2,16 +2,11 @@
 
 namespace DNABeast\BladeImageCrop;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Imagick;
-use Log;
-
 
 class HoldImage
 {
-	public $src;
+	public \Illuminate\Support\Stringable $src;
 
 	public function __construct($src)
 	{
