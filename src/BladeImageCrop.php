@@ -56,7 +56,7 @@ class BladeImageCrop
 		$uri = str($originUrl)->toUri();
 		$originPath = $uri->path();
 
-		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
+		if (config('bladeimagecrop.sort_by_domain_name') == 'true') {
 			$originPath = $uri->host() . '/' .$originPath;
 		}
 
