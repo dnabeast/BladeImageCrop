@@ -56,14 +56,7 @@ class Img extends Component
 
 	public function build(){
 
-		\Log::info('BUILDING: Fake return ');
 
-		return [
-			'sources' => '$sourcesString',
-			'background' => '$backgroundString??null',
-			'src' => '$defaultImageSrc',
-			'attributes' => 'class="" alt=""'
-		];
 
 		$options = [
 			'src' => $this->image->url(),
@@ -73,6 +66,14 @@ class Img extends Component
 		];
         $lines = 'LINES:'.json_encode($options);//Source::make($options)->srcsetLines();
 
+		\Log::info('BUILDING: Fake return ');
+
+		return [
+			'sources' => '$sourcesString',
+			'background' => '$backgroundString??null',
+			'src' => '$defaultImageSrc',
+			'attributes' => 'class="" alt=""'
+		];
 
 		$defaultImageSrc = explode(" ", $lines)[0];
 
