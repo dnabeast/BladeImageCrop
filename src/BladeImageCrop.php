@@ -34,6 +34,7 @@ class BladeImageCrop
 		}
 
 		if ($this->helper->cachedFileExists($newImageUrl)) {
+			\Log::info('Compressed File: Time where returned.');
 			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 
@@ -43,7 +44,7 @@ class BladeImageCrop
 				return 'IMAGE_NOT_FOUND__' . $originUrl;
 			}
 		} else {
-			\Log::info('Time where no process');
+			\Log::info('Original File: Time where no process');
 		}
 
 		return $originUrl;
