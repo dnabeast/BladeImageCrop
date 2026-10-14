@@ -16,6 +16,7 @@ class Source
 	public $media;
 	public $sizes;
 	public $pixelRatios;
+	protected $cachedSrcsetLines = null;
 
 	public function __construct($options, BladeImageCrop $bladeImageCrop)
 	{
@@ -35,20 +36,25 @@ class Source
 
 	public function render()
 	{
-		if (!Str::of($this->srcsetLines())->startsWith('IMAGE_NOT_FOUND__')) {
+		$srcsetLines = $this->srcsetLines();
+		if (!Str::of($srcsetLines)->startsWith('IMAGE_NOT_FOUND__')) {
 			return <<<EOT
-			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$this->srcsetLines()}"{$this->sizesResult()}>
+			<source{$this->mediaResult()}{$this->mimeResult()} srcset="{$srcsetLines}"{$this->sizesResult()}>
 			EOT;
 		}
 	}
 
 	public function srcsetLines()
 	{
+		if ($this->cachedSrcsetLines !== null) {
+			return $this->cachedSrcsetLines;
+		}
+
 		$properties = $this->calcProperties();
 		$cacheKey = Str::slug($this->src . $this->image_format . $properties->flatten()->implode('_'));
 		$timeout = substr(basename($this->src), 0,4) == 'bic_' ? now()->addDay() : now()->addMinutes(5);
 
-		return Cache::remember($cacheKey, $timeout,function () use ($properties){
+		return $this->cachedSrcsetLines = Cache::remember($cacheKey, $timeout,function () use ($properties){
 			$pixelRatios = config('bladeimagecrop.pixel_device_ratios');
 			return $properties
 				->map(function ($property, $key) use ($pixelRatios) {

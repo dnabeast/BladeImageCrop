@@ -11,12 +11,10 @@ use Log;
 
 class BladeImageCrop
 {
-//	private \Illuminate\Contracts\Filesystem\Filesystem $disk;
 	private Helper $helper;
 
 	public function __construct(Helper $helper)
 	{
-//		$this->disk = Storage::disk(config('bladeimagecrop.disk'));
 		$this->helper = $helper;
 	}
 

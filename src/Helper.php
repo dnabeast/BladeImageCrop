@@ -11,8 +11,11 @@ class Helper
 	public function cachedFiles()
 	{
 		return collect(Cache::remember('bic_all_files', now()->addSeconds((int) config('bladeimagecrop.cache_reset')), function() {
+			\Log::debug('cachedFiles start time'. microtime(true));
 			$allFiles = Storage::disk(config('bladeimagecrop.disk'))->allFiles('bic');
 			\Log::debug('Cache miss', $allFiles);
+			\Log::debug('cachedFiles end time'. microtime(true));
+
 			return $allFiles;
 		}));
 	}
