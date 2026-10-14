@@ -43,6 +43,9 @@ class Img extends Component
 		}
 
 		return function (array $data){
+			\Log::info('BUILDING: '.$this->src);
+
+			return '<img src="#">';
 			$build = $this->build();
 			$srcAttributeKey = (str($build['src'])->startsWith('IMAGE_NOT_FOUND__')?'src="#" data':'src');
 
@@ -97,14 +100,14 @@ class Img extends Component
 	public function aspectFromImage(){
 		return 3/4; // default failed image shape
 
-		try {
-			$originalImage = Cache::remember('bic_props_'. $this->image->url(), now()->addMinutes(3), function(){
-				return getimagesize( $this->image->url() );
-			});
-			return $originalImage[1]/$originalImage[0];
-		} catch (\Exception $e) {
-			return 3/4; // default failed image shape
-		}
+//		try {
+//			$originalImage = Cache::remember('bic_props_'. $this->image->url(), now()->addMinutes(3), function(){
+//				return getimagesize( $this->image->url() );
+//			});
+//			return $originalImage[1]/$originalImage[0];
+//		} catch (\Exception $e) {
+//			return 3/4; // default failed image shape
+//		}
 	}
 
 }
