@@ -62,8 +62,9 @@ class Img extends Component
 			'properties' => $this->calculatedProperties(),
 			'pixelRatios' => isset($this->properties[0][1])?false:true
 		];
+        $lines = 'LINES:'.json_encode($options);//Source::make($options)->srcsetLines();
 
-        $lines = 'LINES: '.json_encode($options);//Source::make($options)->srcsetLines();
+\Log::info('BUILDING: '.$lines);
 
 		$defaultImageSrc = explode(" ", $lines)[0];
 
