@@ -5,6 +5,7 @@ namespace DNABeast\BladeImageCrop\Tests\Unit;
 use DNABeast\BladeImageCrop\BladeImageCrop;
 use DNABeast\BladeImageCrop\Helper;
 use DNABeast\BladeImageCrop\ImageBuilder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -29,6 +30,7 @@ class ImageCropTest extends TestCase
 			'driver' => 'local',
 			'root' => storage_path('app/public'),
 		]);
+		Storage::fake('public');
 
 		$this->app->bind('path.public', function() {
 			return str_replace("vendor/orchestra/testbench-core/laravel", "tests/Unit/storage", base_path());
@@ -39,8 +41,6 @@ class ImageCropTest extends TestCase
 
 		$url = 'uploads/banners/page/doesntexist.jpg';
 		$dimensions = [400, 300];
-
-		Storage::fake('public');
 
 		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
@@ -55,24 +55,26 @@ class ImageCropTest extends TestCase
 	function test_if_correct_file_exists_return_file_url(){
 
 		$path = '/uploads/banners/page/cater.jpg';
-		$dimensions = ['width' => 400, 'height' => 300];
+		$dimensions = ['width' => 400, 'height' => 200];
 		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$path);
-
-		Storage::fake('public');
-		Storage::disk('public')->put($path, $image);
+		$url = 'http://localhost'.$path;
+		Cache::set('bic_props_'.$url, [
+			800,
+			600,
+		]);
 		Http::fake([
-
+			$url => $image,
 		]);
 
 		$newImageUrl = (new BladeImageCrop(new Helper()))->fire('http://localhost'.$path, $dimensions);
 
 		$this->assertEquals(
-			'/storage/uploads/banners/page/cater.jpg',
+			$url,
 			$newImageUrl
 		);
 
 		$this->assertTrue(
-			Storage::disk('public')->has('/uploads/banners/page/cater_jpg/bic_400x300_50_50.jpg')
+			Storage::disk('public')->has('bic/uploads/banners/page/cater_jpg/bic_400x200_50_50.jpg')
 		);
 
 	}

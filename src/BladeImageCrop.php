@@ -2,13 +2,13 @@
 
 namespace DNABeast\BladeImageCrop;
 
-use DNABeast\BladeImageCrop\Jobs\ProcessImageJob;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Log;
+use DNABeast\BladeImageCrop\Jobs\ProcessImageJob;
 
 class BladeImageCrop
 {
@@ -22,7 +22,6 @@ class BladeImageCrop
 	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
 		$newImageUrl = $this->updatePath( $originUrl, $dimensions, $offset, $format);
-
 		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
 			$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
 				return $matches[1];
@@ -46,6 +45,7 @@ class BladeImageCrop
 
 	public function updatePath($originUrl, $dimensions, $offset, $format)
 	{
+
 		$uri = str($originUrl)->toUri();
 		$originPath = $uri->path();
 
