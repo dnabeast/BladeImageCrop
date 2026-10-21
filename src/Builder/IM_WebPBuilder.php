@@ -54,8 +54,12 @@ class IM_WebPBuilder extends ImageTypeBuilder
 		$this->image->clear();
 		$this->image->destroy();
 		unset($this->image);
-		@unlink($this->tempFilePath);
-		@unlink($processedPath);
+		if ($this->tempFilePath && file_exists($this->tempFilePath)){
+			@unlink($this->tempFilePath);
+		}
+		if ( file_exists($processedPath)){
+			@unlink($processedPath);
+		}
 		gc_collect_cycles();
 	}
 

@@ -33,7 +33,6 @@ class BladeImageCrop
 		}
 
 		if ($this->helper->cachedFileExists($newImageUrl)) {
-			\Log::info('Compressed File: Time where returned. '.$newImageUrl);
 			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 
@@ -135,12 +134,14 @@ class BladeImageCrop
 	}
 
 	public function createTask($data){
-		DB::table('bladeimagecrop_tasks')
-			->updateOrInsert([
-					'task_properties' => json_encode($data)
-				],
-				['updated_at' => now()]
-			);
+		if (!DB::table('bladeimagecrop_tasks')->where('task_properties', json_encode($data))->exists()) {
+			DB::table('bladeimagecrop_tasks')
+				->insert([
+					'task_properties' => json_encode($data),
+					'created_at' => now(),
+					'updated_at' => now()
+				]);
+		}
 	}
 
 

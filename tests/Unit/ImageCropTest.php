@@ -66,7 +66,7 @@ class ImageCropTest extends TestCase
 			$url => $image,
 		]);
 
-		$newImageUrl = (new BladeImageCrop(new Helper()))->fire('http://localhost'.$path, $dimensions);
+		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
 			$url,
@@ -81,19 +81,24 @@ class ImageCropTest extends TestCase
 
 	function test_if_correct_file_exists_with_webp_format_return_file_url(){
 
-		$url = 'banners/page/cater.jpg';
+		$path = '/uploads/banners/page/cater.jpg';
 		$dimensions = ['width' => 400, 'height' => 300];
 		$offset = ['x'=>50, 'y'=>50];
-		$image = file_get_contents(__DIR__.'/uploads/'.$url);
+		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$path);
+		$url = 'http://localhost'.$path;
+		Cache::set('bic_props_'.$url, [
+			800,
+			600,
+		]);
+		Http::fake([
+			$url => $image,
+		]);
 
-		Storage::fake('public');
-		Storage::disk('public')->put($url, $image);
-		// Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
 
 		(new BladeImageCrop(new Helper()))->fire($url, $dimensions, $offset, 'webp');
 
 		$this->assertTrue(
-			Storage::disk('public')->has('banners/page/cater_jpg/bic_400x300_50_50.webp')
+			Storage::disk('public')->has('bic/uploads/banners/page/cater_jpg/bic_400x300_50_50.webp')
 		);
 
 	}

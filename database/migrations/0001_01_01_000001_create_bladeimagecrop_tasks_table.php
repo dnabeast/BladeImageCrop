@@ -12,7 +12,7 @@ return new class extends Migration {
 	{
 		Schema::create('bladeimagecrop_tasks', function (Blueprint $table) {
 			$table->id();
-			$table->json('task_properties');
+			$table->text('task_properties');
 			$table->timestamps();
 		});
 	}

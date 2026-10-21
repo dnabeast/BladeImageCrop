@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\DB;
 
 class ImageCropCommand extends Command
 {
-	protected $signature = 'bladeimagecrop:process';
+	protected $signature = 'bladeimagecrop:process {task_count?}';
 
 	protected $description = 'Blade Image Crop process a batch of images';
 
 	public function handle(): void
 	{
 		$tasks = DB::table('bladeimagecrop_tasks')
-			->limit(config('bladeimagecrop.batch_size'));
+			->limit($this->argument('task_count')??config('bladeimagecrop.batch_size'));
 
 		if ($tasks->count() == 0) {
 			$this->info('No tasks to process');
