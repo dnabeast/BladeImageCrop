@@ -3,8 +3,10 @@
 namespace DNABeast\BladeImageCrop\Tests\Unit;
 
 use DNABeast\BladeImageCrop\BladeImageCrop;
+use DNABeast\BladeImageCrop\Helper;
 use DNABeast\BladeImageCrop\ImageBuilder;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase;
 
@@ -17,14 +19,12 @@ class ImageCropTest extends TestCase
 	{
 		parent::setUp();
 		Config::set('bladeimagecrop',[
-			'short_pixel_active' => env('BLADE_CROP_SHORTPIXEL', false),
 			'disk' => 'public',
 			'build_classes' => [
 				'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
 				'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder'
 			]
 		]);
-		$path = __DIR__;
 		Config::set('filesystems.disks.public', [
 			'driver' => 'local',
 			'root' => storage_path('app/public'),
@@ -42,10 +42,10 @@ class ImageCropTest extends TestCase
 
 		Storage::fake('public');
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'IMAGE_NOT_FOUND',
+			'IMAGE_NOT_FOUND__uploads/banners/page/doesntexist.jpg',
 			$newImageUrl
 		);
 
@@ -54,14 +54,17 @@ class ImageCropTest extends TestCase
 
 	function test_if_correct_file_exists_return_file_url(){
 
-		$url = 'uploads/banners/page/cater.jpg';
+		$path = '/uploads/banners/page/cater.jpg';
 		$dimensions = ['width' => 400, 'height' => 300];
-		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$url);
+		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$path);
 
 		Storage::fake('public');
-		Storage::disk('public')->put($url, $image);
+		Storage::disk('public')->put($path, $image);
+		Http::fake([
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+		]);
+
+		$newImageUrl = (new BladeImageCrop(new Helper()))->fire('http://localhost'.$path, $dimensions);
 
 		$this->assertEquals(
 			'/storage/uploads/banners/page/cater.jpg',
@@ -85,7 +88,7 @@ class ImageCropTest extends TestCase
 		Storage::disk('public')->put($url, $image);
 		// Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
 
-		(new BladeImageCrop)->fire($url, $dimensions, $offset, 'webp');
+		(new BladeImageCrop(new Helper()))->fire($url, $dimensions, $offset, 'webp');
 
 		$this->assertTrue(
 			Storage::disk('public')->has('banners/page/cater_jpg/bic_400x300_50_50.webp')
@@ -104,7 +107,7 @@ class ImageCropTest extends TestCase
 		Storage::disk('uploads')->put($url, $image);
 		Storage::disk('uploads')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
 			'/storage/banners/page/cater_jpg/bic_400x300_50_50.jpg',
@@ -126,7 +129,7 @@ class ImageCropTest extends TestCase
 		Storage::disk('public')->put($url, $image);
 		Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
 			'/storage/banners/page/cater_jpg/bic_400x300_50_50.jpg',
@@ -144,7 +147,7 @@ class ImageCropTest extends TestCase
 		Storage::fake('public');
 		Storage::disk('public')->put($url, $image);
 
-//		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+//		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
         $blob = Storage::disk( config('bladeimagecrop.disk') )->get($url);
         (new ImageBuilder($blob, 'jpg'))->resize($options)->save('test.jpg');
@@ -167,13 +170,13 @@ class ImageCropTest extends TestCase
 	}
 
 	function test_update_url_returns_proper_url(){
-		$result = (new BladeImageCrop)->updateUrl('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
+		$result = (new BladeImageCrop(new Helper()))->updateUrl('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
 			'uploads/cater_jpg/bic_800x600_50_50.jpg',
 			$result
 		);
 
-		$result = (new BladeImageCrop)->updateUrl('cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
+		$result = (new BladeImageCrop(new Helper()))->updateUrl('cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
 			'cater_jpg/bic_800x600_50_50.jpg',
 			$result
@@ -190,7 +193,7 @@ class ImageCropTest extends TestCase
 		Storage::fake('uploads');
 		Storage::disk('uploads')->put($url.'test.txt', 'test');
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
 			'IMAGE_NOT_FOUND',
@@ -207,7 +210,7 @@ class ImageCropTest extends TestCase
 		Storage::disk('public')->put($url, $image);
 		Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
 
-		$newImageUrl = (new BladeImageCrop)->fire($url, $dimensions);
+		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
 			'IMAGE_NOT_FOUND',
@@ -226,13 +229,13 @@ class ImageCropTest extends TestCase
 		Storage::disk('public')->put($url, $image);
 
 		$this->assertFalse(
-			(new BladeImageCrop)->fileNotImage($url),
+			(new BladeImageCrop(new Helper()))->fileNotImage($url),
 		);
 
 		Storage::disk('public')->put($url2, 'This is some Text');
 
 		$this->assertTrue(
-			(new BladeImageCrop)->fileNotImage($url2),
+			(new BladeImageCrop(new Helper()))->fileNotImage($url2),
 		);
 	}
 
@@ -262,7 +265,7 @@ class ImageCropTest extends TestCase
 		];
 
 
-		$result = (new BladeImageCrop)->options($data, $dimensions, $offset);
+		$result = (new BladeImageCrop(new Helper()))->options($data, $dimensions, $offset);
 
 		$this->assertEquals(
 			$expected,
@@ -296,7 +299,7 @@ class ImageCropTest extends TestCase
 				'targetHeight' => 200
 			];
 
-			$result = (new BladeImageCrop)->options($data, $dimensions, $offset);
+			$result = (new BladeImageCrop(new Helper()))->options($data, $dimensions, $offset);
 
 			$this->assertEquals(
 				$expected,

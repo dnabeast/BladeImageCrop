@@ -5,6 +5,7 @@ namespace DNABeast\BladeImageCrop;
 use DNABeast\BladeImageCrop\Jobs\ProcessImageJob;
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Log;
@@ -20,7 +21,7 @@ class BladeImageCrop
 
 	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		$newImageUrl = $this->updatePath( $originUrl, $dimensions, $offset, $format);;
+		$newImageUrl = $this->updatePath( $originUrl, $dimensions, $offset, $format);
 
 		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
 			$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
@@ -37,14 +38,8 @@ class BladeImageCrop
 			return $this->helper->cachedUrl() . $newImageUrl;
 		}
 
-		if (env('DISPATCH_IMAGES', false)) {
-			$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
-			if (!$imageExists) {
-				return 'IMAGE_NOT_FOUND__' . $originUrl;
-			}
-		} else {
-			\Log::info('Original File: Time where no process. '.$originUrl);
-		}
+		$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
+		if (!$imageExists) {return 'IMAGE_NOT_FOUND__' . $originUrl;}
 
 		return $originUrl;
 	}
@@ -87,11 +82,11 @@ class BladeImageCrop
 
 		$destinationPath = $this->updatePath($originUrl, $dimensions, $offset, $format);;
 
-		dispatch(
-			new ProcessImageJob(
-				$originUrl, $format, $options, $destinationPath
-			)
-		);
+		if ( config('bladeimagecrop.schedule_tasks')){
+			$this->createTask([$originUrl, $format, $options, $destinationPath]);
+		} else {
+			ProcessImageJob::dispatch($originUrl, $format, $options, $destinationPath);
+		}
 
 		return true;
 
@@ -139,32 +134,14 @@ class BladeImageCrop
 		];
 	}
 
-//	public function fileNotImage($path)
-//	{
-//		$disk = $this->disk;
-//
-//		if (method_exists($disk, 'fileExists')) {
-//			$fileExists = $disk->fileExists($path);
-//		} else {
-//			$fileExists = $disk->has($path);
-//		}
-//
-//		if (!$fileExists) {
-//			return true;
-//		}
-//
-//		if (pathinfo($this->disk->url($path), PATHINFO_EXTENSION) === '') {
-//			return true;
-//		}
-//
-//		if (@is_array(Cache::remember('bic_props_' . $this->disk->path($path), now()->addMinutes(3), function () use ($path) {
-//			return getimagesize($this->disk->url($path));
-//		}))) {
-//			return false;
-//		}
-//
-//		return true;
-//	}
+	public function createTask($data){
+		DB::table('bladeimagecrop_tasks')
+			->updateOrInsert([
+					'task_properties' => json_encode($data)
+				],
+				['updated_at' => now()]
+			);
+	}
 
 
 }

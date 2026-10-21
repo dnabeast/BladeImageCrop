@@ -2,6 +2,7 @@
 
 namespace DNABeast\BladeImageCrop;
 
+use DNABeast\BladeImageCrop\Commands\ImageCropCommand;
 use DNABeast\BladeImageCrop\View\Components\Img;
 use DNABeast\BladeImageCrop\View\Components\Pic;
 use DNABeast\BladeImageCrop\View\Components\Sources;
@@ -24,7 +25,14 @@ class BladeImageCropServiceProvider extends ServiceProvider
 			$this->publishes([
 				__DIR__.'/../config/bladeimagecrop.php' => config_path('bladeimagecrop.php'),
 			], 'config');
+			$this->commands([
+				ImageCropCommand::class,
+			]);
 		}
+
+		$this->publishesMigrations([
+			__DIR__.'/../database/migrations' => database_path('migrations'),
+		], 'bladeimagecrop-migrations');
 
 	}
 

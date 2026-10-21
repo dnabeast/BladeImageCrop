@@ -5,11 +5,13 @@ return [
 	'cache_reset' => env('BLADE_CROP_CACHE_RESET', 180), // file check cache reset in seconds
 	'update_legacy_image_names' => env('BLADE_CROP_UPDATE_LEGACY_IMAGE_NAMES', true),
 	'sort_by_domain_name' => env('BLADE_CROP_SORT_BY_DOMAIN_NAME', false),
+	'schedule_tasks' => env('BLADE_CROP_SCHEDULE_TASKS', false),
+	'batch_size' => env('BLADE_CROP_BATCH_SIZE', 8),
 	'disk' => 'public',
 	'offset_x' => 50, // percentage
 	'offset_y' => 50,
 	'pixel_device_ratios' => ['1x', '2x'], // add multipliers here for ultra high def screens
-	'backgrounds' => false,
+	'backgrounds' => true,
 	'build_classes' => [
 		// 'avif' => 'DNABeast\BladeImageCrop\Builder\IM_AVIFBuilder',
 		'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',

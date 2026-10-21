@@ -7,7 +7,7 @@ class Background
 {
 	public $src;
 
-	public function __construct($src)
+	public function __construct($src = null)
 	{
 		$this->src = $src;
 	}

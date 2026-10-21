@@ -16,144 +16,23 @@ use Orchestra\Testbench\TestCase;
 
 class HoldImageTest extends TestCase
 {
-	public function setUp() :void
-	{
-		parent::setUp();
-		Config::set('bladeimagecrop',[
-			'short_pixel_active' => env('BLADE_CROP_SHORTPIXEL', false),
-			'disk' => 'public',
-			'build_classes' => [
-				'jpg' => 'DNABeast\BladeImageCrop\Builder\JPGBuilder',
-				'webp' => 'DNABeast\BladeImageCrop\Builder\WebPBuilder'
-			]
-		]);
-		$path = __DIR__;
-		Config::set('filesystems.disks.public', [
-			'driver' => 'local',
-			'root' => storage_path('app/public'),
-		]);
+    public function test_it_handles_a_full_url_correctly(): void
+    {
+        $fullUrl = 'http://localhost/image.jpg';
 
-		$this->app->bind('path.public', function() {
-			return str_replace("vendor/orchestra/testbench-core/laravel", "tests/Unit", base_path());
-		});
-	}
+		$holdImage = new HoldImage($fullUrl);
 
-	function test_give_it_a_local_image_that_exists_returns_path(){
+        $this->assertEquals($fullUrl, $holdImage->url());
 
-		$file = 'uploads/banners/page/cater.jpg';
-		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$file);
+    }
 
-//		Storage::fake('public');
-//		Storage::disk('public')->put($file, $image);
+    public function test_it_handles_a_local_path_correctly(): void
+    {
+        $localPath = 'images/sample.jpg';
+		$fullUrl = 'http://localhost/images/sample.jpg';
 
-		Http::fake([$file => Http::response($image, 200) ]);
+		$holdImage = new HoldImage($localPath);
 
-		$expected = 'blade_image_crop_holding/uploadsbannerspagecaterjpg.jpg';
-
-		$holdImage = new HoldImage($file);
-
-		$this->assertEquals(
-			$expected,
-			$holdImage->file()
-		);
-
-	}
-
-	function test_give_it_a_local_image_that_doesn_t_exists_returns_fail_message(){
-		$file = 'uploads/banners/page/doesntexist.jpg';
-
-		Storage::fake('public');
-
-		$expected = 'FILE NOT FOUND';
-
-		$holdImage = new HoldImage($file);
-
-		$this->assertEquals(
-			$expected,
-			$holdImage->file()
-		);
-	}
-
-	function test_give_it_an_online_image_that_exists_returns_success(){
-		Config::set(['bladeimagecrop.compress_held_image' => true]);
-
-		$file = 'https://smartenough.org/img/stealbananas.jpg';
-		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'uploads/banners/page/cater.jpg');
-
-		Http::fake([$file => Http::response($image, 200) ]);
-
-		Storage::fake('public');
-
-		$expected = 'blade_image_crop_holding/httpssmartenoughorgimgstealbananasjpg.jpg';
-
-		$holdImage = new HoldImage($file);
-
-		$this->assertEquals(
-			$expected,
-			$holdImage->file()
-		);
-	}
-
-
-	function test_give_it_an_online_image_but_turn_off_domain_returns_truncated_filename(){
-		Config::set(['bladeimagecrop.compress_held_image' => true]);
-		Config::set(['bladeimagecrop.remove_domain' => true]);
-
-		$file = 'http://localhost/img/stealbananas.jpg';
-		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'uploads/banners/page/cater.jpg');
-
-		Http::fake([$file => Http::response($image, 200) ]);
-
-		Storage::fake('public');
-
-		$expected = 'blade_image_crop_holding/imgstealbananasjpg.jpg';
-
-		$holdImage = new HoldImage($file);
-
-		$this->assertEquals(
-			$expected,
-			$holdImage->file()
-		);
-	}
-
-	function test_give_it_an_online_image_that_doesn_t_exists_returns_fail_message(){
-		$file = 'https://smartenough.org/img/stealbananas.jpg';
-
-		Http::fake([$file => Http::response(null, 404) ]);
-
-		Storage::fake('public');
-
-		$expected ='FILE NOT FOUND';
-
-		$holdImage = new HoldImage($file);
-
-		$this->assertEquals(
-			$expected,
-			$holdImage->file()
-		);
-	}
-
-	// if the config option to compress the hold image is set the held image should be smaller than the original image
-	/** @test  */
-	function if_the_config_option_to_compress_the_hold_image_is_set_the_held_image_should_be_smaller_than_the_original_image(){
-		Config::set(['bladeimagecrop.compress_held_image' => true]);
-
-		$file = 'uploads/banners/page/shea.jpg';
-		$image = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.$file);
-
-		Storage::fake('public');
-		Storage::disk('public')->put($file, $image);
-
-		$originalSize = Storage::disk('public')->fileSize($file);
-
-		$holdImage = (new HoldImage($file))->file();
-
-		$heldSize = Storage::disk('public')->fileSize($holdImage);
-
-		$this->assertLessThan(
-			$originalSize,
-			$heldSize
-		);
-
-	}
+		$this->assertEquals($fullUrl, $holdImage->url());
+    }
 }

@@ -3,10 +3,9 @@
 namespace DNABeast\BladeImageCrop;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\View\Component;
 use Imagick;
+use ImagickDraw;
+use ImagickPixel;
 
 
 class BGBuilder extends BGTypeBuilder
@@ -15,46 +14,44 @@ class BGBuilder extends BGTypeBuilder
 
 	public function __construct($src)
 	{
-		$this->src = $src;
+		$this->src = $src; // Loading and manipulating the image is expensive. Be cautious.
 	}
 
-	public function make(){
-		$base64 = Cache::rememberForever(Str::slug($this->src), function(){
-			return $this->resizedImage();
+	public function make()
+	{
+		return Cache::remember('bg-image-'.(floor(rand(1,6))), now()->addHour(), function () {
+			$base64 = $this->fakeImage();
+			return "style=\"background-size: 100% 100%; background-image:linear-gradient(#00C4FCbb, transparent 55%), url('data:image/png;base64,$base64')\"";
 		});
-
-		return "style=\"object-fit: cover; background-size: 100% 100%; background-image: url('data:image/png;base64,$base64')\"";
 	}
 
-	public function resizedImage(){
+	public function fakeImage() // This isn't the faster process. Caching is important.
+	{
 
-		$newWidth = 4;
-		$newHeight = 4;
-		try {
-			$imageString = Storage::disk( config('bladeimagecrop.disk') )->get( $this->src );
-		} catch (\Exception $e) {
-			return 'MissingBGImage';
+		$newWidth = 3;
+		$newHeight = 2;
+
+		$image = new Imagick();
+		$draw = new ImagickDraw();
+		$pixel = new ImagickPixel('red');
+		$image->newImage($newWidth, $newHeight, 'transparent', 'png');
+
+		$subject = ['DarkKhaki','OliveDrab', 'LemonChiffon'];
+
+		$colors = [$subject[array_rand($subject)], 'Wheat', 'Moccasin', 'Tan'];
+		for ($i = 0; $i < $newWidth; $i++) {
+			for ($j = 0; $j < $newHeight; $j++) {
+
+				$pixel->setColor($colors[floor(rand(0, count($colors) - 1))]);
+				$draw->setFillColor($pixel);
+				$draw->point($i, $j);
+			}
 		}
-		if (!$imageString) {
-			return 'MissingBGImage';
-		}
+		$image->drawImage($draw);
 
-		try {
-			$newImage = imagecreatetruecolor($newWidth, $newHeight);
-			$image = imagecreatefromstring($imageString);
-			imagecopyresampled($newImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image));
-
-			ob_start();
-			imagepng($newImage);
-			$data = ob_get_clean();
-
-			imagedestroy($image);
-			imagedestroy($newImage);
-			return base64_encode($data);
-		} catch (\Exception $e) {
-			return 'MissingBGImage';
-		}
-
+		$data = $image->getImage();
+		$image->clear();
+		return base64_encode($data);
 
 	}
 
