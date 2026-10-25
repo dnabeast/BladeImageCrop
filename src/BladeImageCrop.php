@@ -97,8 +97,8 @@ class BladeImageCrop
 		$dimensions['width'] = $dimensions['width'] ?? $dimensions[0];
 		$dimensions['height'] = $dimensions['height'] ?? $dimensions[1];
 
-		$originalWidth = $data[0];
-		$originalHeight = $data[1];
+		$originalWidth = $data[0]??99;
+		$originalHeight = $data[1]??99;
 		$originalRatio = $originalWidth / $originalHeight;
 
 		$newRatio = $dimensions['width'] / $dimensions['height'];
