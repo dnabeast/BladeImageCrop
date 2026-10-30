@@ -5,6 +5,7 @@ namespace DNABeast\BladeImageCrop\View\Components;
 use DNABeast\BladeImageCrop\GlideUrls;
 use DNABeast\BladeImageCrop\ImageProps;
 use DNABeast\BladeImageCrop\Background;
+use DNABeast\BladeImageCrop\SourceDimensions;
 use Illuminate\View\Component;
 
 class Img extends Component
@@ -43,8 +44,9 @@ class Img extends Component
 			$srcset = $this->sources
 				? 'srcset="'.e($this->urls->srcset($lines, $this->hasManySizes(), $fallbackFormat)).'" '
 				: '';
-			// Width only images have no known height until the image is made, so leave it off
-			$height = $lines[0][1] ? ' height="'.$lines[0][1].'"' : '';
+			// Width only images take their height from the original's aspect, left off when the original can't be measured
+			$heightValue = $lines[0][1] ?: (new SourceDimensions)->heightFor($this->urls->sourcePath, $lines[0][0]);
+			$height = $heightValue ? ' height="'.$heightValue.'"' : '';
 
 			$background = config('bladeimagecrop.backgrounds') ? (new Background($src))->render().' ' : '';
 

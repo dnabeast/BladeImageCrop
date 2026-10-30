@@ -3,6 +3,7 @@
 namespace DNABeast\BladeImageCrop\Tests\Unit\Glide;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 
 class ImgComponentTest extends GlideTestCase
 {
@@ -122,10 +123,32 @@ class ImgComponentTest extends GlideTestCase
 
 	function test_width_only_sets_a_height_attribute_matching_the_original_aspect()
 	{
-		$this->markTestIncomplete(
-			'Decide how the height attribute is found for width-only images without reading the original at render time '
-			. '(e.g. a dimensions cache filled by the image route, or reading the local source disk only).'
-		);
+		$this->putSplitImage('img/photo.jpg', 800, 600);
+
+		$html = (string) $this->blade('<x-img src="/img/photo.jpg" width="320"/>');
+
+		$this->assertEquals('320', $this->attribute($html, 'img', 'width'));
+		$this->assertEquals('240', $this->attribute($html, 'img', 'height'));
+	}
+
+	function test_width_only_leaves_out_the_height_when_the_original_is_missing()
+	{
+		$html = (string) $this->blade('<x-img src="/img/missing.jpg" width="320"/>');
+
+		$this->assertNull($this->attribute($html, 'img', 'height'));
+	}
+
+	// Only the header is read, and only once per version of the file
+	function test_the_original_is_measured_once_and_remeasured_when_replaced()
+	{
+		$this->putSplitImage('img/photo.jpg', 800, 600);
+		$this->blade('<x-img src="/img/photo.jpg" width="320"/>');
+
+		$this->putSplitImage('img/photo.jpg', 800, 400);
+		touch(Storage::disk('bic-source')->path('img/photo.jpg'), time() + 10);
+		$html = (string) $this->blade('<x-img src="/img/photo.jpg" width="320"/>');
+
+		$this->assertEquals('160', $this->attribute($html, 'img', 'height'));
 	}
 
 	function test_full_urls_on_this_host_and_relative_paths_point_at_the_same_source()

@@ -50,6 +50,8 @@ class BladeImageCropServiceProvider extends ServiceProvider
 			return ServerFactory::create([
 				'source' => Storage::disk(config('bladeimagecrop.source_disk'))->getDriver(),
 				'cache' => Storage::disk(config('bladeimagecrop.cache_disk'))->getDriver(),
+				// Glide caches crops in a folder named after the source file (img/photo.jpg/abc.webp), which can't be made beside that file on a shared disk
+				'cache_path_prefix' => config('bladeimagecrop.cache_path_prefix'),
 				'max_image_size' => config('bladeimagecrop.max_image_size'),
 				'cache_with_file_extensions' => true,
 			]);

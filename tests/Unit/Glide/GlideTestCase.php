@@ -42,6 +42,7 @@ abstract class GlideTestCase extends TestCase
 			'sign_key' => self::SIGN_KEY,
 			'source_disk' => 'bic-source',
 			'cache_disk' => 'bic-cache',
+			'cache_path_prefix' => 'bic',
 			'offset_x' => 50,
 			'offset_y' => 50,
 			'pixel_device_ratios' => ['1x', '2x'],
