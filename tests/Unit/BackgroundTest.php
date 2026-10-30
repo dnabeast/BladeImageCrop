@@ -14,21 +14,7 @@ class BackgroundTest extends TestCase
 		parent::setUp();
 
 		Config::set('bladeimagecrop', [
-			'disk' => 'public',
-			'offset_x' => 50, // percentage
-			'offset_y' => 50,
-			'pixel_device_ratios' => ['1x', '2x'],
-			'build_classes' => [
-				'webp' => 'DNABeast\BladeImageCrop\Builder\IM_WebPBuilder',
-				'jpg' => 'DNABeast\BladeImageCrop\Builder\IM_JPGBuilder',
-				// 'jpg' => 'DNABeast\BladeImageCrop\Builder\ShortPixelJPGBuilder',
-			],
 			'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
-		]);
-		$path = __DIR__;
-		Config::set('filesystems.disks.public', [
-			'driver' => 'local',
-			'root' => $path,
 		]);
 	}
 

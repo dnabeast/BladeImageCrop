@@ -2,12 +2,16 @@
 
 namespace DNABeast\BladeImageCrop;
 
-use DNABeast\BladeImageCrop\Commands\ImageCropCommand;
+use DNABeast\BladeImageCrop\Http\ImageController;
 use DNABeast\BladeImageCrop\View\Components\Img;
 use DNABeast\BladeImageCrop\View\Components\Pic;
 use DNABeast\BladeImageCrop\View\Components\Sources;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
+use League\Glide\Server;
+use League\Glide\ServerFactory;
 
 class BladeImageCropServiceProvider extends ServiceProvider
 {
@@ -21,18 +25,16 @@ class BladeImageCropServiceProvider extends ServiceProvider
 		Blade::component('img', Img::class);
 		Blade::component('pic', Pic::class);
 
+		Route::get(config('bladeimagecrop.route_prefix') . '/{path}',
+		ImageController::class)
+			->where('path', '.*')
+			->name('bladeimagecrop.image');
+
 		if ($this->app->runningInConsole()) {
 			$this->publishes([
 				__DIR__.'/../config/bladeimagecrop.php' => config_path('bladeimagecrop.php'),
 			], 'config');
-			$this->commands([
-				ImageCropCommand::class,
-			]);
 		}
-
-		$this->publishesMigrations([
-			__DIR__.'/../database/migrations' => database_path('migrations'),
-		], 'bladeimagecrop-migrations');
 
 	}
 
@@ -43,6 +45,15 @@ class BladeImageCropServiceProvider extends ServiceProvider
 	{
 		// Automatically apply the package configuration
 		$this->mergeConfigFrom(__DIR__.'/../config/bladeimagecrop.php', 'bladeimagecrop');
+
+		$this->app->singleton(Server::class, function () {
+			return ServerFactory::create([
+				'source' => Storage::disk(config('bladeimagecrop.source_disk'))->getDriver(),
+				'cache' => Storage::disk(config('bladeimagecrop.cache_disk'))->getDriver(),
+				'max_image_size' => config('bladeimagecrop.max_image_size'),
+				'cache_with_file_extensions' => true,
+			]);
+		});
 
 	}
 }

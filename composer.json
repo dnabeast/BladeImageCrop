@@ -18,7 +18,8 @@
 	"require": {
 		"php": "^8.3",
 		"guzzlehttp/guzzle": "^7.0",
-		"illuminate/support": "^12.40|^13.0"
+		"illuminate/support": "^12.40|^13.0",
+		"league/glide": "^4.2"
 	},
 	"require-dev": {
 		"orchestra/testbench": "^10.8|^11.0",

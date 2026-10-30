@@ -2,11 +2,8 @@
 
 namespace DNABeast\BladeImageCrop\View\Components;
 
-use Cache;
-use DNABeast\BladeImageCrop\HoldImage;
+use DNABeast\BladeImageCrop\GlideUrls;
 use DNABeast\BladeImageCrop\ImageProps;
-use DNABeast\BladeImageCrop\Source;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Component;
 
 
@@ -16,16 +13,15 @@ class Sources extends Component
 	public $media;
 	public $properties;
 	public $sizes;
-    public $image;
-    public $imageFormats;
+	public $urls;
 
 	public function __construct($src, $properties, $media = null,  $sizes = null)
 	{
-		$this->image = new HoldImage($src);
+		$this->src = $src;
+		$this->urls = new GlideUrls($src);
 		$this->media = $media;
 		$this->properties = $properties;
 		$this->sizes = $sizes;
-		$this->imageFormats = collect(array_keys(config('bladeimagecrop.build_classes')));
 	}
 
 	/**
@@ -35,49 +31,24 @@ class Sources extends Component
 	 */
 	public function render()
 	{
-		if (!config('bladeimagecrop.enabled', true)){
+		if (!config('bladeimagecrop.enabled', true) || !$this->urls->isLocal()){
 			return '';
 		}
-		return $this->build();
-	}
 
-
-	public function build(){
 		return function (array $data){
+			$lines = (new ImageProps)->calc($this->properties);
+			$manySizes = count((new ImageProps)->properWrapping($this->properties)) > 1;
 
-			return $this->imageFormats->map(function($format) use ($data){
-				$options = [
-					'src' => $this->image->url(),
-					'media' => $this->media,
-					'format' => $format,
-					'properties' => $this->calculatedProperties(),
-					'sizes' => $this->sizes,
-					'pixelRatios' => isset($this->properties[0][1])?false:true,
-					'attributes' => $data['attributes']
-				];
+			$media = $this->media ? ' media="'.e($this->media).'"' : '';
+			$sizes = $this->sizes ? ' sizes="'.e($this->sizes).'"' : '';
 
-				return Source::make($options)->render();
+			return collect(config('bladeimagecrop.formats'))->map(function ($format) use ($lines, $manySizes, $media, $sizes, $data){
+				$srcset = $this->urls->srcset($lines, $manySizes, $format);
+
+				return '<source type="'.GlideUrls::mimeType($format).'" srcset="'.e($srcset).'"'.$media.$sizes.' '.$data['attributes'].'>';
 			})->implode("\n");
-
 		};
-	}
 
-	public function calculatedProperties(){
-		$aspect = is_string($this->properties)||!isset($this->properties[1])?$this->aspectFromImage():null;
-		return (new ImageProps)->calc($this->properties, $aspect);
-	}
-
-	public function aspectFromImage(){
-		return 3/4; // default failed image shape
-
-//		try {
-//			$originalImage = Cache::remember('bic_props_'. $this->image->url(), now()->addMinutes(3), function(){
-//				return getimagesize( $this->image->url() );
-//			});
-//			return $originalImage[1]/$originalImage[0];
-//		} catch (\Exception $e) {
-//			return 3/4; // default failed image shape
-//		}
 	}
 
 }

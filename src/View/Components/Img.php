@@ -2,15 +2,10 @@
 
 namespace DNABeast\BladeImageCrop\View\Components;
 
-use DNABeast\BladeImageCrop\Background;
-use DNABeast\BladeImageCrop\HoldImage;
+use DNABeast\BladeImageCrop\GlideUrls;
 use DNABeast\BladeImageCrop\ImageProps;
-use DNABeast\BladeImageCrop\Source;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use DNABeast\BladeImageCrop\Background;
 use Illuminate\View\Component;
-
 
 class Img extends Component
 {
@@ -18,16 +13,14 @@ class Img extends Component
 	public $width;
 	public $properties;
 	public $sources;
-    public $image;
-    public $imageFormats;
+	public $urls;
 
 	public function __construct($src, $width=null, $properties=null, $sources=null)
 	{
 		$this->src = $src;
-		$this->image = new HoldImage($src);
+		$this->urls = new GlideUrls($src);
 		$this->sources = $sources=='false'?false:true;
 		$this->properties = $properties??$width;
-		$this->imageFormats = collect(array_keys(config('bladeimagecrop.build_classes')));
 	}
 
 	/**
@@ -37,58 +30,39 @@ class Img extends Component
 	 */
 	public function render()
 	{
-		if (!config('bladeimagecrop.enabled', true)){
+		if (!config('bladeimagecrop.enabled', true) || !$this->urls->isLocal()){
 			$propertyArray = is_array($this->properties)?['width'=>$this->properties[0].'px', 'height'=>isset($this->properties[1])?$this->properties[1].'px':'auto']:['width' => $this->properties.'px', 'height'=>'auto'];
-			return '<img style="object-fit: cover; width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.$this->src.'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
+			return '<img style="object-fit: cover; width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.e($this->src).'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
 		}
 
 		return function (array $data){
-			$build = $this->build();
-			$srcAttributeKey = (str($build['src'])->startsWith('IMAGE_NOT_FOUND__')?'src="#" data':'src');
+			$lines = $this->calculatedProperties();
+			$fallbackFormat = collect(config('bladeimagecrop.formats'))->last();
 
-			return <<<EOT
-			<img {$build['sources']} {$build['background']} {$srcAttributeKey}="{$build['src']}" width="{$this->calculatedProperties()[0][0]}" height="{$this->calculatedProperties()[0][1]}" {$data['attributes']}>
-			EOT;
+			$src = $this->urls->url($lines[0], $fallbackFormat);
+			$srcset = $this->sources
+				? 'srcset="'.e($this->urls->srcset($lines, $this->hasManySizes(), $fallbackFormat)).'" '
+				: '';
+			// Width only images have no known height until the image is made, so leave it off
+			$height = $lines[0][1] ? ' height="'.$lines[0][1].'"' : '';
+
+			$background = config('bladeimagecrop.backgrounds') ? (new Background($src))->render().' ' : '';
+
+			return '<img '.$srcset.$background.'src="'.e($src).'" width="'.$lines[0][0].'"'.$height.' '.$data['attributes'].'>';
 		};
 
 	}
-
-
-	public function build(){
-
-		$options = [
-			'src' => $this->image->url(),
-			'format' => array_keys(config('bladeimagecrop.build_classes'))[count(config('bladeimagecrop.build_classes'))-1],
-			'properties' => $this->calculatedProperties(),
-			'pixelRatios' => isset($this->properties[0][1])?false:true
-		];
-        $lines = Source::make($options)->srcsetLines();
-
-		$defaultImageSrc = explode(" ", $lines)[0];
-
-		if (config('bladeimagecrop.backgrounds')){
-            $backgroundString = (new Background($defaultImageSrc))->render();
-		}
-
-		$sourcesString = $this->sources?'srcset="'.$lines.'"':'';
-
-		return [
-			'sources' => $sourcesString,
-			'background' => $backgroundString??null,
-			'src' => $defaultImageSrc,
-			'attributes' => 'class="" alt=""'
-		];
-
-	}
-
 
 	public function calculatedProperties(){
 		if (!$this->properties && !$this->width){
 			throw new \Exception("No Width provided");
 		}
-		$aspect = is_string($this->properties)||!isset($this->properties[1])?(3/4):null;
 
-		return (new ImageProps)->calc($this->properties, $aspect);
+		return (new ImageProps)->calc($this->properties);
+	}
+
+	public function hasManySizes(){
+		return count((new ImageProps)->properWrapping($this->properties)) > 1;
 	}
 
 
