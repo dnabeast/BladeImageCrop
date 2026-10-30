@@ -8,39 +8,51 @@ use League\Glide\Urls\UrlBuilderFactory;
 
 /**
  * Turns an image src and calculated property lines into signed urls for the image route.
- * Only builds strings. Nothing here touches the disk or the network.
+ * Builds strings, plus one file check when a same-host src might be in the public folder. Nothing touches the network.
  */
 class GlideUrls
 {
+	// "disk" is the source_disk, "public" is the app's public folder. Each url carries one: /bic/disk/img/photo.jpg
+	const SOURCES = ['disk', 'public'];
+
 	public $src;
+	public $source;
 	public $sourcePath;
 
 	public function __construct($src)
 	{
 		$this->src = $src;
-		$this->sourcePath = $this->sourcePath($src);
+		[$this->source, $this->sourcePath] = $this->locate($src);
 	}
 
 	/**
-	 * Path of the image on the source disk, or null when it's hosted somewhere else.
-	 * "/img/photo.jpg", "img/photo.jpg" and "http://localhost/img/photo.jpg" all become "img/photo.jpg".
+	 * [source, path] of the image, or [null, null] when it's hosted somewhere else.
+	 * "/img/photo.jpg", "img/photo.jpg" and "http://localhost/img/photo.jpg" all become "img/photo.jpg",
+	 * on the public source when that file is in the public folder and on the disk otherwise.
 	 */
-	public function sourcePath($src)
+	public function locate($src)
 	{
 		// A url from the source disk itself, e.g. Storage::url() on a bucket, maps back to its path on that disk
 		$diskUrl = $this->sourceDiskUrl();
 		if ($diskUrl && str_starts_with($src, $diskUrl . '/')) {
-			return ltrim(substr($src, strlen($diskUrl)), '/');
+			return ['disk', ltrim(substr($src, strlen($diskUrl)), '/')];
 		}
 
 		$parts = parse_url($src);
 		$appHost = parse_url(config('app.url'), PHP_URL_HOST);
 
 		if (isset($parts['host']) && $parts['host'] !== $appHost) {
-			return null;
+			return [null, null];
 		}
 
-		return ltrim($parts['path'] ?? '', '/');
+		$path = ltrim($parts['path'] ?? '', '/');
+
+		// Files built into public/ (Vite assets etc.) aren't on the source disk, so read them from the folder instead
+		if (config('bladeimagecrop.public_source') && $path !== '' && is_file(public_path($path))) {
+			return ['public', $path];
+		}
+
+		return ['disk', $path];
 	}
 
 	/**
@@ -76,7 +88,7 @@ class GlideUrls
 
 		$params['fm'] = $format;
 
-		return $this->builder()->getUrl($this->sourcePath, $params);
+		return $this->builder()->getUrl($this->source . '/' . $this->sourcePath, $params);
 	}
 
 	/**

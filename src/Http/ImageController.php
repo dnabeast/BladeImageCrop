@@ -6,15 +6,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exceptions\DecoderException;
 use League\Glide\Filesystem\FileNotFoundException;
-use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
 use League\Glide\Signatures\SignatureFactory;
 
 class ImageController
 {
-	public function __invoke(Request $request, Server $server, string $path)
+	public function __invoke(Request $request, string $source, string $path)
 	{
-		// Sign and validate against the full request path (/bic/img/photo.jpg), the same string the url was signed with
+		// Sign and validate against the full request path (/bic/disk/img/photo.jpg), the same string the url was signed with,
+		// so the source can't be swapped without breaking the signature
 		try {
 			SignatureFactory::create(config('bladeimagecrop.sign_key'))
 				->validateRequest($request->getPathInfo(), $request->query());
@@ -22,9 +22,13 @@ class ImageController
 			abort(403);
 		}
 
-		// Glide works with the path relative to the source disk (img/photo.jpg)
+		if ($source === 'public' && !config('bladeimagecrop.public_source')) {
+			abort(404);
+		}
+
+		// Glide works with the path relative to the source (img/photo.jpg)
 		try {
-			$cachedPath = $server->makeImage($path, $request->query());
+			$cachedPath = app('bladeimagecrop.server.' . $source)->makeImage($path, $request->query());
 		} catch (FileNotFoundException $e) {
 			abort(404);
 		} catch (DecoderException $e) {

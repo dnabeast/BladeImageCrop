@@ -45,7 +45,7 @@ class Img extends Component
 				? 'srcset="'.e($this->urls->srcset($lines, $this->hasManySizes(), $fallbackFormat)).'" '
 				: '';
 			// Width only images take their height from the original's aspect, left off when the original can't be measured
-			$heightValue = $lines[0][1] ?: (new SourceDimensions)->heightFor($this->urls->sourcePath, $lines[0][0]);
+			$heightValue = $lines[0][1] ?: (new SourceDimensions)->heightFor($this->urls->sourcePath, $lines[0][0], $this->urls->source);
 			$height = $heightValue ? ' height="'.$heightValue.'"' : '';
 
 			$background = config('bladeimagecrop.backgrounds') ? (new Background($src))->render().' ' : '';

@@ -3,7 +3,6 @@
 namespace DNABeast\BladeImageCrop\Tests\Unit\Glide;
 
 use Illuminate\Support\Facades\Storage;
-use League\Glide\Server;
 
 class ImageRouteTest extends GlideTestCase
 {
@@ -78,12 +77,12 @@ class ImageRouteTest extends GlideTestCase
 	function test_the_cache_can_share_a_disk_with_the_source()
 	{
 		config()->set('bladeimagecrop.cache_disk', 'bic-source');
-		$this->app->forgetInstance(Server::class);
+		$this->app->forgetInstance('bladeimagecrop.server.disk');
 		$this->putSplitImage('img/photo.jpg');
 
 		$this->get($this->signedUrl('img/photo.jpg', ['w' => 300, 'h' => 200, 'fit' => 'crop-50-50', 'fm' => 'jpg']))->assertOk();
 
-		$this->assertNotEmpty(Storage::disk('bic-source')->allFiles('bic'));
+		$this->assertNotEmpty(Storage::disk('bic-source')->allFiles('bic/disk'));
 	}
 
 	function test_a_second_request_is_served_from_the_cache_without_reading_the_source()
@@ -116,7 +115,7 @@ class ImageRouteTest extends GlideTestCase
 	{
 		$this->putSplitImage('img/photo.jpg');
 
-		$this->get('/bic/img/photo.jpg?w=300&h=200&fit=crop-50-50&fm=jpg')->assertForbidden();
+		$this->get('/bic/disk/img/photo.jpg?w=300&h=200&fit=crop-50-50&fm=jpg')->assertForbidden();
 	}
 
 	function test_a_tampered_request_is_rejected()
