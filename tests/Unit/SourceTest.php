@@ -2,6 +2,7 @@
 
 namespace DNABeast\BladeImageCrop\Tests\Unit;
 
+use Cache;
 use DNABeast\BladeImageCrop\BladeImageCrop;
 use DNABeast\BladeImageCrop\Source;
 use Illuminate\Support\Facades\Config;
@@ -95,7 +96,7 @@ class SourceTest extends TestCase
 		$this->swap(BladeImageCrop::class, new FakeBladeImageCrop($response));
 
 		$expected = '/image_jpg/800x600_50_50.jpg 1x';
-
+		(new \ReflectionProperty(Source::class, 'staticCache'))->setValue(null, []);
 
 		$options = [
 			'src' => 'image.jpg',
@@ -104,7 +105,6 @@ class SourceTest extends TestCase
 			'sizes' => 'string content',
 			'pixelRatios' => true
 		];
-
 		$source = Source::make($options);
 
 		$this->assertEquals(

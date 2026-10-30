@@ -21,19 +21,10 @@ class BladeImageCrop
 
 	public function fire($originUrl, $dimensions, $offset = ['x' => 50, 'y' => 50], $format = 'jpg')
 	{
-		$newImageUrl = $this->updatePath( $originUrl, $dimensions, $offset, $format);
-		if (config('bladeimagecrop.update_legacy_image_names') == 'true') {
-			$oldUblockUnfriendlyUrl = Str::of($newImageUrl)->replaceMatches('/bic_(\d*x\d*_\d*_\d*\.\w{1,6})/', function (array $matches) {
-				return $matches[1];
-			})->toString();
+		$newImagePath = $this->updatePath( $originUrl, $dimensions, $offset, $format);
 
-			if ($this->helper->cachedFileExists($oldUblockUnfriendlyUrl)) {
-				Storage::disk(config('bladeimagecrop.disk'))->move($oldUblockUnfriendlyUrl, $newImageUrl);
-			}
-		}
-
-		if ($this->helper->cachedFileExists($newImageUrl)) {
-			return $this->helper->cachedUrl() . $newImageUrl;
+		if ($this->helper->cachedFileExists($newImagePath)) {
+			return $this->helper->cachedUrl() . $newImagePath;
 		}
 
 		$imageExists = $this->alterImage($originUrl, $dimensions, $offset, $format);
@@ -97,8 +88,8 @@ class BladeImageCrop
 		$dimensions['width'] = $dimensions['width'] ?? $dimensions[0];
 		$dimensions['height'] = $dimensions['height'] ?? $dimensions[1];
 
-		$originalWidth = $data[0]??99;
-		$originalHeight = $data[1]??99;
+		$originalWidth = $data[0];
+		$originalHeight = $data[1];
 		$originalRatio = $originalWidth / $originalHeight;
 
 		$newRatio = $dimensions['width'] / $dimensions['height'];

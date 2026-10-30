@@ -103,61 +103,24 @@ class ImageCropTest extends TestCase
 
 	}
 
-	function test_if_correct_file_exists_on_correct_disk_return_file_url(){
-		Config::set('bladeimagecrop.disk', 'uploads');
 
-		$url = 'banners/page/cater.jpg';
-		$dimensions = [400, 300];
-		$image = file_get_contents(__DIR__.'/uploads/'.$url);
 
-		Storage::fake('uploads');
-		Storage::disk('uploads')->put($url, $image);
-		Storage::disk('uploads')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
+	function test_if_correct_file_doesnt_exists_return_file_url_and_make_new_directory_and_file(){
 
-		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
-
-		$this->assertEquals(
-			'/storage/banners/page/cater_jpg/bic_400x300_50_50.jpg',
-			$newImageUrl
-		);
-//		$this->assertTrue(
-//		Storage::disk('uploads')->has('banners/page/cater_jpg/bic_400x300_50_50.jpg', $image)
-//		);
-
-	}
-
-	function test_if_correct_file_in_correct_directory_exists_return_file_url(){
-
-		$url = 'banners/page/cater.jpg';
-		$dimensions = [400, 300];
-		$image = file_get_contents(__DIR__.'/uploads/'.$url);
-
-		Storage::fake('public');
-		Storage::disk('public')->put($url, $image);
-		Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
-
-		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
-
-		$this->assertEquals(
-			'/storage/banners/page/cater_jpg/bic_400x300_50_50.jpg',
-			$newImageUrl
-		);
-
-	}
-
-	function test_if_correct_file_doens_t_exists_return_file_url_and_make_new_directory_and_file(){
-
-		$url = 'banners/page/grid.png';
+		$path = 'banners/page/grid.png';
 		$options = ['targetWidth'=>500, 'targetHeight'=>250, 'cropWidth'=>50, 'cropHeight'=>50, 'x'=>50, 'y'=>50];
-		$image = file_get_contents(__DIR__.'/uploads/'.$url);
+		$image = file_get_contents(__DIR__.'/uploads/'.$path);
 
-		Storage::fake('public');
-		Storage::disk('public')->put($url, $image);
+		$url = 'http://localhost'.$path;
 
-//		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
+		Http::fake([
+			$url => $image,
+		]);
 
-        $blob = Storage::disk( config('bladeimagecrop.disk') )->get($url);
-        (new ImageBuilder($blob, 'jpg'))->resize($options)->save('test.jpg');
+//		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($path, $dimensions);
+
+        $imageUrl = Storage::disk( config('bladeimagecrop.disk') )->url($url);
+        (new ImageBuilder($imageUrl, 'jpg'))->resize($options)->save('test.jpg');
 
 		$this->assertTrue(
             Storage::disk( config('bladeimagecrop.disk') )->has('test.jpg')
@@ -177,72 +140,56 @@ class ImageCropTest extends TestCase
 	}
 
 	function test_update_url_returns_proper_url(){
-		$result = (new BladeImageCrop(new Helper()))->updateUrl('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
+		$result = (new BladeImageCrop(new Helper()))->updatePath('uploads/cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'uploads/cater_jpg/bic_800x600_50_50.jpg',
+			'bic/uploads/cater_jpg/bic_800x600_50_50.jpg',
 			$result
 		);
 
-		$result = (new BladeImageCrop(new Helper()))->updateUrl('cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
+		$result = (new BladeImageCrop(new Helper()))->updatePath('cater.jpg', ['width'=>800,'height'=>600], ['x'=>50, 'y'=>50], 'jpg');
 		$this->assertEquals(
-			'cater_jpg/bic_800x600_50_50.jpg',
+			'bic/cater_jpg/bic_800x600_50_50.jpg',
 			$result
 		);
 	}
 
 	function test_if_url_has_directory_but_is_not_a_file_it_should_return_image_not_found(){
-		Config::set('bladeimagecrop.disk', 'uploads');
-		Config::set('bladeimagecrop.images_from_public_path', true);
+		Config::set('bladeimagecrop.disk', 'public');
 
-		$url = 'uploads/';
+		$path = '/uploads/test.txt';
 		$dimensions = ['width'=>400,'height'=>300];
+		$not_image = 'Not an image';
 
-		Storage::fake('uploads');
-		Storage::disk('uploads')->put($url.'test.txt', 'test');
+		$url = 'http://localhost'.$path;
+
+		Http::fake([
+			$url => $not_image,
+		]);
 
 		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'IMAGE_NOT_FOUND',
+			'IMAGE_NOT_FOUND__http://localhost/uploads/test.txt',
 			$newImageUrl
 		);
 	}
 
 	function test_if_file_has_no_extensions_should_return_image_not_found(){
-		$url = 'banners/page/caterjpg';
+		$path = 'banners/page/caterjpg';
 		$dimensions = ['width'=>400,'height'=>300];
 		$image = file_get_contents(__DIR__.'/uploads/banners/page/cater.jpg');
 
-		Storage::fake('public');
-		Storage::disk('public')->put($url, $image);
-		Storage::disk('public')->put('banners/page/cater_jpg/400x300_50_50.jpg', $image);
+		$url = 'http://localhost'.$path;
+
+		Http::fake([
+			$url => $image,
+		]);
 
 		$newImageUrl = (new BladeImageCrop(new Helper()))->fire($url, $dimensions);
 
 		$this->assertEquals(
-			'IMAGE_NOT_FOUND',
+			'IMAGE_NOT_FOUND__http://localhostbanners/page/caterjpg',
 			$newImageUrl
-		);
-	}
-
-	function test_if_file_is_not_an_image_return_false(){
-
-		$url = 'uploads/banners/page/isImage.jpg';
-		$url2 = 'uploads/banners/page/isText.txt';
-
-		$image = file_get_contents(__DIR__.'/uploads/banners/page/cater.jpg');
-
-		Storage::fake('public');
-		Storage::disk('public')->put($url, $image);
-
-		$this->assertFalse(
-			(new BladeImageCrop(new Helper()))->fileNotImage($url),
-		);
-
-		Storage::disk('public')->put($url2, 'This is some Text');
-
-		$this->assertTrue(
-			(new BladeImageCrop(new Helper()))->fileNotImage($url2),
 		);
 	}
 

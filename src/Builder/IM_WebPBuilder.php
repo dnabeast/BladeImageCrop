@@ -2,7 +2,6 @@
 
 namespace DNABeast\BladeImageCrop\Builder;
 
-use DNABeast\BladeImageCrop\Helper;
 use DNABeast\BladeImageCrop\TempStorage;
 use Illuminate\Support\Facades\Storage;
 use Imagick;
@@ -23,7 +22,7 @@ class IM_WebPBuilder extends ImageTypeBuilder
 
 	public function makeImage(){
 		$this->tempFilePath = TempStorage::fire( $this->originUrl );
-		return new Imagick($this->tempFilePath);
+			return new Imagick($this->tempFilePath);
 	}
 
 	public function resize($options){
@@ -52,7 +51,7 @@ class IM_WebPBuilder extends ImageTypeBuilder
 		Storage::disk( config('bladeimagecrop.disk') )->put($destinationPath, fopen($processedPath, 'r+'));
 
 		$this->image->clear();
-		$this->image->destroy();
+		$this->image->destroy(); // Depreciated in later versions of Imagick
 		unset($this->image);
 		if ($this->tempFilePath && file_exists($this->tempFilePath)){
 			@unlink($this->tempFilePath);

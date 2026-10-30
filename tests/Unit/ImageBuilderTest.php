@@ -103,8 +103,6 @@ class ImageBuilderTest extends TestCase
 			Storage::disk('public')->mimeType($uri)
 		);
 
-
-
 		$this->assertTrue(Storage::disk('public')->exists($destinationPath), 'Image was not processed and saved correctly.');
 
 		// Cleanup fake storage

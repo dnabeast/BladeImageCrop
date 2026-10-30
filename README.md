@@ -13,9 +13,8 @@ It supports
 - Automatic cropping to a specified aspect ratio and focus point
 - Multiple files for different DPI
 - webp with jpeg as a fallback (In a picture tag)
-- (X) Inline backgrounds that display first on slow connections (currently broken)
+- Inline fake backgrounds that display first on slow connections
 - Mobile and desktop versions
-- local AND online images
 - queuing the image processing
 - S3 and Laravel Cloud
 
@@ -41,12 +40,34 @@ Or make whatever changes you wish to the storage. (more info below)
 
 ## Upgrade Guide
 
+This is a major rewrite of the package with many breaking changes.
+
+### Gateway timeouts with cloud storage
+Using this on Cloud created an enormous amount of Http calls. The system now caches the current list of compressed images and avoids making live calls until it needs to.
+The system now automatically only gets the image via its url. If you specify a path it will convert it.
+
+### GD library is too slow
 By default we use Image Magick which (in most instances) comes installed by default on Laravel Forge and Cloud. There is still the option to switch to GD library by publishing the config file and selecting the GD options.
 The system now grabs the original src from the URL.
-The next time you load an image using the blade component it will duplicate your image to a holding directory and remake your resized images. It will only do this once.
-You can safely remove older versions of files.
-If you've turned the images_from_public_path to false then it's not going to work any more and you'll have to update your img src attributes.
-No longer upscales images if the original image is too small. (It allows the browser to do this)
+
+### Copying the original image was too slow.
+We no longer make a compressed version of the original image. This compression was slowing things down and was not worth the benefit. If there are not yet compressed versions the original will be used so be aware that for the first few minutes the site may use a very large original.
+
+### Folder traversal was slow
+The folder structure has changed. The original images are now held in a folder called **bic** in the public folder. You can change this folder but Laravel Cloud uses public.
+The compressed folders will match the original folder structure. This allows for a sensible structure where we don't have several thousand folders in the one parent.
+
+This change means that your compression will occur all over again. The files themselves aren't changed but the folder names have.
+
+### Too many jobs taxed the server
+This was tested on pages with dozens of images and it was creating memory problems with the dispatched jobs. The solution was to provide an option to create a list of tasks in the database. You can set the amount of tasks it runs each minute. 
+The Image Magick processing is being cleared each time but something is still creating memory problems. The task solution solves this.
+
+### More caching
+To prevent having to do http calls to the server we now cache the compressed image urls. They may not appear immediately after they are processed. After five minutes they should replace the original image after which they are remembered for 24 hours.
+
+### Faster backgrounds
+The image backgrounds were poorly implemented. They were recompressing the original image after each cache clear. They are now faked and cached. This should speed things up considerably.
 
 ## Usage
 
@@ -170,7 +191,7 @@ If the browser can use WebP it will. If not it will try to load the JPG.
 
 The picture tag can take some getting used to. By default it is inline so you'll probably want to style it with a block or inline-block. You can add classes to the picture tag or add classes to the blade component tag (and thus the img tag) depending on which element you're targeting.
 
-The picture tag in essential to this technique as you need multiple source tags to check for the formats.
+The picture tag is essential to this technique as you need multiple source tags to check for the formats.
 
 ### The sources tag
 
@@ -212,18 +233,24 @@ This creates an extra set of source files that only activate when the media quer
 
 ## Config Options
 
+### 'enabled' => env('BLADE_CROP_ENABLED', true)
+If you want to turn off the package you can do so here. It should still resize the original image but you may have distortions depending on how it's used.
+
+### 'cache_reset' => env('BLADE_CROP_CACHE_RESET', false)
+This cache is used to store the list of compressed images. Cloud based storage requires a http call to find the list of files that have already been compressed. Caching it for a few seconds or minutes speeds up this process with little downside.
+
+### 'sort_by_domain_name' => env('BLADE_CROP_SORT_BY_DOMAIN_NAME', false)
+If you are using multiple domains to pull your images in there is a danger that similar images could overwrite each other. This creates a set of subfolders for each domain.
+
+### 'schedule_tasks' => env('BLADE_CROP_SCHEDULE_TASKS', false)
+Turn this on to make the package save the options to the database. Then set a scheduled job to run. This allows the images to compress in the background if you have trouble with dispatched queues. It requires you run the attached migration.
+The command is `php artisan bladeimagecrop:process (n)` where n is the number of images to process at a time and the default is set in the config.
+
+### 'batch_size' => env('BLADE_CROP_BATCH_SIZE', 8)
+This is where you set the default amount. The better your server the more you can set.
+
 ### 'disk' => 'public'
-
-Select the disk you want to use for storage
-
-### 'remove_domain'
-
-If you need your images to have the site url attached but don't want this included in the name of your held files set this to true.
-
-Files will save to 
-```/bladeimagecrop/imgfilenamepng.jpg```
-instead of 
-```/bladeimagecrop/httpsitecomimgfilenamepng.jpg```
+Select the disk you want to use for storage.
 
 ### Default Offsets
 ```php
@@ -239,23 +266,7 @@ If you want to support ultra hi def screens you can change this to whatever mult
 Or if you don't want any DPI options just set it to ['1x']
 
 ### 'backgrounds' => true,
-
 The inline backgrounds can be turned off. If you need to add style tags on your image you may need to turn this off.
-
-### 'text_labels' => env('BLADE_CROP_TEST_LABELS', false),
-This wrote text to the images for testing but has since been removed as it was not valuable and took too much support.
-
-### 'compress_held_image' => env('BLADE_CROP_COMPRESS_HELD_IMAGE', true)
-
-The package creates and stores a Held Image that it uses for reference. If the original image vanishes for some reason there is always a source of truth. If this image is not compressed at all we can ensure that it's at least stored as slightly lossy else your storage fills up with lossless images.
-
-## 	'render_source_tag_if_unavailable' => env('BLADE_CROP_RENDER_SOURCE', false),
-
-When developing if can be useful to see the source tags even when an error has occurred. In production you can turn this off. If you rely on JS to detect image errors turn this off.
-ie.
-```
-<img src="broken_img.jpg" onerror="this.onerror=null; this.src='/svg/backup.svg'"/>
-```
 
 ### Build Classes
 The default build classes can be switched out here. The keys will be the file types that are created. If you want to replace the way the image files are compressed you can build your own. The class accepts an image string in the constructor and needs to save that to your drive.
@@ -274,9 +285,8 @@ The default build classes can be switched out here. The keys will be the file ty
 The order of keys is the order the files will load in your browser. So if you put JPG first it won't even try to load WebP.
 
 ### 'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
-The background builder can also be over written. Currently it takes the images and resizes it to 4px x 4px. It then converts that to base64 and return the style tag with the background info. This is cached by Laravel.
-
-If you wanted to (for instance) change this to load the same loading image you can write your own builder and swap it in with the config.
+The background builder can also be over written. 
+Currently it creates 6 tiny fake backgrounds using a 3x2 pixel image with a linear gradient over it that is converted to a css style background-image.
 
 ## Troubleshooting
 **Is the site crashing and you're freaking out?**
@@ -306,15 +316,10 @@ File not found at path: imageNotFound
 or the image is appearing as an empty 4x3 aspect rectangle.
 
 The original image isn't where you told it. It should be looking in the public path. If you've done something weird to your public path this is a good place to start looking.
-In your local environment you can check the img's output image path to see the full path that it's looking for the image.
+You can check the img's output image path to see the full path that it's looking for the image.
 
-**Server failures? 500 errors?**
-
-When loading a page of many images or some big images the php service can get overwhelmed. BladeImageCrop does the image processing asynchronously so perhaps try setting up your queue drivers.
-
-**Images are showing sideways or upside down**
-
-Some images taken on devices that register orientation (smart phones etc) will show the image upright and then display in the browser at the incorrect angle. This is slowly getting fixed by browsers but until then the solution exists only when you're using Image Magick. If Image Magick in installed on your server they will auto align but with only GD there is no current fix for ths issue. You will need to resave this image using your photo processing software of choice.
+**Server failures? 500 errors? Gateway Timeouts?**
+When loading a page of many images or some big images the php service can get overwhelmed. BladeImageCrop does the image processing asynchronously so perhaps try setting up your queue drivers or turn on scheduled tasks.
 
 ### Testing
 

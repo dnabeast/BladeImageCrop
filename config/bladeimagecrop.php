@@ -3,7 +3,6 @@
 return [
 	'enabled' => env('BLADE_CROP_ENABLED', true),
 	'cache_reset' => env('BLADE_CROP_CACHE_RESET', 180), // file check cache reset in seconds
-	'update_legacy_image_names' => env('BLADE_CROP_UPDATE_LEGACY_IMAGE_NAMES', true),
 	'sort_by_domain_name' => env('BLADE_CROP_SORT_BY_DOMAIN_NAME', false),
 	'schedule_tasks' => env('BLADE_CROP_SCHEDULE_TASKS', false),
 	'batch_size' => env('BLADE_CROP_BATCH_SIZE', 8),

@@ -30,10 +30,11 @@ class ImageCropCommand extends Command
 				->combine(json_decode($task->task_properties, true));
 
 			(new ImageBuilder($properties['originUrl'], $properties['format']))->resize($properties['options'])->save($properties['destinationPath']);
+
+			DB::table('bladeimagecrop_tasks')->delete($task->id);
 		});
 
 		Cache::forget('bic_all_files');
-		$tasks->delete();
 
 		$this->info('All tasks done!');
 	}
