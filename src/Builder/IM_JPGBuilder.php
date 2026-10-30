@@ -17,8 +17,8 @@ class IM_JPGBuilder extends ImageTypeBuilder
 	public function __construct($originUrl)
 	{
 		$this->originUrl = $originUrl;
-		$this->image = $this->makeImage();
 		$this->tempFilePath = null;
+		$this->image = $this->makeImage();
 	}
 
 	public function makeImage(){

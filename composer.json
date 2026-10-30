@@ -18,7 +18,6 @@
 	"require": {
 		"php": "^8.3",
 		"guzzlehttp/guzzle": "^7.0",
-		"shortpixel/shortpixel-php": "^1.7",
 		"illuminate/support": "^12.40|^13.0"
 	},
 	"require-dev": {

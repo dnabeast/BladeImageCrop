@@ -4,10 +4,11 @@ namespace DNABeast\BladeImageCrop\Jobs;
 
 use DNABeast\BladeImageCrop\ImageBuilder;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class ProcessImageJob implements ShouldQueue
+class ProcessImageJob implements ShouldQueue, ShouldBeUnique
 {
 	use Dispatchable, Queueable;
 
@@ -22,6 +23,11 @@ class ProcessImageJob implements ShouldQueue
 		$this->format = $format;
 		$this->options = $options;
 		$this->destinationPath = $destinationPath;
+	}
+
+	public function uniqueId(): string
+	{
+		return $this->destinationPath;
 	}
 
 	public function handle(): void

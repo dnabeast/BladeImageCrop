@@ -86,22 +86,10 @@ class Img extends Component
 		if (!$this->properties && !$this->width){
 			throw new \Exception("No Width provided");
 		}
-		$aspect = is_string($this->properties)||!isset($this->properties[1])?$this->aspectFromImage():null;
+		$aspect = is_string($this->properties)||!isset($this->properties[1])?(3/4):null;
 
 		return (new ImageProps)->calc($this->properties, $aspect);
 	}
 
-	public function aspectFromImage(){
-		return 3/4; // default failed image shape
-
-//		try {
-//			$originalImage = Cache::remember('bic_props_'. $this->image->url(), now()->addMinutes(3), function(){
-//				return getimagesize( $this->image->url() );
-//			});
-//			return $originalImage[1]/$originalImage[0];
-//		} catch (\Exception $e) {
-//			return 3/4; // default failed image shape
-//		}
-	}
 
 }

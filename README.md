@@ -91,6 +91,9 @@ To prevent having to do http calls to the server we now cache the compressed ima
 ### Faster backgrounds
 The image backgrounds were poorly implemented. They were recompressing the original image after each cache clear. They are now faked and cached. This should speed things up considerably.
 
+### Redesigned Builders
+The old builders used to accept image strings. This was a bad idea. The new builders accept a path to the image. This is slightly better for memory.
+
 ## Usage
 
 ### The easy image tag
@@ -116,12 +119,12 @@ JPG format. The resulting output would be
 
 ```html
 <img srcset="
-https://yourserver.com/bic/storage/overlyLargeImage_jpg/300x200_50_50.jpg 1x,
-https://yourserver.com/bic/storage/overlyLargeImage_jpg/600x400_50_50.jpg 2x"
+https://yourserver.com/storage/bic/overlyLargeImage_jpg/300x200_50_50.jpg 1x,
+https://yourserver.com/storage/bic/overlyLargeImage_jpg/600x400_50_50.jpg 2x"
 	 style="
 background-size: 100% 100%;
 background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*)"
-	 src="https://yourserver.com/bic/storage/overlyLargeImage_jpg/300x200_50_50.jpg"
+	 src="https://yourserver.com/storage/bic/overlyLargeImage_jpg/300x200_50_50.jpg"
 	 width="300" height="200" class="" alt="">
 ```
 
@@ -170,12 +173,12 @@ The resulting code would be
 
 ```html
 <img srcset="
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/300x180_50_50.jpg 300w,
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/1024x300_50_50.jpg 1024w,
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/2048x600_50_50.jpg 2048w"
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/300x180_50_50.jpg 300w,
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/1024x300_50_50.jpg 1024w,
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/2048x600_50_50.jpg 2048w"
 	 style="background-size: 100% 100%; background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*"
 	 )
-	 src="https://yourserver.com/bic/storage/overlyLargeImage_jpg/300x180_50_50.jpg"
+	 src="https://yourserver.com/storage/bic/overlyLargeImage_jpg/300x180_50_50.jpg"
 	 width="300" height="180" class="" alt="">
 ```
 
@@ -223,13 +226,13 @@ This will result in
 
 <picture>
 	<source type="image/webp" srcset="
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/300x100_50_50.webp 1x,
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/600x200_50_50.webp 2x">
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/300x100_50_50.webp 1x,
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/600x200_50_50.webp 2x">
 	<source type="image/jpeg" srcset="
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/300x100_50_50.jpg 1x,
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/600x200_50_50.jpg 2x">
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/300x100_50_50.jpg 1x,
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/600x200_50_50.jpg 2x">
 	<img style="background-size: 100% 100%; background-image: url('data:image/png;base64,*very_low_res_base64_encoded_img*')"
-		 src="https://yourserver.com/bic/storage/overlyLargeImage_jpg/300x100_50_50.jpg"
+		 src="https://yourserver.com/storage/bic/overlyLargeImage_jpg/300x100_50_50.jpg"
 		 width="300" height="100" class="" alt="">
 </picture>
 ```
@@ -263,15 +266,15 @@ This will output
 
 <picture>
 	<source type="image/webp" srcset="
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/800x600_50_50.webp 800w,
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/1024x768_50_50.webp 1024w"
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/800x600_50_50.webp 800w,
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/1024x768_50_50.webp 1024w"
 			sizes="(min-width: 60rem) 80vw, 100vw">
 	<source type="image/jpeg" srcset="
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/800x600_50_50.jpg 800w,
-	https://yourserver.com/bic/storage/overlyLargeImage_jpg/1024x768_50_50.jpg 1024w"
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/800x600_50_50.jpg 800w,
+	https://yourserver.com/storage/bic/overlyLargeImage_jpg/1024x768_50_50.jpg 1024w"
 			sizes="(min-width: 60rem) 80vw, 100vw">
 	<img style="background-size: 100% 100%; background-image: url('*very_low_res_base64_encoded_img*')"
-		 src="https://yourserver.com/bic/storage/overlyLargeImage_jpg/800x600_50_50.jpg" width="800" height="600">
+		 src="https://yourserver.com/storage/bic/overlyLargeImage_jpg/800x600_50_50.jpg" width="800" height="600">
 </picture>
 ```
 
@@ -345,7 +348,7 @@ The inline backgrounds can be turned off. If you need to add style tags on your 
 ### Build Classes
 
 The default build classes can be switched out here. The keys will be the file types that are created. If you want to
-replace the way the image files are compressed you can build your own. The class accepts an image string in the
+replace the way the image files are compressed you can build your own. The class accepts an image url in the
 constructor and needs to save that to your drive.
 
 ```php
