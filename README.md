@@ -275,8 +275,10 @@ This creates an extra set of source files that only activate when the media quer
 
 ### 'enabled' => env('BLADE_CROP_ENABLED', true)
 
-If you want to turn off the package you can do so here. It should still resize the original (large) image on the page but you may have
-distortions depending on how it's used.
+If you want to turn off the package you can do so here. Tags then output the original (large) image at the same location a crop would have read it from, with the first size as its width and height attributes.
+Your css still applies, and `object-fit: cover` stops the image stretching. A `<x-sources>` with a `media` attribute keeps its media query, the others output nothing.
+
+Images on a private disk won't load this way as the browser can't reach the original. The image route stays on, so crop urls in cached pages keep working.
 
 ### 'driver' => env('BLADE_CROP_DRIVER', 'gd')
 

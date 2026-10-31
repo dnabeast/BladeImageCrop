@@ -69,6 +69,29 @@ class GlideUrls
 		return str_starts_with($url, 'http') ? $url : null;
 	}
 
+	/**
+	 * Url of the original image for when the package is turned off, using the same lookup as a crop.
+	 * That off switch is what you reach for when something is broken, so a broken disk leaves the src as it was instead of throwing.
+	 */
+	public static function original($src)
+	{
+		try {
+			$urls = new static($src);
+
+			if ($urls->source === 'public') {
+				return url($urls->sourcePath);
+			}
+
+			if ($urls->source === 'disk' && $urls->sourcePath !== '') {
+				return Storage::disk(config('bladeimagecrop.source_disk'))->url($urls->sourcePath);
+			}
+		} catch (\Throwable $e) {
+			report($e);
+		}
+
+		return $src;
+	}
+
 	public function isLocal()
 	{
 		return $this->sourcePath !== null;

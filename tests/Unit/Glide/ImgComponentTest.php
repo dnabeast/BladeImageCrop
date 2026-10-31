@@ -4,6 +4,7 @@ namespace DNABeast\BladeImageCrop\Tests\Unit\Glide;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ImgComponentTest extends GlideTestCase
 {
@@ -186,7 +187,7 @@ class ImgComponentTest extends GlideTestCase
 
 		$html = (string) $this->blade('<x-img src="/img/photo.jpg" :properties="[300, 200]"/>');
 
-		$this->assertEquals('/img/photo.jpg', $this->attribute($html, 'img', 'src'));
+		$this->assertEquals(Storage::disk('bic-source')->url('img/photo.jpg'), $this->attribute($html, 'img', 'src'));
 		$this->assertStringNotContainsString('/bic/', $html);
 	}
 
@@ -196,8 +197,94 @@ class ImgComponentTest extends GlideTestCase
 
 		$html = (string) $this->blade('<x-img src="/img/photo.jpg" :properties="[[300, 180], [1024, 300]]"/>');
 
-		$this->assertEquals('/img/photo.jpg', $this->attribute($html, 'img', 'src'));
+		$this->assertEquals(Storage::disk('bic-source')->url('img/photo.jpg'), $this->attribute($html, 'img', 'src'));
 		$this->assertStringNotContainsString('/bic/', $html);
+	}
+
+	function test_disabled_points_a_public_folder_image_at_that_folder()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+		$this->putSplitImage('img/photo.jpg', 800, 600, 'public');
+
+		$html = (string) $this->blade('<x-img src="img/photo.jpg" width="300"/>');
+
+		$this->assertEquals('http://localhost/img/photo.jpg', $this->attribute($html, 'img', 'src'));
+	}
+
+	function test_disabled_leaves_a_remote_image_alone()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+
+		$html = (string) $this->blade('<x-img src="https://other.test/photo.jpg" width="300"/>');
+
+		$this->assertEquals('https://other.test/photo.jpg', $this->attribute($html, 'img', 'src'));
+	}
+
+	function test_disabled_renders_when_the_source_disk_is_broken()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+		Config::set('bladeimagecrop.source_disk', 'not-a-disk');
+
+		$html = (string) $this->blade('<x-img src="/img/photo.jpg" width="300"/>');
+
+		$this->assertEquals('/img/photo.jpg', $this->attribute($html, 'img', 'src'));
+	}
+
+	function test_disabled_sizes_can_be_overridden_by_the_sites_css()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+
+		$html = (string) $this->blade('<x-img src="/img/photo.jpg" :properties="[[300, 180], [1024, 300]]" class="w-full" style="border: 0"/>');
+
+		$this->assertEquals('300', $this->attribute($html, 'img', 'width'));
+		$this->assertEquals('180', $this->attribute($html, 'img', 'height'));
+		$this->assertEquals('object-fit: cover; border: 0;', $this->attribute($html, 'img', 'style'));
+		$this->assertEquals(1, substr_count($html, 'style='));
+	}
+
+	#[DataProvider('emptySizes')]
+	function test_disabled_renders_with_an_empty_size($size)
+	{
+		Config::set('bladeimagecrop.enabled', false);
+
+		$html = (string) $this->blade('<x-img src="/img/photo.jpg" :properties="$size"/>', ['size' => $size]);
+
+		$this->assertStringContainsString('<img', $html);
+		$this->assertNull($this->attribute($html, 'img', 'width'));
+	}
+
+	public static function emptySizes()
+	{
+		return [[''], [null], [[]]];
+	}
+
+	function test_disabled_escapes_the_size()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+
+		$html = (string) $this->blade('<x-img src="/img/photo.jpg" :width="$width"/>', ['width' => '1"><script>alert(1)</script>']);
+
+		$this->assertStringNotContainsString('<script', $html);
+	}
+
+	#[DataProvider('enabledStates')]
+	function test_alt_text_and_src_are_not_compiled_as_blade($enabled)
+	{
+		Config::set('bladeimagecrop.enabled', $enabled);
+
+		$html = (string) $this->blade(
+			'<x-img :src="$src" width="300" :alt="$alt"/><x-img :src="$remote" width="300" :alt="$crash"/>',
+			['src' => '/img/{{ 7*7 }}.jpg', 'remote' => 'https://other.test/{{ 7*7 }}.jpg', 'alt' => '{{ 7*7 }}', 'crash' => 'Photo by @if on insta']
+		);
+
+		$this->assertStringContainsString('alt="{{ 7*7 }}"', $html);
+		$this->assertStringContainsString('{{ 7*7 }}.jpg', $this->attribute($html, 'img', 'src'));
+		$this->assertStringContainsString('Photo by @if on insta', $html);
+	}
+
+	public static function enabledStates()
+	{
+		return [[true], [false]];
 	}
 
 	function test_properties_without_a_colon_prefix_throw()

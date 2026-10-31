@@ -6,61 +6,74 @@ use DNABeast\BladeImageCrop\GlideUrls;
 use DNABeast\BladeImageCrop\ImageProps;
 use DNABeast\BladeImageCrop\Background;
 use DNABeast\BladeImageCrop\SourceDimensions;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\View\Component;
 
-class Img extends Component
+class Img extends Component implements Htmlable
 {
 	public $src;
 	public $width;
 	public $properties;
 	public $sources;
-	public $urls;
 
 	public function __construct($src, $width=null, $properties=null, $sources=null)
 	{
 		$this->src = $src;
-		$this->urls = new GlideUrls($src);
 		$this->sources = $sources=='false'?false:true;
 		$this->properties = $properties??$width;
 	}
 
 	/**
 	 * Get the view / contents that represent the component.
+	 * The component is its own Htmlable as a returned string would be compiled as Blade, including any alt text or src inside it.
 	 *
-	 * @return \Illuminate\Contracts\View\View|\Closure|string
+	 * @return \Illuminate\Contracts\Support\Htmlable
 	 */
 	public function render()
 	{
-		if (!config('bladeimagecrop.enabled', true) || !$this->urls->isLocal()) {
-			return function (array $data) {
-				$firstLine = (new ImageProps)->properWrapping($this->properties)[0];
-				$width = $firstLine[0];
-				$height = $firstLine[1] ?? null;
+		return $this;
+	}
 
-				$styleHeight = $height ? $height . 'px' : 'auto';
-				$heightAttribute = $height ? ' height="' . $height . '"' : '';
-
-				return '<img style="object-fit: cover; width: ' . $width . 'px; height: ' . $styleHeight . ';" src="' . e($this->src) . '" width="' . $width . '"' . $heightAttribute . ' ' . $data['attributes'] . '>';
-			};
+	public function toHtml()
+	{
+		if (!config('bladeimagecrop.enabled', true)) {
+			return $this->originalImg(GlideUrls::original($this->src));
 		}
 
-		return function (array $data){
-			$lines = $this->calculatedProperties();
-			$fallbackFormat = collect(config('bladeimagecrop.formats'))->last();
+		$urls = new GlideUrls($this->src);
 
-			$src = $this->urls->url($lines[0], $fallbackFormat);
-			$srcset = $this->sources
-				? 'srcset="'.e($this->urls->srcset($lines, $this->hasManySizes(), $fallbackFormat)).'" '
-				: '';
-			// Width only images take their height from the original's aspect, left off when the original can't be measured
-			$heightValue = $lines[0][1] ?: (new SourceDimensions)->heightFor($this->urls->sourcePath, $lines[0][0], $this->urls->source);
-			$height = $heightValue ? ' height="'.$heightValue.'"' : '';
+		if (!$urls->isLocal()) {
+			return $this->originalImg($this->src);
+		}
 
-			$background = config('bladeimagecrop.backgrounds') ? (new Background($src))->render().' ' : '';
+		$lines = $this->calculatedProperties();
+		$fallbackFormat = collect(config('bladeimagecrop.formats'))->last();
 
-			return '<img '.$srcset.$background.'src="'.e($src).'" width="'.$lines[0][0].'"'.$height.' '.$data['attributes'].'>';
-		};
+		$src = $urls->url($lines[0], $fallbackFormat);
+		$srcset = $this->sources
+			? 'srcset="'.e($urls->srcset($lines, $this->hasManySizes(), $fallbackFormat)).'" '
+			: '';
+		// Width only images take their height from the original's aspect, left off when the original can't be measured
+		$heightValue = $lines[0][1] ?: (new SourceDimensions)->heightFor($urls->sourcePath, $lines[0][0], $urls->source);
+		$height = $heightValue ? ' height="'.$heightValue.'"' : '';
 
+		$background = config('bladeimagecrop.backgrounds') ? (new Background($src))->render().' ' : '';
+
+		return '<img '.$srcset.$background.'src="'.e($src).'" width="'.$lines[0][0].'"'.$height.' '.$this->attributes.'>';
+	}
+
+	/**
+	 * An uncropped image. The size goes in attributes so the site's css still wins, object-fit stops them stretching the original.
+	 */
+	protected function originalImg($src)
+	{
+		$firstLine = $this->properties ? (new ImageProps)->properWrapping($this->properties)[0] : [];
+		$width = (int) ($firstLine[0] ?? 0);
+		$height = (int) ($firstLine[1] ?? 0);
+
+		$size = ($width ? ' width="'.$width.'"' : '').($height ? ' height="'.$height.'"' : '');
+
+		return '<img src="'.e($src).'"'.$size.' '.$this->attributes->merge(['style' => 'object-fit: cover']).'>';
 	}
 
 	public function calculatedProperties(){

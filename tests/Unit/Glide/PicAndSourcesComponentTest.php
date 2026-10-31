@@ -3,6 +3,7 @@
 namespace DNABeast\BladeImageCrop\Tests\Unit\Glide;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 
 class PicAndSourcesComponentTest extends GlideTestCase
 {
@@ -89,5 +90,49 @@ class PicAndSourcesComponentTest extends GlideTestCase
 		$html = (string) $this->blade('<x-sources src="/img/photo.jpg" :properties="[300, 200]"/>');
 
 		$this->assertStringNotContainsString('<source', $html);
+	}
+
+	function test_sources_keep_their_media_query_when_disabled()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+
+		$html = (string) $this->blade('<x-sources src="/img/wide.jpg" media="(min-width: 800px)" :properties="[800, 300]"/>');
+
+		$this->assertEquals('(min-width: 800px)', $this->attribute($html, 'source', 'media'));
+		$this->assertEquals(Storage::disk('bic-source')->url('img/wide.jpg'), $this->attribute($html, 'source', 'srcset'));
+	}
+
+	function test_sources_render_when_disabled_and_the_source_disk_is_broken()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+		Config::set('bladeimagecrop.source_disk', 'not-a-disk');
+
+		$html = (string) $this->blade('<picture><x-pic src="/img/photo.jpg" :properties="[300, 200]"/></picture>');
+
+		$this->assertEquals('/img/photo.jpg', $this->attribute($html, 'img', 'src'));
+	}
+
+	function test_pic_accepts_any_width_and_a_quote_in_the_src()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+
+		$html = (string) $this->blade('<picture><x-pic :src="$src" width="100%"/></picture>', ['src' => 'https://other.test/a"b.jpg']);
+
+		$this->assertEquals('100', $this->attribute($html, 'img', 'width'));
+		$this->assertStringContainsString('a&quot;b.jpg', $html);
+	}
+
+	function test_pic_still_accepts_properties_without_a_colon()
+	{
+		$html = (string) $this->blade('<picture><x-pic src="/img/photo.jpg" properties="[300, 200]"/></picture>');
+
+		$this->assertEquals('200', $this->attribute($html, 'img', 'height'));
+	}
+
+	function test_pic_attributes_are_only_escaped_once()
+	{
+		$html = (string) $this->blade('<picture><x-pic src="/img/photo.jpg" :properties="[300, 200]" alt="Bob\'s photo"/></picture>');
+
+		$this->assertEquals("Bob's photo", $this->attribute($html, 'img', 'alt'));
 	}
 }
