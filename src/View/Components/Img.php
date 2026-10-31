@@ -31,9 +31,17 @@ class Img extends Component
 	 */
 	public function render()
 	{
-		if (!config('bladeimagecrop.enabled', true) || !$this->urls->isLocal()){
-			$propertyArray = is_array($this->properties)?['width'=>$this->properties[0].'px', 'height'=>isset($this->properties[1])?$this->properties[1].'px':'auto']:['width' => $this->properties.'px', 'height'=>'auto'];
-			return '<img style="object-fit: cover; width: '.$propertyArray['width'].'; height: '.$propertyArray['height'].';" src="'.e($this->src).'" width="'.$propertyArray['width'].'" height="'.$propertyArray['height'].'">';
+		if (!config('bladeimagecrop.enabled', true) || !$this->urls->isLocal()) {
+			return function (array $data) {
+				$firstLine = (new ImageProps)->properWrapping($this->properties)[0];
+				$width = $firstLine[0];
+				$height = $firstLine[1] ?? null;
+
+				$styleHeight = $height ? $height . 'px' : 'auto';
+				$heightAttribute = $height ? ' height="' . $height . '"' : '';
+
+				return '<img style="object-fit: cover; width: ' . $width . 'px; height: ' . $styleHeight . ';" src="' . e($this->src) . '" width="' . $width . '"' . $heightAttribute . ' ' . $data['attributes'] . '>';
+			};
 		}
 
 		return function (array $data){

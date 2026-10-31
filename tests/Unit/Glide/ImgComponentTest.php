@@ -190,6 +190,16 @@ class ImgComponentTest extends GlideTestCase
 		$this->assertStringNotContainsString('/bic/', $html);
 	}
 
+	function test_disabled_outputs_the_original_image_with_multiple_sizes()
+	{
+		Config::set('bladeimagecrop.enabled', false);
+
+		$html = (string) $this->blade('<x-img src="/img/photo.jpg" :properties="[[300, 180], [1024, 300]]"/>');
+
+		$this->assertEquals('/img/photo.jpg', $this->attribute($html, 'img', 'src'));
+		$this->assertStringNotContainsString('/bic/', $html);
+	}
+
 	function test_properties_without_a_colon_prefix_throw()
 	{
 		$this->expectException(\Exception::class);

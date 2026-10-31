@@ -34,7 +34,6 @@ You can publish the config file
 ```bash
 php artisan vendor:publish --provider="DNABeast\BladeImageCrop\BladeImageCropServiceProvider"
 ```
-. 
 By default the system is set to use the Laravel public storage path so don't forget to set up
 
 ```bash
@@ -50,32 +49,28 @@ Laravel
 - 12
 - 13
 
-GD (the default) or Imagick installed on server. Imagick needs
-- 7.0
-- 6.1
-
 ## Upgrade Guide
 
 This is a major rewrite of the package with many breaking changes.
 
 ### Copying the original image was too slow.
-We no longer make a compressed version of the original image. This compression was slowing things down and was not worth the benefit. If there are not yet compressed versions the original will be used so be aware that for the first few minutes the site may use a very large original.
+We no longer make a compressed version of the original image. This compression was slowing things down and was not worth the benefit.
 
 ### Folder traversal was slow
-The folder structure has changed. The original images are now held in a folder called **bic** (configurable) in the public folder. You can change this folder but Laravel Cloud uses public.
+The folder structure has changed. The new images are now held in a folder called **bic** (configurable) on the public disk. You can change this disk but Laravel Cloud uses public.
 The compressed folders will match the original folder structure. This allows for a sensible structure where we don't have several thousand folders in the one parent.
 
-This change means that your compression will occur all over again. You can safely deleted the blade_image_crop directory.
+This change means that your compression will occur all over again. You can safely delete the blade_image_crop_holding directory.
 
 ### Faster backgrounds
-The image backgrounds were poorly implemented. They were recompressing the original image after each cache clear. They are now faked and cached. This should speed things up considerably.
+The image backgrounds were poorly implemented. They were recompressing the original image after each cache clear. They are now faked. This should speed things up considerably.
 
-### No more builders
+### No more build classes
 The system uses Glide so any custom builders you may have created will no longer work.
-List your required formats in the config. The order indicates what it preferred in the browser.
+List your required formats in the config options 'formats' . The order indicates what is preferred in the browser.
 
 ### Image URLs have changed
-Page caching and CDN caches should gbe cleared.
+Page caching and CDN caches should be cleared.
 
 ## Usage
 
@@ -116,8 +111,8 @@ that's found in the public folder is read from there (`/bic/public/...`). Anythi
 (`/bic/disk/...`).
 
 Note that the different DPI versions are set in the srcset tag. A random mix of css gradients is placed inline into the
-style tag. It also works out the height of the resized image. This combination means that the loading image appears
-onscreen without needing to make a html call and avoids a redraw problem.
+style tag. It also works out the height of the resized image if a height property is provided. This combination means that the loading image appears
+onscreen without needing to make a HTTP request and avoids a redraw problem.
 [Why this is important]( https://www.smashingmagazine.com/2020/03/setting-height-width-images-important-again/ )
 
 The first instance of the image loading will be slow while the compressed version is created. Subsequent loads will be
@@ -168,7 +163,7 @@ The resulting code would be
 ```
 
 **Note** that the srcset now has 300w, 1024w and 2048w instead of 1x, 2x. Also be aware that you would need to add css
-styles to makes sure the height (or width) was set to auto otherwise some versions of the image would be distorted. (
+styles to make sure the height (or width) was set to auto otherwise some versions of the image would be distorted. (
 tailwindcss adds this by default)
 
 #### Creating versions with specific focus points
@@ -192,8 +187,8 @@ This can be great for avatars or mobile versions of the same image.
 
 ### The pic tag
 
-JPGs are for suckers. All the cool kids are now using WebP. Trouble is that it's not quite fully supported yet. The
-solution is to make multi-resolution versions of webp and JPG (and any other format you want to use). You'd then put
+JPGs are for suckers. All the cool kids are now using WebP. Trouble is that some older browsers still can't use it. The
+solution is to make multi-resolution versions of WebP and JPG (and any other format you want to use). You'd then put
 your default img and your source tags inside a picture tag. Imagine if it was as easy as writing an img tag.
 
 You don't have to. The real power of Blade Image Crop is in the pic tag.
@@ -264,7 +259,7 @@ This will output
 ```
 
 Or, if you're looking to have a mobile version of your image that is square and a desktop version that is wide. (and
-also let's pretend the focus of the image in slightly on the left )
+also let's pretend the focus of the image is slightly on the left )
 
 ```blade
 <picture>
@@ -280,7 +275,7 @@ This creates an extra set of source files that only activate when the media quer
 
 ### 'enabled' => env('BLADE_CROP_ENABLED', true)
 
-If you want to turn off the package you can do so here. It should still resize the original image but you may have
+If you want to turn off the package you can do so here. It should still resize the original (large) image on the page but you may have
 distortions depending on how it's used.
 
 ### 'driver' => env('BLADE_CROP_DRIVER', 'gd')
@@ -292,22 +287,25 @@ Crops already in the cache aren't remade when you change this. Clear the cache d
 rebuild them.
 
 ### 'route_prefix' => 'bic'
-This is the route prefix for where the images are stored.
+This is the route prefix for where the images appear in the url.
 
 ### 'sign_key' => env('BLADE_CROP_SIGN_KEY', env('APP_KEY'))
-This is the key used to sign the image urls. By default it uses the app key but if you don't want to resign your images when you rotate your keys add a new key here.
+This is the key used to sign the image urls. By default it uses the app key but if you don't want to re-sign your images when you rotate your keys add a new key here.
 
-### 'source_disk' => 'public'
+### 'source_disk' => env('BLADE_CROP_SOURCE_DISK', 'public')
 Set the disk that the original images are stored on.
 
-### 'cache_disk' => 'public'
+### 'public_source' => env('BLADE_CROP_PUBLIC_SOURCE', true)
+This allows you to also crop images found in the app's public folder (Vite builds etc.), read straight from that folder
+
+### 'cache_disk' => env('BLADE_CROP_CACHE_DISK', 'public')
 Set the disk that the resized images are stored on. If they are the same disk you need to set a prefix.
 
-### 'cache_path_prefix' => 'bic'
+### 'cache_path_prefix' => env('BLADE_CROP_CACHE_PATH_PREFIX', 'bic')
 Set the path prefix for the resized images. If you're using a different disk as the source images you can leave this blank.
 
 ### 'max_image_size' => 2000 * 2000
-This sets the maximum size of the image that can be processed.
+This sets the maximum size in pixels of the image that can result from the crop. 
 
 ### Default Offsets
 
@@ -328,7 +326,7 @@ Or if you don't want any DPI options just set it to ['1x']
 
 The inline backgrounds can be turned off. If you need to add style tags on your image you may need to turn this off.
 
-### 'background_colors' => ['DarkKhaki','OliveDrab', 'LemonChiffon']
+### 'background_colors' => ['OliveDrab','FloralWhite','DeepSkyBlue']
 
 The theme colors for the inline backgrounds. Any css color works, including `var(--brand)`. Each gradient picks one and
 offsets it slightly using css relative colors, so the browser needs to support those (Chrome 119, Safari 18, Firefox 128).
@@ -375,7 +373,7 @@ It probably means you haven't closed the blade component tag. Use one of these s
 **How about this one?**
 
 ```
-File not found at path: 
+Images return and error.
 ```
 
 - 404: The original image isn't on the source disk.
