@@ -2,6 +2,7 @@
 
 namespace DNABeast\BladeImageCrop\Tests\Unit\Glide;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -16,6 +17,60 @@ class PublicSourceTest extends GlideTestCase
 		$html = (string) $this->blade('<x-img src="http://localhost/build/assets/hero-a1b2c3.jpg" :properties="[300, 200]"/>');
 
 		$this->assertSignedImageUrl($this->srcsets($html)[0][0][0], 'build/assets/hero-a1b2c3.jpg', ['w' => 300, 'h' => 200, 'fit' => 'crop-50-50', 'fm' => 'jpg'], 'public');
+	}
+
+	function test_a_src_on_the_requested_host_is_found_when_the_app_answers_on_a_second_domain()
+	{
+		$this->putSplitImage('build/assets/hero-a1b2c3.jpg', 800, 600, 'public');
+		$this->app->instance('request', Request::create('http://second-domain.test/'));
+
+		$html = (string) $this->blade('<x-img src="http://second-domain.test/build/assets/hero-a1b2c3.jpg" :properties="[300, 200]"/>');
+
+		$this->assertStringStartsWith('http://second-domain.test/bic/public/build/assets/hero-a1b2c3.jpg?', $this->srcsets($html)[0][0][0]);
+	}
+
+	function test_a_src_on_the_apps_main_host_is_found_when_app_url_has_no_subdomain()
+	{
+		config()->set('app.url', 'http://testsite.com');
+		$this->putSplitImage('build/assets/hero-a1b2c3.jpg', 800, 600, 'public');
+		$this->app->instance('request', Request::create('http://testsite.com/'));
+
+		$html = (string) $this->blade('<x-img src="http://testsite.com/build/assets/hero-a1b2c3.jpg" :properties="[300, 200]"/>');
+
+		$this->assertStringStartsWith('http://testsite.com/bic/public/build/assets/hero-a1b2c3.jpg?', $this->srcsets($html)[0][0][0]);
+	}
+
+	function test_a_src_on_a_subdomain_of_the_app_is_found()
+	{
+		config()->set('app.url', 'http://testsite.com');
+		$this->putSplitImage('build/assets/hero-a1b2c3.jpg', 800, 600, 'public');
+		$this->app->instance('request', Request::create('http://first.testsite.com/'));
+
+		$html = (string) $this->blade('<x-img src="http://first.testsite.com/build/assets/hero-a1b2c3.jpg" :properties="[300, 200]"/>');
+
+		$this->assertStringStartsWith('http://first.testsite.com/bic/public/build/assets/hero-a1b2c3.jpg?', $this->srcsets($html)[0][0][0]);
+	}
+
+	function test_a_src_on_another_subdomain_of_the_app_is_found()
+	{
+		config()->set('app.url', 'http://testsite.com');
+		$this->putSplitImage('build/assets/hero-a1b2c3.jpg', 800, 600, 'public');
+		$this->app->instance('request', Request::create('http://first.testsite.com/'));
+
+		$html = (string) $this->blade('<x-img src="http://second.testsite.com/build/assets/hero-a1b2c3.jpg" :properties="[300, 200]"/>');
+
+		$this->assertStringStartsWith('http://first.testsite.com/bic/public/build/assets/hero-a1b2c3.jpg?', $this->srcsets($html)[0][0][0]);
+	}
+
+	function test_a_host_that_only_ends_with_the_app_host_is_left_alone()
+	{
+		config()->set('app.url', 'http://testsite.com');
+		$this->app->instance('request', Request::create('http://testsite.com/'));
+
+		$html = (string) $this->blade('<x-img src="http://eviltestsite.com/img/photo.jpg" :properties="[300, 200]"/>');
+
+		$this->assertStringNotContainsString('/bic/', $html);
+		$this->assertStringContainsString('src="http://eviltestsite.com/img/photo.jpg"', $html);
 	}
 
 	function test_the_route_serves_an_image_from_the_public_folder()

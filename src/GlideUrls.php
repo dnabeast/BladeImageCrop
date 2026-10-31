@@ -27,8 +27,8 @@ class GlideUrls
 
 	/**
 	 * [source, path] of the image, or [null, null] when it's hosted somewhere else.
-	 * "/img/photo.jpg", "img/photo.jpg" and "http://localhost/img/photo.jpg" all become "img/photo.jpg",
-	 * on the public source when that file is in the public folder and on the disk otherwise.
+	 * "/img/photo.jpg", "img/photo.jpg", "http://localhost/img/photo.jpg" and "http://first.localhost/img/photo.jpg"
+	 * all become "img/photo.jpg", on the public source when that file is in the public folder and on the disk otherwise.
 	 */
 	public function locate($src)
 	{
@@ -39,9 +39,8 @@ class GlideUrls
 		}
 
 		$parts = parse_url($src);
-		$appHost = parse_url(config('app.url'), PHP_URL_HOST);
 
-		if (isset($parts['host']) && $parts['host'] !== $appHost) {
+		if (isset($parts['host']) && !$this->isAppHost($parts['host'])) {
 			return [null, null];
 		}
 
@@ -53,6 +52,19 @@ class GlideUrls
 		}
 
 		return ['disk', $path];
+	}
+
+	/**
+	 * The app answers on its own host, on any subdomain of it, and on whatever host this request came in on.
+	 * Subdomains are matched on the dot so eviltestsite.com isn't mistaken for testsite.com.
+	 */
+	protected function isAppHost($host)
+	{
+		$host = strtolower($host);
+		$appHost = strtolower((string) parse_url(config('app.url'), PHP_URL_HOST));
+
+		return $host === request()->getHost()
+			|| ($appHost !== '' && ($host === $appHost || str_ends_with($host, '.' . $appHost)));
 	}
 
 	/**

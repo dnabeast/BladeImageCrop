@@ -91,6 +91,7 @@ Instead you would put
 
 Note: You can put the full url in the src attribute or just the local path. The output will always be the full url in
 order to support other disks. Resizing only takes place on images in the allocated source disk (in your storage) and the host server allowing for Vite assets.
+The host server is the host in `APP_URL`, any subdomain of it, and the host of the current request. Any other host is left as it is.
 
 The initial image would be resized and saved to a 300px wide version and a 600px wide version (for hi-res displays) in
 JPG format. The resulting output would be
