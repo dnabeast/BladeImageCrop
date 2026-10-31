@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Shared setup for the Glide version of the package.
  *
  * Proposed config keys (replacing build_classes, cache_reset, schedule_tasks, batch_size, sort_by_domain_name):
+ * - driver:         image library used for crops, gd or imagick
  * - route_prefix:   URL prefix the image route listens on, e.g. /bic/{source}/{path}
  * - sign_key:       key used to sign and validate Glide URLs
  * - source_disk:    disk the original images are read from
@@ -52,6 +53,7 @@ abstract class GlideTestCase extends TestCase
 			'pixel_device_ratios' => ['1x', '2x'],
 			'formats' => ['webp', 'jpg'],
 			'backgrounds' => false,
+			'background_colors' => ['DarkKhaki', 'OliveDrab', 'LemonChiffon'],
 			'max_image_size' => 2000 * 2000,
 		]);
 	}

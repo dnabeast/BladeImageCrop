@@ -50,6 +50,7 @@ class BladeImageCropServiceProvider extends ServiceProvider
 		foreach (GlideUrls::SOURCES as $source) {
 			$this->app->singleton('bladeimagecrop.server.' . $source, function () use ($source) {
 				return ServerFactory::create([
+					'driver' => config('bladeimagecrop.driver'),
 					// A path string is read straight from that folder, no Laravel disk needed
 					'source' => $source === 'public' ? public_path() : Storage::disk(config('bladeimagecrop.source_disk'))->getDriver(),
 					'cache' => Storage::disk(config('bladeimagecrop.cache_disk'))->getDriver(),

@@ -20,7 +20,42 @@ class BackgroundPlaceholderTest extends GlideTestCase
 	{
 		$html = (string) $this->blade('<x-img src="/img/photo.jpg" :properties="[300, 200]"/>');
 
-		$this->assertStringContainsString("background-image:linear-gradient(#00C4FCbb, transparent 55%), url('data:image/png;base64,", $this->attribute($html, 'img', 'style'));
+		$style = $this->attribute($html, 'img', 'style');
+
+		$this->assertStringContainsString('background-image:', $style);
+		$this->assertStringContainsString('gradient(', $style);
+		$this->assertStringNotContainsString('url(', $style);
+	}
+
+	function test_the_placeholder_offsets_the_configured_colors()
+	{
+		Config::set('bladeimagecrop.background_colors', ['Tomato', '#123456']);
+
+		$style = (new BGBuilder('img/photo.jpg'))->make();
+
+		preg_match_all('/hsl\(from (\S+) calc\(h \+ (-?\d+)\) calc\(s \+ (-?\d+)\) calc\(l \+ (-?\d+)\) \/ \d+%\)/', $style, $colors);
+
+		$this->assertNotEmpty($colors[1]);
+		$this->assertEmpty(array_diff($colors[1], ['Tomato', '#123456']));
+	}
+
+	function test_the_placeholder_ends_on_an_opaque_layer()
+	{
+		for ($i = 0; $i < 20; $i++) {
+			$style = (new BGBuilder('img/photo.jpg'))->make();
+
+			$this->assertMatchesRegularExpression('/linear-gradient\(\d+deg, [^,]+ \/ 100%\), [^,]+ \/ 100%\)\)"$/', $style);
+		}
+	}
+
+	function test_the_placeholder_is_random()
+	{
+		$styles = [];
+		for ($i = 0; $i < 10; $i++) {
+			$styles[] = (new BGBuilder('img/photo.jpg'))->make();
+		}
+
+		$this->assertGreaterThan(1, count(array_unique($styles)));
 	}
 
 	function test_pic_img_gets_the_placeholder_but_sources_do_not()

@@ -2,57 +2,56 @@
 
 namespace DNABeast\BladeImageCrop;
 
-use Illuminate\Support\Facades\Cache;
-use Imagick;
-use ImagickDraw;
-use ImagickPixel;
-
 
 class BGBuilder extends BGTypeBuilder
 {
-	public $src;
-
-	public function __construct($src)
-	{
-		$this->src = $src; // Loading and manipulating the image is expensive. Be cautious.
-	}
 
 	public function make()
 	{
-		return Cache::remember('bg-image-'.(floor(rand(1,6))), now()->addHour(), function () {
-			$base64 = $this->fakeImage();
-			return "style=\"background-size: 100% 100%; background-image:linear-gradient(#00C4FCbb, transparent 55%), url('data:image/png;base64,$base64')\"";
-		});
+		$layers = [];
+		for ($i = rand(2, 4); $i > 0; $i--) {
+			$layers[] = rand(0, 2) ? $this->radialLayer() : $this->linearLayer();
+		}
+		$layers[] = $this->baseLayer();
+
+		return 'style="background-size: 100% 100%; background-image:' . implode(', ', $layers) . '"';
 	}
 
-	public function fakeImage() // This isn't the faster process. Caching is important.
+	private function radialLayer()
 	{
+		$x = rand(0, 100);
+		$y = rand(0, 100);
+		$color = $this->themeColor(rand(60, 90));
+		$fade = rand(40, 75);
 
-		$newWidth = 3;
-		$newHeight = 2;
+		return "radial-gradient(circle at $x% $y%, $color, transparent $fade%)";
+	}
 
-		$image = new Imagick();
-		$draw = new ImagickDraw();
-		$pixel = new ImagickPixel('red');
-		$image->newImage($newWidth, $newHeight, 'transparent', 'png');
+	private function linearLayer()
+	{
+		$angle = rand(0, 359);
+		$color = $this->themeColor(rand(50, 80));
+		$fade = rand(45, 80);
 
-		$subject = ['DarkKhaki','OliveDrab', 'LemonChiffon'];
+		return "linear-gradient({$angle}deg, $color, transparent $fade%)";
+	}
 
-		$colors = [$subject[array_rand($subject)], 'Wheat', 'Moccasin', 'Tan'];
-		for ($i = 0; $i < $newWidth; $i++) {
-			for ($j = 0; $j < $newHeight; $j++) {
+	private function baseLayer() // Opaque, the other layers fade into it
+	{
+		$angle = rand(0, 359);
 
-				$pixel->setColor($colors[floor(rand(0, count($colors) - 1))]);
-				$draw->setFillColor($pixel);
-				$draw->point($i, $j);
-			}
-		}
-		$image->drawImage($draw);
+		return "linear-gradient({$angle}deg, {$this->themeColor()}, {$this->themeColor()})";
+	}
 
-		$data = $image->getImage();
-		$image->clear();
-		return base64_encode($data);
+	private function themeColor($alpha = 100) // Relative color syntax, so any css color works in the config
+	{
+		$colors = config('bladeimagecrop.background_colors');
+		$color = $colors[array_rand($colors)];
+		$hue = rand(-12, 12);
+		$saturation = rand(-8, 8);
+		$lightness = rand(-6, 6);
 
+		return "hsl(from $color calc(h + $hue) calc(s + $saturation) calc(l + $lightness) / $alpha%)";
 	}
 
 }

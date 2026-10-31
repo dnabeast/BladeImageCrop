@@ -14,21 +14,20 @@ class BackgroundTest extends TestCase
 		parent::setUp();
 
 		Config::set('bladeimagecrop', [
-			'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder'
+			'background_builder' => 'DNABeast\BladeImageCrop\BGBuilder',
+			'background_colors' => ['DarkKhaki'],
 		]);
 	}
 
-	function test_src_of_image_returns_png_string(){
+	function test_src_of_image_returns_gradient_style(){
 
-		$expected = 'style="background-size: 100% 100%; background-image:linear-gradient(#00C4FCbb, transparent 55%), url(\'data:image/png';
 		$src = 'uploads/banners/page/cater.jpg';
 
 		$result = (new Background($src))->render();
 
-		$this->assertEquals(
-			$expected,
-			substr($result, 0, 116)
-		);
+		$this->assertStringStartsWith('style="background-size: 100% 100%; background-image:', $result);
+		$this->assertStringContainsString('gradient(', $result);
+		$this->assertStringNotContainsString('url(', $result);
 
 	}
 
